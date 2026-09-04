@@ -1,122 +1,54 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { ThemeProvider } from './context/ThemeContext';
+import LoadingScreen from './components/LoadingScreen';
+import Layout from './components/Layout';
+import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
+import ChemDraw from './pages/ChemDraw';
+import AIChemistryLab from './pages/AIChemistryLab';
+import QuantumLab from './pages/QuantumLab';
+import IbmRxnPage from './pages/IbmRxnPage';
+import Spectroscopy from './pages/Spectroscopy';
+import Contact from './pages/Contact';
+import PeriodicTable from './pages/PeriodicTable';
+import ChemistsPage from './pages/ChemistsPage';
+import Auth from './pages/Auth';
+import Settings from './pages/Settings';
+import ResearchProjects from './pages/ResearchProjects';
+import ChromatographyPage from './pages/ChromatographyPage';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [initialLoading, setInitialLoading] = useState(true);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <ThemeProvider>
+      {initialLoading && (
+        <LoadingScreen onFinish={() => setInitialLoading(false)} duration={900} />
+      )}
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/chemdraw" element={<ChemDraw />} />
+            <Route path="/rdkit-lab" element={<AIChemistryLab />} />
+            <Route path="/quantum-library" element={<QuantumLab />} />
+            <Route path="/quantum-lab" element={<Navigate to="/quantum-library" replace />} />
+            <Route path="/ibm-rxn" element={<IbmRxnPage />} />
+            <Route path="/spectroscopy" element={<Spectroscopy />} />
+            <Route path="/chromatography" element={<ChromatographyPage />} />
+            <Route path="/periodic-table" element={<PeriodicTable />} />
+            <Route path="/scientists" element={<ChemistsPage />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/research-projects" element={<ResearchProjects />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+          <Route path="/login" element={<Auth />} />
+          <Route path="/register" element={<Auth />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
+  );
 }
-
-export default App

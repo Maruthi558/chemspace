@@ -1,16 +1,38 @@
-# React + Vite
+# ChemSpace
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+ChemSpace is a full-stack chemistry workspace built with React + Vite on the frontend, FastAPI on the backend, and SQLite for persistence.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Modern landing page and auth flow
+- Secure login and registration
+- Dashboard, molecule search, periodic table, calculator, reaction guidance, lab notes, and profile management
+- REST APIs with SQLite-backed storage
+- Responsive UI for desktop and mobile
 
-## React Compiler
+## Project structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- frontend: React + Vite app in the src folder
+- backend: FastAPI API in backend/main.py
+- database: SQLite file created automatically at backend/chemspace.db
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+1. Install frontend dependencies
+   - npm install
+2. Install Python dependencies
+   - python -m pip install -r backend/requirements.txt
+
+## Run locally
+
+Start the FastAPI backend:
+- python -m uvicorn backend.main:app --reload --port 8000
+
+In a second terminal, start the Vite frontend:
+- npm run dev
+
+The frontend is configured to proxy requests to the backend through /api.
+
+## Demo accounts
+
+You can create a new account from the Register page. The app stores users, profile details, and notes in SQLite.

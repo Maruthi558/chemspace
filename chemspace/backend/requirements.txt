@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+pydantic
+email-validator
+rdkit
+numpy
+pillow
+pyscf
+scipy
+matplotlib
+joblib
+pandas
+
