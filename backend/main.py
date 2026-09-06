@@ -484,6 +484,16 @@ def login(data: LoginInput):
         "user": {"id": user[0], "username": user[1], "email": user[2]}
     }
 
+@app.get("/api/auth/check-email")
+def check_email(email: str):
+    clean_email = email.lower().strip()
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, username FROM users WHERE lower(email) = ?", (clean_email,))
+    user = cursor.fetchone()
+    conn.close()
+    return {"exists": bool(user), "username": user[1] if user else None}
+
 @app.post("/api/auth/otp/send-email")
 def send_email_otp(data: SendEmailOtpInput):
     email_clean = data.email.lower().strip()
@@ -524,6 +534,46 @@ def send_email_otp(data: SendEmailOtpInput):
     conn.commit()
     conn.close()
     
+    # Optional SMTP Real Email Dispatch
+    smtp_host = os.getenv("SMTP_HOST")
+    if smtp_host:
+        try:
+            import smtplib
+            from email.mime.multipart import MIMEMultipart
+            from email.mime.text import MIMEText
+            
+            smtp_port = int(os.getenv("SMTP_PORT", "587"))
+            smtp_user = os.getenv("SMTP_USER")
+            smtp_pass = os.getenv("SMTP_PASSWORD")
+            smtp_from = os.getenv("SMTP_FROM", smtp_user or "auth@chemspace.org")
+            
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = f"ChemSpace Security Verification Code: {otp_code}"
+            msg["From"] = f"ChemSpace Security <{smtp_from}>"
+            msg["To"] = email_clean
+            
+            html_body = f"""
+            <div style="font-family: monospace; background: #08080a; color: #fff; padding: 24px; border-radius: 16px;">
+                <h2 style="color: #06b6d4; margin-bottom: 8px;">CHEMSPACE LABORATORY ACCESS</h2>
+                <p style="color: #94a3b8; font-size: 13px;">Your single-use 6-digit verification code is:</p>
+                <div style="background: #111114; border: 1px solid #334155; padding: 16px; border-radius: 12px; font-size: 28px; font-weight: bold; letter-spacing: 8px; color: #10b981; text-align: center; margin: 16px 0;">
+                    {otp_code}
+                </div>
+                <p style="color: #64748b; font-size: 11px;">Valid for 5 minutes. If you did not request this code, please ignore this notice.</p>
+            </div>
+            """
+            msg.attach(MIMEText(html_body, "html"))
+            
+            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
+            server.starttls()
+            if smtp_user and smtp_pass:
+                server.login(smtp_user, smtp_pass)
+            server.sendmail(smtp_from, [email_clean], msg.as_string())
+            server.quit()
+            print(f"[ChemSpace Auth] SMTP Email successfully delivered to {email_clean}")
+        except Exception as smtp_err:
+            print(f"[ChemSpace Auth] SMTP delivery notice ({smtp_err}), fallback to server console.")
+
     # Server-side dispatch notice & secure log for development verification
     print(f"\n[ChemSpace Auth] ===============================================")
     print(f"[ChemSpace Auth] OTP DISPATCH TO: {email_clean}")

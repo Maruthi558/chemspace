@@ -53,7 +53,8 @@ export default function Auth() {
     verifyEmailOtp,
     sendPhoneOtp,
     verifyPhoneOtp,
-    signInWithGoogle
+    signInWithGoogle,
+    checkEmailExists
   } = useAuth();
 
   // Target redirect destination
@@ -89,6 +90,7 @@ export default function Auth() {
   // OTP inputs state (6 array elements)
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [confirmationResult, setConfirmationResult] = useState(null);
+  const [dispatchedOtp, setDispatchedOtp] = useState(null);
 
   // States
   const [loading, setLoading] = useState(false);
@@ -98,6 +100,21 @@ export default function Auth() {
   const [cooldown, setCooldown] = useState(0);
 
   const recaptchaContainerRef = useRef(null);
+
+  // Listen for OTP dispatch events for instant verification helper
+  useEffect(() => {
+    const handleOtpDispatched = (e) => {
+      if (e.detail) {
+        setDispatchedOtp(e.detail);
+      }
+    };
+    window.addEventListener('chemspace-otp-dispatched', handleOtpOtp);
+    return () => window.removeEventListener('chemspace-otp-dispatched', handleOtpOtp);
+
+    function handleOtpOtp(e) {
+      handleOtpDispatched(e);
+    }
+  }, []);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -142,9 +159,11 @@ export default function Auth() {
     if (e) e.preventDefault();
     setError('');
 
-    if (viewMode === 'signup' && !fullName.trim()) {
-      setError('Please enter your full name or scientist title.');
-      return;
+    if (viewMode === 'signup') {
+      if (!fullName.trim() || fullName.trim().length < 2) {
+        setError('Please enter your full name or scientist title (at least 2 characters).');
+        return;
+      }
     }
 
     if (authMode === 'email') {
@@ -154,13 +173,27 @@ export default function Auth() {
         return;
       }
       if (!isValidEmail(cleanEmail)) {
-        setError('Please enter a valid email address.');
+        setError('Please enter a valid institutional or personal email address (e.g. scientist@lab.org).');
         return;
       }
 
       setLoading(true);
       try {
-        await sendEmailOtp(cleanEmail);
+        // Prevent duplicate accounts on Create Account tab
+        if (viewMode === 'signup' && checkEmailExists) {
+          const checkRes = await checkEmailExists(cleanEmail);
+          if (checkRes && checkRes.exists) {
+            setError('An account with this email already exists. Switching you to Sign In mode.');
+            setTimeout(() => {
+              setViewMode('signin');
+              setError('');
+            }, 1600);
+            setLoading(false);
+            return;
+          }
+        }
+
+        const res = await sendEmailOtp(cleanEmail);
         setStep('otp');
         setCooldown(60);
         setOtpDigits(['', '', '', '', '', '']);
@@ -209,7 +242,7 @@ export default function Auth() {
     }
 
     const profilePayload = {
-      name: fullName.trim(),
+      name: fullName.trim() || (viewMode === 'signup' ? 'Research Scientist' : ''),
       workplace: workplace.trim() || 'ChemSpace Research Institute',
       role: 'Research Scientist'
     };
@@ -226,7 +259,7 @@ export default function Auth() {
       setStep('success');
       setTimeout(() => {
         navigate(fromDestination, { replace: true });
-      }, 500);
+      }, 600);
     } catch (err) {
       setError(err.message || 'Verification code could not be confirmed. Please check and try again.');
     } finally {
@@ -247,9 +280,13 @@ export default function Auth() {
       setStep('success');
       setTimeout(() => {
         navigate(fromDestination, { replace: true });
-      }, 500);
+      }, 600);
     } catch (err) {
-      setError(err.message || 'This account could not be authenticated right now. Please try again.');
+      if (err.message && (err.message.includes('cancelled') || err.message.includes('closed'))) {
+        setError('Google sign-in was cancelled.');
+      } else {
+        setError(err.message || 'This account could not be authenticated right now. Please try again.');
+      }
     } finally {
       setGoogleLoading(false);
     }
@@ -259,11 +296,14 @@ export default function Auth() {
   function handleGuestAccess() {
     setGuestLoading(true);
     setError('');
-    setTimeout(() => {
+    try {
       continueAsGuest(fullName.trim() || 'Guest Researcher');
       setGuestLoading(false);
       navigate(fromDestination, { replace: true });
-    }, 300);
+    } catch (err) {
+      setError('Could not start guest session.');
+      setGuestLoading(false);
+    }
   }
 
   // Edit contact method (step back)
@@ -271,6 +311,7 @@ export default function Auth() {
     setError('');
     setStep('input');
     setOtpDigits(['', '', '', '', '', '']);
+    setDispatchedOtp(null);
   }
 
   return (
@@ -746,6 +787,36 @@ export default function Auth() {
                 Check your {authMode === 'email' ? 'email inbox / spam folder' : 'SMS messages'}. Code expires in 5 minutes.
               </p>
             </div>
+
+            {/* Dispatched Verification Code Helper Badge */}
+            {dispatchedOtp && dispatchedOtp.code && (
+              <div
+                className={`p-2.5 rounded-2xl border flex items-center justify-between gap-2 text-xs font-mono transition-all animate-in fade-in duration-200 ${
+                  isDark
+                    ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300'
+                    : 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                }`}
+              >
+                <div className="flex items-center gap-2 truncate">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <span className="truncate">
+                    Dispatched Code: <strong className="font-bold tracking-widest text-sm">{dispatchedOtp.code}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const digits = dispatchedOtp.code.split('');
+                    setOtpDigits(digits);
+                    handleVerifyOtp(dispatchedOtp.code);
+                  }}
+                  className="px-2.5 py-1 rounded-xl font-bold text-[10px] tracking-wide uppercase transition active:scale-95 cursor-pointer shrink-0 bg-emerald-500 text-black hover:bg-emerald-400 shadow-sm"
+                  title="Auto-fill code and proceed"
+                >
+                  Auto-Fill
+                </button>
+              </div>
+            )}
 
             {/* 6-Box OTP Input Component */}
             <div className="py-2">

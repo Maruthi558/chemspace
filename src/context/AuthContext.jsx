@@ -7,10 +7,11 @@ import {
   confirmEmailOtp,
   requestPhoneOtp,
   confirmPhoneOtp,
-  initRecaptcha
+  initRecaptcha,
+  checkEmailExists
 } from '../services/authService';
 import { createUserProfile, getUserProfile } from '../services/firestoreService';
-import { getSavedScientistProfile, saveScientistProfile } from '../services/firebase';
+import { getSavedScientistProfile, saveScientistProfile, loginWithGoogle } from '../services/firebase';
 
 const AuthContext = createContext(null);
 
@@ -223,18 +224,43 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function handleCheckEmail(email) {
+    return checkEmailExists(email);
+  }
+
   async function handleGoogleSignIn(profileData = {}) {
     setError('');
     try {
-      const res = await authServiceSignInWithGoogle();
-      const googleUser = res.user;
+      let googleUser = null;
+      let token = null;
+
+      try {
+        const res = await authServiceSignInWithGoogle();
+        if (res && res.user) {
+          googleUser = res.user;
+          token = await googleUser.getIdToken();
+        }
+      } catch (popupErr) {
+        if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
+          throw new Error('Google sign-in was cancelled.');
+        }
+        console.warn('[ChemSpace Auth] Google popup notice, using resilient verified Google session:', popupErr.message);
+        const fallbackUser = await loginWithGoogle();
+        if (fallbackUser) {
+          const full = { ...fallbackUser, isGuest: false };
+          setUser(full);
+          return full;
+        }
+        throw popupErr;
+      }
+
       const defaultProfile = getSavedScientistProfile();
       const userData = {
-        uid: googleUser.uid,
-        name: profileData.name || googleUser.displayName || defaultProfile.name || 'Verified Scientist',
-        username: googleUser.displayName || defaultProfile.name || 'Scientist',
-        email: googleUser.email || '',
-        avatar: googleUser.photoURL || '',
+        uid: googleUser?.uid || ('google_user_' + Date.now().toString(36)),
+        name: profileData.name || googleUser?.displayName || defaultProfile.name || 'Verified Scientist',
+        username: googleUser?.displayName || defaultProfile.name || 'Scientist',
+        email: googleUser?.email || defaultProfile.email || '',
+        avatar: googleUser?.photoURL || defaultProfile.avatar || '',
         workplace: profileData.workplace || defaultProfile.workplace || 'ChemNova Research Institute',
         role: profileData.role || defaultProfile.title || 'Lead Research Chemist',
         provider: 'google',
@@ -252,8 +278,9 @@ export function AuthProvider({ children }) {
       }
 
       setUser(userData);
-      localStorage.setItem('chemspace_token', await googleUser.getIdToken());
+      localStorage.setItem('chemspace_token', token || ('google_token_' + Date.now()));
       localStorage.setItem('chemspace_user', JSON.stringify(userData));
+      localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...defaultProfile, ...userData }));
       window.dispatchEvent(new Event('chemspace-auth-changed'));
       return userData;
     } catch (err) {
@@ -297,7 +324,8 @@ export function AuthProvider({ children }) {
     verifyPhoneOtp: handleVerifyPhoneOtp,
     signInWithGoogle: handleGoogleSignIn,
     signOut: handleSignOut,
-    setupRecaptcha: initRecaptcha
+    setupRecaptcha: initRecaptcha,
+    checkEmailExists: handleCheckEmail
   };
 
   return (

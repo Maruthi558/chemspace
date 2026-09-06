@@ -2,6 +2,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signInWithRedirect,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
   onAuthStateChanged,
@@ -18,11 +19,19 @@ import {
   sendEmailOtp as apiSendEmailOtp,
   verifyEmailOtp as apiVerifyEmailOtp,
   sendPhoneOtpApi,
-  verifyPhoneOtpApi
+  verifyPhoneOtpApi,
+  checkEmailExistsApi
 } from './api';
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+/**
+ * Check whether an account exists with the specified email.
+ */
+export async function checkEmailExists(email) {
+  return checkEmailExistsApi(email);
+}
 
 /**
  * Register a new user with email and password.
@@ -43,10 +52,18 @@ export async function signInWithEmail(email, password) {
 }
 
 /**
- * Sign in with a Google popup.
+ * Sign in with a Google popup or redirect fallback.
  */
 export async function signInWithGoogle() {
-  return signInWithPopup(auth, googleProvider);
+  try {
+    return await signInWithPopup(auth, googleProvider);
+  } catch (err) {
+    if (err.code === 'auth/popup-blocked') {
+      console.warn('[ChemSpace Auth] Popup was blocked by browser. Attempting redirect mode...');
+      return await signInWithRedirect(auth, googleProvider);
+    }
+    throw err;
+  }
 }
 
 /**
