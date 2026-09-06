@@ -1,0 +1,539 @@
+/* ==========================================================================
+   CHEMNOVA UNIFIED DUAL-THEME SCIENTIFIC DESIGN SYSTEM
+   Obsidian Dark & Ceramic Light Modes with Premium 3D Glassmorphism & Depth
+   ========================================================================== */
+
+:root,
+html[data-theme="dark"],
+.dark {
+  /* Surface & Background Palette */
+  --bg-page: #030407;
+  --bg-card: rgba(10, 14, 22, 0.85);
+  --bg-card-glass: rgba(8, 12, 19, 0.85);
+  --bg-sidebar: rgba(5, 7, 11, 0.96);
+  --border-sidebar: rgba(255, 255, 255, 0.08);
+  --bg-header: rgba(3, 4, 7, 0.85);
+  --bg-inner: rgba(6, 8, 13, 0.92);
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.12);
+  --bg-input: rgba(4, 5, 8, 0.9);
+  --viewport-bg: #04060a;
+  
+  /* Border System */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.16);
+  --border-strong: rgba(255, 255, 255, 0.30);
+  --border-focus: #38bdf8;
+  
+  /* Typography Hierarchy */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-dim: #475569;
+  --text-inverse: #000000;
+  --text-sidebar: #cbd5e1;
+  
+  /* Primary Solid Button */
+  --btn-primary-bg: #ffffff;
+  --btn-primary-text: #000000;
+  --btn-primary-hover: #f1f5f9;
+  --btn-primary-shadow: 0 4px 18px rgba(255, 255, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
+  
+  /* Secondary Frosted Glass Button */
+  --btn-secondary-bg: rgba(255, 255, 255, 0.06);
+  --btn-secondary-text: #e2e8f0;
+  --btn-secondary-border: rgba(255, 255, 255, 0.14);
+  --btn-secondary-hover: rgba(255, 255, 255, 0.12);
+  --btn-secondary-hover-border: rgba(255, 255, 255, 0.40);
+  
+  /* Accent Button */
+  --btn-accent-bg: rgba(56, 189, 248, 0.14);
+  --btn-accent-text: #38bdf8;
+  --btn-accent-border: rgba(56, 189, 248, 0.30);
+  --btn-accent-hover: rgba(56, 189, 248, 0.24);
+  
+  /* Sidebar Active Navigation Item */
+  --sidebar-active-bg: #ffffff;
+  --sidebar-active-text: #000000;
+  --sidebar-active-shadow: 0 4px 18px rgba(255, 255, 255, 0.22);
+  --sidebar-hover-bg: rgba(255, 255, 255, 0.06);
+  --sidebar-hover-text: #ffffff;
+
+  /* Telemetry & Badges */
+  --pill-bg: rgba(0, 0, 0, 0.65);
+  --pill-border: rgba(255, 255, 255, 0.12);
+  --pill-text: #cbd5e1;
+  
+  /* Module Specific Scientific Accents */
+  --mod-chemdraw-accent: #06b6d4;
+  --mod-chemdraw-bg: rgba(6, 182, 212, 0.14);
+  --mod-rdkit-accent: #10b981;
+  --mod-rdkit-bg: rgba(16, 185, 129, 0.14);
+  --mod-spectroscopy-accent: #f59e0b;
+  --mod-spectroscopy-bg: rgba(245, 158, 11, 0.14);
+  --mod-quantum-accent: #8b5cf6;
+  --mod-quantum-bg: rgba(139, 92, 246, 0.14);
+  --mod-rxn-accent: #f43f5e;
+  --mod-rxn-bg: rgba(244, 63, 94, 0.14);
+  --mod-periodic-accent: #0284c7;
+  --mod-periodic-bg: rgba(2, 132, 199, 0.14);
+  --mod-scientists-accent: #d97706;
+  --mod-scientists-bg: rgba(217, 119, 6, 0.14);
+
+  /* 3D Dimensional Shadows & Ambient Layered Lighting */
+  --card-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.75), 0 8px 16px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --card-shadow-hover: 0 24px 60px -12px rgba(0, 0, 0, 0.90), 0 12px 24px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  --ambient-bg: 
+    radial-gradient(1100px circle at 15% 10%, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+    radial-gradient(1300px circle at 85% 15%, rgba(139, 92, 246, 0.10) 0%, transparent 65%),
+    radial-gradient(950px circle at 50% 85%, rgba(16, 185, 129, 0.08) 0%, transparent 60%),
+    linear-gradient(180deg, #030407 0%, #060911 50%, #0a0d16 100%);
+}
+
+html[data-theme="light"],
+.light {
+  /* Surface & Background Palette */
+  --bg-page: #f4f6fb;
+  --bg-card: rgba(255, 255, 255, 0.88);
+  --bg-card-glass: rgba(255, 255, 255, 0.85);
+  --bg-sidebar: rgba(255, 255, 255, 0.95);
+  --border-sidebar: rgba(0, 0, 0, 0.08);
+  --bg-header: rgba(255, 255, 255, 0.88);
+  --bg-inner: rgba(241, 245, 249, 0.85);
+  --bg-hover: #f1f5f9;
+  --bg-active: #e2e8f0;
+  --bg-input: #ffffff;
+  --viewport-bg: #eef2f6;
+  
+  /* Border System */
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border-medium: rgba(0, 0, 0, 0.14);
+  --border-strong: rgba(0, 0, 0, 0.28);
+  --border-focus: #0284c7;
+  
+  /* Typography Hierarchy */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-dim: #94a3b8;
+  --text-inverse: #ffffff;
+  --text-sidebar: #334155;
+  
+  /* Primary Solid Button */
+  --btn-primary-bg: #0f172a;
+  --btn-primary-text: #ffffff;
+  --btn-primary-hover: #1e293b;
+  --btn-primary-shadow: 0 4px 18px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(0, 0, 0, 0.06);
+  
+  /* Secondary Frosted Glass Button */
+  --btn-secondary-bg: rgba(255, 255, 255, 0.9);
+  --btn-secondary-text: #0f172a;
+  --btn-secondary-border: rgba(0, 0, 0, 0.12);
+  --btn-secondary-hover: #f8fafc;
+  --btn-secondary-hover-border: rgba(0, 0, 0, 0.32);
+  
+  /* Accent Button */
+  --btn-accent-bg: #e0f2fe;
+  --btn-accent-text: #0369a1;
+  --btn-accent-border: rgba(2, 132, 199, 0.28);
+  --btn-accent-hover: #bae6fd;
+  
+  /* Sidebar Active Navigation Item */
+  --sidebar-active-bg: #0f172a;
+  --sidebar-active-text: #ffffff;
+  --sidebar-active-shadow: 0 4px 18px rgba(15, 23, 42, 0.18);
+  --sidebar-hover-bg: #f1f5f9;
+  --sidebar-hover-text: #0f172a;
+
+  /* Telemetry & Badges */
+  --pill-bg: rgba(255, 255, 255, 0.95);
+  --pill-border: rgba(0, 0, 0, 0.10);
+  --pill-text: #475569;
+  
+  /* Module Specific Scientific Accents */
+  --mod-chemdraw-accent: #0891b2;
+  --mod-chemdraw-bg: #ecfeff;
+  --mod-rdkit-accent: #059669;
+  --mod-rdkit-bg: #ecfdf5;
+  --mod-spectroscopy-accent: #d97706;
+  --mod-spectroscopy-bg: #fffbeb;
+  --mod-quantum-accent: #7c3aed;
+  --mod-quantum-bg: #f5f3ff;
+  --mod-rxn-accent: #e11d48;
+  --mod-rxn-bg: #fff1f2;
+  --mod-periodic-accent: #0284c7;
+  --mod-periodic-bg: #f0f9ff;
+  --mod-scientists-accent: #b45309;
+  --mod-scientists-bg: #fffbeb;
+
+  /* 3D Dimensional Shadows & Rich Layered Background */
+  --card-shadow: 0 12px 36px -8px rgba(15, 23, 42, 0.07), 0 4px 12px -2px rgba(15, 23, 42, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --card-shadow-hover: 0 20px 48px -8px rgba(15, 23, 42, 0.12), 0 8px 16px -2px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255, 255, 255, 1.0);
+  --ambient-bg: 
+    radial-gradient(1100px circle at 15% 10%, rgba(6, 182, 212, 0.09) 0%, transparent 60%),
+    radial-gradient(1300px circle at 85% 15%, rgba(139, 92, 246, 0.08) 0%, transparent 65%),
+    radial-gradient(950px circle at 50% 85%, rgba(16, 185, 129, 0.07) 0%, transparent 60%),
+    linear-gradient(180deg, #f8fafc 0%, #edf2f7 50%, #e2e8f0 100%);
+}
+
+/* ==========================================================================
+   BASE & RESET
+   ========================================================================== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  min-height: 100vh;
+  height: 100%;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body {
+  background-image: var(--ambient-bg);
+  background-attachment: fixed;
+}
+
+/* Precision Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* Custom Scrollbar Utility */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: 9999px;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ==========================================================================
+   REUSABLE 3D GLASSMORPHIC UTILITY CLASSES
+   ========================================================================== */
+
+.font-serif-editorial {
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+.font-mono-chem {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+.art-card {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.art-card:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Main Workspace Viewport Container */
+.workspace-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 120px);
+}
+
+/* Scientific Workspace Header Bar */
+.workspace-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 1.5rem;
+  border-radius: 1.75rem;
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 3D Dimensional Glass Panel */
+.glass-panel {
+  background: var(--bg-card-glass);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel:hover {
+  border-color: var(--border-medium);
+  box-shadow: var(--card-shadow-hover);
+}
+
+/* Deep Recessed Inner Box */
+.inner-box {
+  background: var(--bg-inner);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+}
+
+/* Precision Scientific Input Controls */
+.input-control {
+  width: 100%;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.875rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.75rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-control:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.20);
+}
+
+/* Scientific Telemetry Status Pill */
+.telemetry-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: var(--pill-bg);
+  border: 1px solid var(--pill-border);
+  color: var(--pill-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ==========================================================================
+   STANDARDIZED BUTTON SYSTEM
+   ========================================================================== */
+
+.btn-primary {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-text);
+  box-shadow: var(--btn-primary-shadow);
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  background: var(--btn-primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+.btn-secondary {
+  background: var(--btn-secondary-bg);
+  color: var(--btn-secondary-text);
+  border: 1px solid var(--btn-secondary-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-secondary:hover {
+  background: var(--btn-secondary-hover);
+  border-color: var(--btn-secondary-hover-border);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+.btn-accent {
+  background: var(--btn-accent-bg);
+  color: var(--btn-accent-text);
+  border: 1px solid var(--btn-accent-border);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-accent:hover {
+  background: var(--btn-accent-hover);
+  border-color: var(--btn-accent-text);
+  transform: translateY(-1px);
+}
+
+.btn-horizontal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ==========================================================================
+   MODULE THEME ACCENTS
+   ========================================================================== */
+
+.badge-chemdraw {
+  background: var(--mod-chemdraw-bg);
+  color: var(--mod-chemdraw-accent);
+  border: 1px solid var(--mod-chemdraw-accent);
+}
+
+.badge-rdkit {
+  background: var(--mod-rdkit-bg);
+  color: var(--mod-rdkit-accent);
+  border: 1px solid var(--mod-rdkit-accent);
+}
+
+.badge-spectroscopy {
+  background: var(--mod-spectroscopy-bg);
+  color: var(--mod-spectroscopy-accent);
+  border: 1px solid var(--mod-spectroscopy-accent);
+}
+
+.badge-quantum {
+  background: var(--mod-quantum-bg);
+  color: var(--mod-quantum-accent);
+  border: 1px solid var(--mod-quantum-accent);
+}
+
+.badge-rxn {
+  background: var(--mod-rxn-bg);
+  color: var(--mod-rxn-accent);
+  border: 1px solid var(--mod-rxn-accent);
+}
+
+.badge-periodic {
+  background: var(--mod-periodic-bg);
+  color: var(--mod-periodic-accent);
+  border: 1px solid var(--mod-periodic-accent);
+}
+
+.badge-scientists {
+  background: var(--mod-scientists-bg);
+  color: var(--mod-scientists-accent);
+  border: 1px solid var(--mod-scientists-accent);
+}
+
+/* ==========================================================================
+   ANIMATIONS & KEYFRAMES
+   ========================================================================== */
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 18s linear infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes scanlineMove {
+  0% {
+    top: 0%;
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    top: 96%;
+    opacity: 0.2;
+  }
+}
+
+@keyframes spinReverse {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}

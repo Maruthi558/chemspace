@@ -1,0 +1,17 @@
+{
+  "hosting": {
+    "site": "chemistry-46c1c-4dac1",
+    "public": "dist",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

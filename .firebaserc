@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "chemistry-46c1c"
+  },
+  "targets": {
+    "chemistry-46c1c": {
+      "hosting": {
+        "chemistry-46c1c-4dac1": [
+          "chemistry-46c1c-4dac1"
+        ]
+      }
+    }
+  }
+}

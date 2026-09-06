@@ -1,22 +1,28 @@
-# Node
+# Dependencies
 node_modules/
-dist/
-dist-ssr/
-*.local
-
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
+.venv/
 env/
 venv/
-.venv/
-*.db
-*.sqlite3
+.Python
 
-# Logs
+# Build and Distribution
+dist/
+dist-ssr/
+build/
+*.egg-info/
+
+# Environment and Secrets (CRITICAL FOR PRODUCTION)
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+!.env.example
+*.pem
+*.key
+*.p12
+
+# Logs & Debugging
 logs/
 *.log
 npm-debug.log*
@@ -24,13 +30,25 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Editor
+# Python cache & databases
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.db-journal
+
+# IDE and Editor Metadata
+.idea/
 .vscode/*
 !.vscode/extensions.json
-.idea/
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary / OS
+tmp/
+temp/
