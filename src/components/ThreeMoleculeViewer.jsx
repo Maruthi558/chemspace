@@ -107,6 +107,24 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
       cameraRef.current.position.z = Math.max(2, Math.min(30, cameraRef.current.position.z));
     };
 
+    // Touchless Hand Gesture Zoom and Rotation Handlers
+    const handleGestureZoom = (e) => {
+      if (!cameraRef.current || !e.detail) return;
+      const delta = e.detail.delta || 0;
+      // Spread hands (delta > 0) zooms in (decreases z distance)
+      cameraRef.current.position.z -= delta * 1.6;
+      cameraRef.current.position.z = Math.max(2, Math.min(30, cameraRef.current.position.z));
+    };
+
+    const handleGestureRotate = (e) => {
+      if (!moleculeGroupRef.current || !e.detail) return;
+      moleculeGroupRef.current.rotation.y += (e.detail.deltaX || 0) * 0.015;
+      moleculeGroupRef.current.rotation.x += (e.detail.deltaY || 0) * 0.015;
+    };
+
+    window.addEventListener('chemspace-gesture-zoom', handleGestureZoom);
+    window.addEventListener('chemspace-gesture-rotate', handleGestureRotate);
+
     const handleClick = (e) => {
       const rect = renderer.domElement.getBoundingClientRect();
       const mouse = new THREE.Vector2(
@@ -165,6 +183,8 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
       dom.removeEventListener('wheel', handleWheel);
       dom.removeEventListener('click', handleClick);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('chemspace-gesture-zoom', handleGestureZoom);
+      window.removeEventListener('chemspace-gesture-rotate', handleGestureRotate);
       if (rendererRef.current && rendererRef.current.domElement) {
         rendererRef.current.dispose();
       }

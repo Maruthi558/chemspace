@@ -24,7 +24,8 @@ import {
   History,
   Sparkles,
   FlaskConical,
-  FolderLock
+  FolderLock,
+  Hand
 } from 'lucide-react';
 import CopilotWindow from './AICopilot/CopilotWindow';
 import GoogleAuthModal from './GoogleAuthModal';
@@ -32,6 +33,8 @@ import RotatingAtomButton from './RotatingAtomButton';
 import Background3DCanvas from './Background3DCanvas';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { useGestures } from '../context/GestureContext';
+import GestureControlPanel from './Gestures/GestureControlPanel';
 import GuestBanner from './GuestBanner';
 import { getRecentActivities } from '../services/activityStore';
 import { logoutUser } from '../services/firebase';
@@ -54,6 +57,7 @@ export default function Layout() {
   const location = useLocation();
   const { theme, toggleTheme } = useTheme();
   const { isGuest, exitGuestSession } = useAuth();
+  const { isEnabled: gesturesEnabled } = useGestures();
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
@@ -65,6 +69,7 @@ export default function Layout() {
 
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [googleModalOpen, setGoogleModalOpen] = useState(false);
+  const [gesturePanelOpen, setGesturePanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [user, setUser] = useState(() => {
     try {
@@ -529,6 +534,21 @@ export default function Layout() {
 
             <RotatingAtomButton className="hidden sm:inline-flex" />
 
+            {/* Touchless Gesture Controller Trigger */}
+            <button
+              onClick={() => setGesturePanelOpen((prev) => !prev)}
+              type="button"
+              className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold transition shadow-sm cursor-pointer border ${
+                gesturesEnabled
+                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/25'
+                  : 'bg-white/5 border-white/10 text-neutral-400 hover:text-white hover:border-white/20'
+              }`}
+              title="Touchless Gesture Control Panel (Webcam AI Vision)"
+            >
+              <Hand className={`w-3.5 h-3.5 ${gesturesEnabled ? 'text-emerald-400 animate-pulse' : 'text-neutral-400'}`} />
+              <span className="hidden sm:inline">{gesturesEnabled ? 'GESTURES: ON' : 'TOUCHLESS'}</span>
+            </button>
+
             <div className="telemetry-pill">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="hidden sm:inline">CLUSTER // ONLINE (60 FPS)</span>
@@ -572,6 +592,7 @@ export default function Layout() {
       {/* Modals */}
       {aiModalOpen && <CopilotWindow onClose={() => setAiModalOpen(false)} />}
       {googleModalOpen && <GoogleAuthModal onClose={() => setGoogleModalOpen(false)} />}
+      <GestureControlPanel isOpen={gesturePanelOpen} onClose={() => setGesturePanelOpen(false)} />
     </div>
   );
 }
