@@ -1,8 +1,31 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function spaFallbackPlugin() {
+  return {
+    name: 'spa-fallback',
+    closeBundle() {
+      try {
+        const distDir = path.resolve(__dirname, 'dist');
+        const indexPath = path.join(distDir, 'index.html');
+        const fallbackPath = path.join(distDir, '200.html');
+        if (fs.existsSync(indexPath)) {
+          fs.copyFileSync(indexPath, fallbackPath);
+        }
+      } catch (err) {
+        console.warn('Could not generate 200.html SPA fallback:', err);
+      }
+    }
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), spaFallbackPlugin()],
   server: {
     proxy: {
       '/api': {
