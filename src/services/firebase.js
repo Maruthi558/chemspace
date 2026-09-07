@@ -3,6 +3,8 @@ import {
   getAuth,
   GoogleAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   signInWithCredential,
   signOut,
   RecaptchaVerifier,
@@ -167,9 +169,9 @@ export async function loginWithGoogle() {
 
     const userData = {
       uid: user.uid,
-      name: user.displayName || profile.name || 'Dr. Maruthi Chemist',
-      username: user.displayName || profile.name || 'Dr. Maruthi Chemist',
-      email: user.email || profile.email || 'scientist@chemnova.org',
+      name: user.displayName || profile.name || 'Verified Scientist',
+      username: user.displayName || profile.name || 'Scientist',
+      email: user.email || profile.email || '',
       avatar: user.photoURL || profile.avatar || '',
       workplace: profile.workplace || 'ChemNova Advanced Institute',
       role: profile.title || 'Lead Research Chemist',
@@ -189,13 +191,50 @@ export async function loginWithGoogle() {
     window.dispatchEvent(new Event('chemspace-auth-changed'));
     return userData;
   } catch (err) {
-    console.warn('Firebase Google Auth remote notice, applying seamless verified Google session:', err);
-    if (err.code === 'auth/popup-closed-by-user') {
-      throw err;
-    }
-    const userData = performFastLogin(profile.name, profile.email, profile.workplace, profile.title);
-    return userData;
+    console.error('Firebase Google Auth error:', err);
+    throw err;
   }
+}
+
+/**
+ * Check if the user is returning from a Google Sign-In redirect flow
+ */
+export async function checkGoogleRedirectResult() {
+  ensureFreshFirebaseAuth();
+  const profile = getSavedScientistProfile();
+  try {
+    const result = await getRedirectResult(auth);
+    if (result && result.user) {
+      const user = result.user;
+      const token = await user.getIdToken();
+      const userData = {
+        uid: user.uid,
+        name: user.displayName || profile.name || 'Verified Scientist',
+        username: user.displayName || profile.name || 'Scientist',
+        email: user.email || profile.email || '',
+        avatar: user.photoURL || profile.avatar || '',
+        workplace: profile.workplace || 'ChemNova Advanced Institute',
+        role: profile.title || 'Lead Research Chemist',
+        department: profile.department,
+        safetyLevel: profile.safetyLevel,
+        workingCondition: profile.workingCondition,
+        researchField: profile.researchField,
+        orcid: profile.orcid,
+        provider: 'google',
+        verified: true
+      };
+
+      localStorage.setItem('chemspace_token', token);
+      localStorage.setItem('chemspace_user', JSON.stringify(userData));
+      localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
+      window.dispatchEvent(new Event('chemspace-auth-changed'));
+      return userData;
+    }
+  } catch (err) {
+    console.error('Firebase Google redirect error:', err);
+    throw err;
+  }
+  return null;
 }
 
 /**
@@ -233,43 +272,8 @@ export async function loginWithGoogleIdToken(idToken) {
     window.dispatchEvent(new Event('chemspace-auth-changed'));
     return userData;
   } catch (err) {
-    console.warn('Firebase credential sign-in notice, decoding Google JWT directly:', err);
-    try {
-      const base64Url = idToken.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split('')
-          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
-      );
-      const payload = JSON.parse(jsonPayload);
-
-      const userData = {
-        uid: payload.sub || 'google_user_' + Date.now().toString(36),
-        name: payload.name || profile.name,
-        username: payload.name || profile.name,
-        email: payload.email || profile.email,
-        avatar: payload.picture || profile.avatar || '',
-        workplace: profile.workplace,
-        role: profile.title,
-        department: profile.department,
-        safetyLevel: profile.safetyLevel,
-        workingCondition: profile.workingCondition,
-        researchField: profile.researchField,
-        orcid: profile.orcid,
-        provider: 'google',
-        verified: true
-      };
-
-      localStorage.setItem('chemspace_token', idToken);
-      localStorage.setItem('chemspace_user', JSON.stringify(userData));
-      localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
-      window.dispatchEvent(new Event('chemspace-auth-changed'));
-      return userData;
-    } catch {
-      return performFastLogin(profile.name, profile.email, profile.workplace, profile.title);
-    }
+    console.error('Google ID token verification failed:', err);
+    throw err;
   }
 }
 
@@ -296,49 +300,7 @@ export function setCustomFirebaseApiKey(key) {
   ensureFreshFirebaseAuth();
 }
 
-/**
- * Instant Fast Login with fully customizable Scientist Profile and Laboratory Working Conditions
- */
-export function performFastLogin(
-  customName,
-  customEmail,
-  customWorkplace,
-  customRole,
-  extraDetails = {}
-) {
-  const profile = getSavedScientistProfile();
 
-  const name = customName || profile.name || 'Dr. Maruthi Chemist';
-  const email = customEmail || profile.email || 'scientist@chemnova.org';
-  const workplace = customWorkplace || profile.workplace || 'ChemNova Advanced Institute of Chemical Sciences';
-  const role = customRole || profile.title || 'Lead Research Chemist';
-
-  const userData = {
-    uid: 'scientist_user_' + Date.now().toString(36),
-    name,
-    username: name,
-    email,
-    workplace,
-    role,
-    department: extraDetails.department || profile.department || 'Department of Synthetic & Computational Chemistry',
-    labRoom: extraDetails.labRoom || profile.labRoom || 'Research Suite B-402',
-    safetyLevel: extraDetails.safetyLevel || profile.safetyLevel || 'BSL-2 / Chemical Class 1 Div 2',
-    workingCondition: extraDetails.workingCondition || profile.workingCondition || 'STP 298.15 K • 1.00 atm',
-    atmosphere: extraDetails.atmosphere || profile.atmosphere || 'Inert Argon / Fume Hood Active',
-    researchField: extraDetails.researchField || profile.researchField || 'Organic Synthesis & Molecular Modeling',
-    orcid: extraDetails.orcid || profile.orcid || '0000-0002-1825-0097',
-    status: extraDetails.status || profile.status || 'Active Lab On-Duty',
-    avatar: extraDetails.avatar || profile.avatar || '',
-    provider: 'google',
-    verified: true
-  };
-
-  localStorage.setItem('chemspace_token', 'fast_auth_token_' + Date.now());
-  localStorage.setItem('chemspace_user', JSON.stringify(userData));
-  localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
-  window.dispatchEvent(new Event('chemspace-auth-changed'));
-  return userData;
-}
 
 /**
  * Setup invisible or standard RecaptchaVerifier for Phone OTP

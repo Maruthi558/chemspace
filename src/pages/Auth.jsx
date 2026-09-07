@@ -90,7 +90,6 @@ export default function Auth() {
   // OTP inputs state (6 array elements)
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [confirmationResult, setConfirmationResult] = useState(null);
-  const [dispatchedOtp, setDispatchedOtp] = useState(null);
 
   // States
   const [loading, setLoading] = useState(false);
@@ -100,21 +99,6 @@ export default function Auth() {
   const [cooldown, setCooldown] = useState(0);
 
   const recaptchaContainerRef = useRef(null);
-
-  // Listen for OTP dispatch events for instant verification helper
-  useEffect(() => {
-    const handleOtpDispatched = (e) => {
-      if (e.detail) {
-        setDispatchedOtp(e.detail);
-      }
-    };
-    window.addEventListener('chemspace-otp-dispatched', handleOtpOtp);
-    return () => window.removeEventListener('chemspace-otp-dispatched', handleOtpOtp);
-
-    function handleOtpOtp(e) {
-      handleOtpDispatched(e);
-    }
-  }, []);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -276,11 +260,13 @@ export default function Auth() {
       workplace: workplace.trim() || 'ChemSpace Research Institute'
     };
     try {
-      await signInWithGoogle(profilePayload);
-      setStep('success');
-      setTimeout(() => {
-        navigate(fromDestination, { replace: true });
-      }, 600);
+      const res = await signInWithGoogle(profilePayload);
+      if (res) {
+        setStep('success');
+        setTimeout(() => {
+          navigate(fromDestination, { replace: true });
+        }, 600);
+      }
     } catch (err) {
       if (err.message && (err.message.includes('cancelled') || err.message.includes('closed'))) {
         setError('Google sign-in was cancelled.');
@@ -311,7 +297,6 @@ export default function Auth() {
     setError('');
     setStep('input');
     setOtpDigits(['', '', '', '', '', '']);
-    setDispatchedOtp(null);
   }
 
   return (
@@ -787,36 +772,6 @@ export default function Auth() {
                 Check your {authMode === 'email' ? 'email inbox / spam folder' : 'SMS messages'}. Code expires in 5 minutes.
               </p>
             </div>
-
-            {/* Dispatched Verification Code Helper Badge */}
-            {dispatchedOtp && dispatchedOtp.code && (
-              <div
-                className={`p-2.5 rounded-2xl border flex items-center justify-between gap-2 text-xs font-mono transition-all animate-in fade-in duration-200 ${
-                  isDark
-                    ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300'
-                    : 'bg-emerald-50 border-emerald-300 text-emerald-800'
-                }`}
-              >
-                <div className="flex items-center gap-2 truncate">
-                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-                  <span className="truncate">
-                    Dispatched Code: <strong className="font-bold tracking-widest text-sm">{dispatchedOtp.code}</strong>
-                  </span>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const digits = dispatchedOtp.code.split('');
-                    setOtpDigits(digits);
-                    handleVerifyOtp(dispatchedOtp.code);
-                  }}
-                  className="px-2.5 py-1 rounded-xl font-bold text-[10px] tracking-wide uppercase transition active:scale-95 cursor-pointer shrink-0 bg-emerald-500 text-black hover:bg-emerald-400 shadow-sm"
-                  title="Auto-fill code and proceed"
-                >
-                  Auto-Fill
-                </button>
-              </div>
-            )}
 
             {/* 6-Box OTP Input Component */}
             <div className="py-2">

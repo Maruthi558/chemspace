@@ -4,7 +4,6 @@ import { useTheme } from '../context/ThemeContext';
 import {
   loginWithGoogle,
   loginWithGoogleIdToken,
-  performFastLogin,
   setCustomFirebaseApiKey,
   getFirebaseConfig,
   getSavedScientistProfile,
@@ -57,17 +56,8 @@ export default function GoogleAuthModal({ onClose }) {
                     onClose();
                   }, 900);
                 } catch (err) {
-                  console.error('Google token auth error, continuing with verified profile:', err);
-                  const fastUser = performFastLogin(
-                    scientistName.trim(),
-                    savedProfile.email || 'scientist@chemnova.org',
-                    scientistWorkplace.trim(),
-                    scientistRole.trim()
-                  );
-                  setSuccessUser(fastUser);
-                  setTimeout(() => {
-                    onClose();
-                  }, 600);
+                  console.error('Google token auth error:', err);
+                  setError({ message: err.message || 'Google token authentication failed. Please try again.' });
                 } finally {
                   setLoading(false);
                 }
@@ -162,21 +152,6 @@ export default function GoogleAuthModal({ onClose }) {
     } finally {
       setLoading(false);
     }
-  }
-
-  function handleFastLogin() {
-    setLoading(true);
-    setError(null);
-    const user = performFastLogin(
-      scientistName.trim() || 'Dr. Maruthi Chemist',
-      savedProfile.email || 'scientist@chemnova.org',
-      scientistWorkplace.trim() || 'ChemNova Advanced Institute',
-      scientistRole.trim() || 'Lead Research Chemist'
-    );
-    setSuccessUser(user);
-    setTimeout(() => {
-      onClose();
-    }, 600);
   }
 
   function handleSaveKey(e) {
@@ -358,24 +333,16 @@ export default function GoogleAuthModal({ onClose }) {
                 <p className="text-[10px] leading-relaxed text-slate-300">
                   In a new Firebase project, Authentication must be initialized once by clicking <strong>"Get started"</strong> in the console.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                <div className="flex gap-2 pt-1">
                   <a
                     href="https://console.firebase.google.com/project/chemistry-46c1c/authentication"
                     target="_blank"
                     rel="noreferrer"
-                    className="flex-1 py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-600 text-[10px] font-mono flex items-center justify-center gap-1 transition"
+                    className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-600 text-[10px] font-mono flex items-center justify-center gap-1 transition"
                   >
-                    <span>1. Open Firebase Auth Console</span>
+                    <span>Open Firebase Auth Console</span>
                     <ExternalLink className="w-2.5 h-2.5" />
                   </a>
-                  <button
-                    type="button"
-                    onClick={handleFastLogin}
-                    className="flex-1 py-1.5 px-2.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-black text-[10px] font-bold flex items-center justify-center gap-1 transition"
-                  >
-                    <Zap className="w-3 h-3" />
-                    <span>2. Fast Sign In (Skip)</span>
-                  </button>
                 </div>
               </div>
             )}
@@ -446,17 +413,6 @@ export default function GoogleAuthModal({ onClose }) {
                   <span>Continue with Google Account</span>
                 </>
               )}
-            </button>
-
-            {/* Fast 1-Click Login Option (Instant) */}
-            <button
-              type="button"
-              onClick={handleFastLogin}
-              disabled={loading}
-              className="w-full py-2.5 px-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500/10 via-cyan-500/10 to-emerald-500/10 border border-cyan-500/30 text-cyan-300 hover:border-cyan-400 hover:bg-cyan-500/20 transition shadow-sm active:scale-[0.99]"
-            >
-              <Zap className="w-3.5 h-3.5 text-amber-400" />
-              <span>⚡ Fast 1-Click Sign-In (Instant Access)</span>
             </button>
           </div>
         )}

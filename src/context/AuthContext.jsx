@@ -8,10 +8,11 @@ import {
   requestPhoneOtp,
   confirmPhoneOtp,
   initRecaptcha,
-  checkEmailExists
+  checkEmailExists,
+  getGoogleRedirectResult
 } from '../services/authService';
 import { createUserProfile, getUserProfile } from '../services/firestoreService';
-import { getSavedScientistProfile, saveScientistProfile, loginWithGoogle } from '../services/firebase';
+import { getSavedScientistProfile, saveScientistProfile } from '../services/firebase';
 
 const AuthContext = createContext(null);
 
@@ -60,6 +61,17 @@ export function AuthProvider({ children }) {
 
   // Listen to Firebase auth changes & cross-tab / event updates
   useEffect(() => {
+    // Check if user is returning from a Google redirect
+    getGoogleRedirectResult()
+      .then((redirectUser) => {
+        if (redirectUser) {
+          setUser({ ...redirectUser, isGuest: false });
+        }
+      })
+      .catch((err) => {
+        console.warn('[ChemSpace Auth] Google redirect result notice:', err);
+      });
+
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       setError('');
       if (firebaseUser) {
@@ -231,36 +243,22 @@ export function AuthProvider({ children }) {
   async function handleGoogleSignIn(profileData = {}) {
     setError('');
     try {
-      let googleUser = null;
-      let token = null;
-
-      try {
-        const res = await authServiceSignInWithGoogle();
-        if (res && res.user) {
-          googleUser = res.user;
-          token = await googleUser.getIdToken();
-        }
-      } catch (popupErr) {
-        if (popupErr.code === 'auth/popup-closed-by-user' || popupErr.code === 'auth/cancelled-popup-request') {
-          throw new Error('Google sign-in was cancelled.');
-        }
-        console.warn('[ChemSpace Auth] Google popup notice, using resilient verified Google session:', popupErr.message);
-        const fallbackUser = await loginWithGoogle();
-        if (fallbackUser) {
-          const full = { ...fallbackUser, isGuest: false };
-          setUser(full);
-          return full;
-        }
-        throw popupErr;
+      const res = await authServiceSignInWithGoogle();
+      if (!res || !res.user) {
+        // Redirect flow initiated
+        return null;
       }
+
+      const googleUser = res.user;
+      const token = await googleUser.getIdToken();
 
       const defaultProfile = getSavedScientistProfile();
       const userData = {
-        uid: googleUser?.uid || ('google_user_' + Date.now().toString(36)),
-        name: profileData.name || googleUser?.displayName || defaultProfile.name || 'Verified Scientist',
-        username: googleUser?.displayName || defaultProfile.name || 'Scientist',
-        email: googleUser?.email || defaultProfile.email || '',
-        avatar: googleUser?.photoURL || defaultProfile.avatar || '',
+        uid: googleUser.uid,
+        name: profileData.name || googleUser.displayName || defaultProfile.name || 'Verified Scientist',
+        username: googleUser.displayName || defaultProfile.name || 'Scientist',
+        email: googleUser.email || defaultProfile.email || '',
+        avatar: googleUser.photoURL || defaultProfile.avatar || '',
         workplace: profileData.workplace || defaultProfile.workplace || 'ChemNova Research Institute',
         role: profileData.role || defaultProfile.title || 'Lead Research Chemist',
         provider: 'google',
@@ -278,7 +276,7 @@ export function AuthProvider({ children }) {
       }
 
       setUser(userData);
-      localStorage.setItem('chemspace_token', token || ('google_token_' + Date.now()));
+      localStorage.setItem('chemspace_token', token);
       localStorage.setItem('chemspace_user', JSON.stringify(userData));
       localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...defaultProfile, ...userData }));
       window.dispatchEvent(new Event('chemspace-auth-changed'));
@@ -348,11 +346,11 @@ function formatAuthError(err) {
   const code = err.code || '';
   const message = err.message || '';
 
-  if (code === 'auth/invalid-verification-code' || message.includes('invalid-verification-code') || message.includes('Incorrect verification code')) {
-    return 'Incorrect verification code. Please check the code and try again.';
+  if (code === 'auth/invalid-verification-code' || message.includes('invalid-verification-code') || message.includes('Incorrect verification code') || message.includes('Invalid verification code')) {
+    return 'Invalid verification code. Please check the code and try again.';
   }
   if (code === 'auth/code-expired' || message.includes('expired')) {
-    return 'This verification code has expired. Please request a new code.';
+    return 'Verification code expired. Please request a new code.';
   }
   if (code === 'auth/too-many-requests' || message.includes('Too many') || message.includes('cooldown') || message.includes('wait')) {
     return message || 'Too many attempts. Please wait before requesting another code.';
@@ -360,11 +358,23 @@ function formatAuthError(err) {
   if (code === 'auth/invalid-phone-number' || message.includes('phone-number')) {
     return 'Please enter a valid international mobile phone number starting with your country code.';
   }
-  if (code === 'auth/popup-closed-by-user') {
-    return 'Google sign-in popup was closed before completing.';
+  if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+    return 'Google sign-in was cancelled.';
+  }
+  if (code === 'auth/popup-blocked') {
+    return 'Sign-in popup was blocked by your browser. Please allow popups for this site.';
   }
   if (code === 'auth/unauthorized-domain') {
-    return 'Authentication domain not authorized. Please verify localhost in Firebase Console.';
+    return 'Authentication domain not authorized. Please add this domain to Authorized Domains in Firebase Console.';
+  }
+  if (code === 'auth/operation-not-allowed') {
+    return 'This authentication provider is disabled in Firebase Console. Please enable it in Authentication > Sign-in method.';
+  }
+  if (code === 'auth/configuration-not-found') {
+    return 'Firebase Authentication is not activated in this project. Please click "Get Started" in Firebase Console.';
+  }
+  if (code === 'auth/captcha-check-failed') {
+    return 'Security reCAPTCHA verification failed. Please refresh and try again.';
   }
   if (code === 'auth/network-request-failed') {
     return 'Network connection failed. Please verify your internet connection.';

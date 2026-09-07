@@ -13,7 +13,8 @@ import {
   sendFirebasePhoneOtp,
   verifyFirebasePhoneOtp,
   setupRecaptchaVerifier,
-  getSavedScientistProfile
+  getSavedScientistProfile,
+  checkGoogleRedirectResult
 } from './firebase';
 import {
   sendEmailOtp as apiSendEmailOtp,
@@ -64,6 +65,13 @@ export async function signInWithGoogle() {
     }
     throw err;
   }
+}
+
+/**
+ * Capture Google Sign-In result if redirected
+ */
+export async function getGoogleRedirectResult() {
+  return checkGoogleRedirectResult();
 }
 
 /**
@@ -120,13 +128,21 @@ export async function requestPhoneOtp(phoneNumber, verifier) {
     const confirmationResult = await sendFirebasePhoneOtp(phoneNumber, verifier);
     return confirmationResult;
   } catch (firebaseErr) {
-    console.warn('[ChemSpace Auth] Firebase Phone Auth notice, routing through secure SMS engine:', firebaseErr.message || firebaseErr);
-    const apiRes = await sendPhoneOtpApi(phoneNumber);
-    return {
-      isBackend: true,
-      phone: phoneNumber,
-      message: apiRes.message
-    };
+    console.warn('[ChemSpace Auth] Firebase Phone Auth error:', firebaseErr.message || firebaseErr);
+    // If backend SMS configured, attempt fallback
+    try {
+      const apiRes = await sendPhoneOtpApi(phoneNumber);
+      if (apiRes && apiRes.status === 'success') {
+        return {
+          isBackend: true,
+          phone: phoneNumber,
+          message: apiRes.message
+        };
+      }
+    } catch {
+      // Backend SMS not configured or failed; propagate primary Firebase error
+    }
+    throw firebaseErr;
   }
 }
 

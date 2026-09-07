@@ -512,7 +512,7 @@ def send_email_otp(data: SendEmailOtpInput):
             conn.close()
             raise HTTPException(
                 status_code=429,
-                detail=f"Please wait {cooldown_remaining} seconds before requesting a new code."
+                detail=f"Please wait {cooldown_remaining} seconds before requesting a new verification code."
             )
             
     # Cryptographically secure 6-digit OTP
@@ -534,9 +534,58 @@ def send_email_otp(data: SendEmailOtpInput):
     conn.commit()
     conn.close()
     
-    # Optional SMTP Real Email Dispatch
+    # Real Email Delivery Dispatch
+    email_sent = False
+    delivery_provider = None
+    delivery_error = None
+    
+    # 1. Resend API Dispatch
+    resend_api_key = os.getenv("RESEND_API_KEY")
+    if resend_api_key and not email_sent:
+        try:
+            resend_url = "https://api.resend.com/emails"
+            from_email = os.getenv("RESEND_FROM", "ChemSpace Security <auth@chemspace.org>")
+            resend_payload = json.dumps({
+                "from": from_email,
+                "to": [email_clean],
+                "subject": "ChemSpace Security Verification Code",
+                "html": f"""
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #08080a; color: #fff; padding: 32px; border-radius: 16px; max-width: 500px; margin: 0 auto;">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <h1 style="color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: 2px; margin: 0;">CHEMSPACE</h1>
+                        <p style="color: #94a3b8; font-size: 12px; margin-top: 4px;">Verified Scientific Identity & Access</p>
+                    </div>
+                    <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">Hello,</p>
+                    <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">Your single-use verification code to access ChemSpace is:</p>
+                    <div style="background: #111114; border: 1px solid #27272a; padding: 20px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #10b981; text-align: center; margin: 24px 0; font-family: monospace;">
+                        {otp_code}
+                    </div>
+                    <p style="color: #94a3b8; font-size: 12px; line-height: 1.5;">This code will expire in <strong>5 minutes</strong>. If you did not request this verification code, please disregard this email.</p>
+                    <hr style="border: 0; border-top: 1px solid #27272a; margin: 24px 0;" />
+                    <p style="color: #64748b; font-size: 11px; text-align: center;">ChemSpace Advanced Chemical Computing & Molecular Studio</p>
+                </div>
+                """
+            }).encode('utf-8')
+            
+            req = urllib.request.Request(
+                resend_url,
+                data=resend_payload,
+                headers={
+                    "Authorization": f"Bearer {resend_api_key}",
+                    "Content-Type": "application/json"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201):
+                    email_sent = True
+                    delivery_provider = "Resend API"
+        except Exception as e:
+            delivery_error = f"Resend API error: {str(e)}"
+            print(f"[ChemSpace Auth] Resend dispatch notice: {delivery_error}")
+
+    # 2. Standard SMTP Dispatch
     smtp_host = os.getenv("SMTP_HOST")
-    if smtp_host:
+    if smtp_host and not email_sent:
         try:
             import smtplib
             from email.mime.multipart import MIMEMultipart
@@ -546,43 +595,89 @@ def send_email_otp(data: SendEmailOtpInput):
             smtp_user = os.getenv("SMTP_USER")
             smtp_pass = os.getenv("SMTP_PASSWORD")
             smtp_from = os.getenv("SMTP_FROM", smtp_user or "auth@chemspace.org")
+            use_ssl = os.getenv("SMTP_SSL", "false").lower() in ("true", "1")
             
             msg = MIMEMultipart("alternative")
-            msg["Subject"] = f"ChemSpace Security Verification Code: {otp_code}"
+            msg["Subject"] = "ChemSpace Security Verification Code"
             msg["From"] = f"ChemSpace Security <{smtp_from}>"
             msg["To"] = email_clean
             
             html_body = f"""
-            <div style="font-family: monospace; background: #08080a; color: #fff; padding: 24px; border-radius: 16px;">
-                <h2 style="color: #06b6d4; margin-bottom: 8px;">CHEMSPACE LABORATORY ACCESS</h2>
-                <p style="color: #94a3b8; font-size: 13px;">Your single-use 6-digit verification code is:</p>
-                <div style="background: #111114; border: 1px solid #334155; padding: 16px; border-radius: 12px; font-size: 28px; font-weight: bold; letter-spacing: 8px; color: #10b981; text-align: center; margin: 16px 0;">
+            <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #08080a; color: #fff; padding: 32px; border-radius: 16px; max-width: 500px; margin: 0 auto;">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <h1 style="color: #ffffff; font-size: 20px; font-weight: 800; letter-spacing: 2px; margin: 0;">CHEMSPACE</h1>
+                    <p style="color: #94a3b8; font-size: 12px; margin-top: 4px;">Verified Scientific Identity & Access</p>
+                </div>
+                <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">Hello,</p>
+                <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">Your single-use verification code to access ChemSpace is:</p>
+                <div style="background: #111114; border: 1px solid #27272a; padding: 20px; border-radius: 12px; font-size: 32px; font-weight: 800; letter-spacing: 8px; color: #10b981; text-align: center; margin: 24px 0; font-family: monospace;">
                     {otp_code}
                 </div>
-                <p style="color: #64748b; font-size: 11px;">Valid for 5 minutes. If you did not request this code, please ignore this notice.</p>
+                <p style="color: #94a3b8; font-size: 12px; line-height: 1.5;">This code will expire in <strong>5 minutes</strong>. If you did not request this verification code, please disregard this email.</p>
+                <hr style="border: 0; border-top: 1px solid #27272a; margin: 24px 0;" />
+                <p style="color: #64748b; font-size: 11px; text-align: center;">ChemSpace Advanced Chemical Computing & Molecular Studio</p>
             </div>
             """
             msg.attach(MIMEText(html_body, "html"))
             
-            server = smtplib.SMTP(smtp_host, smtp_port, timeout=10)
-            server.starttls()
+            if use_ssl or smtp_port == 465:
+                server = smtplib.SMTP_SSL(smtp_host, smtp_port, timeout=12)
+            else:
+                server = smtplib.SMTP(smtp_host, smtp_port, timeout=12)
+                server.starttls()
+                
             if smtp_user and smtp_pass:
                 server.login(smtp_user, smtp_pass)
             server.sendmail(smtp_from, [email_clean], msg.as_string())
             server.quit()
-            print(f"[ChemSpace Auth] SMTP Email successfully delivered to {email_clean}")
+            email_sent = True
+            delivery_provider = f"SMTP ({smtp_host})"
         except Exception as smtp_err:
-            print(f"[ChemSpace Auth] SMTP delivery notice ({smtp_err}), fallback to server console.")
+            delivery_error = f"SMTP error: {str(smtp_err)}"
+            print(f"[ChemSpace Auth] SMTP dispatch notice: {delivery_error}")
 
-    # Server-side dispatch notice & secure log for development verification
-    print(f"\n[ChemSpace Auth] ===============================================")
-    print(f"[ChemSpace Auth] OTP DISPATCH TO: {email_clean}")
-    print(f"[ChemSpace Auth] CODE: {otp_code} (Valid for 5 minutes)")
-    print(f"[ChemSpace Auth] ===============================================\n")
-    
+    # 3. SendGrid API Dispatch
+    sendgrid_api_key = os.getenv("SENDGRID_API_KEY")
+    if sendgrid_api_key and not email_sent:
+        try:
+            sg_url = "https://api.sendgrid.com/v3/mail/send"
+            sg_from = os.getenv("SENDGRID_FROM", "auth@chemspace.org")
+            sg_payload = json.dumps({
+                "personalizations": [{"to": [{"email": email_clean}]}],
+                "from": {"email": sg_from, "name": "ChemSpace Security"},
+                "subject": "ChemSpace Security Verification Code",
+                "content": [{
+                    "type": "text/html",
+                    "value": f"<div style='font-family: monospace; background: #08080a; color: #fff; padding: 24px;'><h2>CHEMSPACE VERIFICATION</h2><p>Your code is: <strong>{otp_code}</strong></p><p>Valid for 5 minutes.</p></div>"
+                }]
+            }).encode('utf-8')
+            
+            sg_req = urllib.request.Request(
+                sg_url,
+                data=sg_payload,
+                headers={
+                    "Authorization": f"Bearer {sendgrid_api_key}",
+                    "Content-Type": "application/json"
+                }
+            )
+            with urllib.request.urlopen(sg_req, timeout=10) as resp:
+                if resp.status in (200, 202):
+                    email_sent = True
+                    delivery_provider = "SendGrid API"
+        except Exception as sg_err:
+            delivery_error = f"SendGrid error: {str(sg_err)}"
+            print(f"[ChemSpace Auth] SendGrid dispatch notice: {delivery_error}")
+
+    # Secure Audit Log (Zero OTP Exposure in logs)
+    if email_sent:
+        print(f"[ChemSpace Auth] Verification code successfully dispatched to {email_clean} via {delivery_provider}")
+    else:
+        print(f"[ChemSpace Auth] Verification code generated for {email_clean}. (Notice: Live email delivery provider not configured or errored: {delivery_error or 'No SMTP/Resend configured'})")
+
     return {
         "status": "success",
-        "message": f"Verification code sent to {email_clean}."
+        "message": f"Verification code sent to {email_clean}. Please check your inbox.",
+        "delivered": email_sent
     }
 
 @app.post("/api/auth/otp/verify-email")
@@ -716,15 +811,47 @@ def send_phone_otp(data: SendPhoneOtpInput):
     conn.commit()
     conn.close()
     
-    # Server-side dispatch notice & secure log
-    print(f"\n[ChemSpace Auth] ===============================================")
-    print(f"[ChemSpace Auth] SMS OTP DISPATCH TO: {phone_clean}")
-    print(f"[ChemSpace Auth] CODE: {otp_code} (Valid for 5 minutes)")
-    print(f"[ChemSpace Auth] ===============================================\n")
+    # Twilio SMS Provider Dispatch
+    sms_sent = False
+    twilio_sid = os.getenv("TWILIO_ACCOUNT_SID")
+    twilio_token = os.getenv("TWILIO_AUTH_TOKEN")
+    twilio_from = os.getenv("TWILIO_PHONE_NUMBER")
+    
+    if twilio_sid and twilio_token and twilio_from:
+        try:
+            import base64
+            twilio_url = f"https://api.twilio.com/2010-04-01/Accounts/{twilio_sid}/Messages.json"
+            post_data = urllib.parse.urlencode({
+                "To": phone_clean,
+                "From": twilio_from,
+                "Body": f"ChemSpace Security: Your 6-digit verification code is {otp_code}. Valid for 5 minutes."
+            }).encode('utf-8')
+            
+            auth_header = base64.b64encode(f"{twilio_sid}:{twilio_token}".encode()).decode()
+            req = urllib.request.Request(
+                twilio_url,
+                data=post_data,
+                headers={
+                    "Authorization": f"Basic {auth_header}",
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201):
+                    sms_sent = True
+        except Exception as twilio_err:
+            print(f"[ChemSpace Auth] Twilio dispatch notice: {twilio_err}")
+
+    # Secure Server-side dispatch notice (Zero OTP Exposure in logs)
+    if sms_sent:
+        print(f"[ChemSpace Auth] SMS OTP successfully dispatched to {phone_clean} via Twilio.")
+    else:
+        print(f"[ChemSpace Auth] Mobile OTP generated for {phone_clean}. (Note: Firebase Phone Auth is the primary SMS gateway; Twilio is optional server-side fallback).")
     
     return {
         "status": "success",
-        "message": f"Verification code sent to {phone_clean}."
+        "message": f"Verification code sent to {phone_clean}. Please check your SMS messages.",
+        "delivered": sms_sent
     }
 
 @app.post("/api/auth/otp/verify-phone")
