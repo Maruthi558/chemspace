@@ -11,6 +11,7 @@ import {
   signInWithPhoneNumber
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getAnalytics, isSupported } from 'firebase/analytics';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Firebase Configuration for Project maruthii-5b928
@@ -41,15 +42,24 @@ export function getFirebaseConfig() {
     projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "maruthii-5b928",
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "maruthii-5b928.firebasestorage.app",
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "11169483347",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:11169483347:web:d86d1c2d357b117b48d4a6",
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:11169483347:web:d6f6f119aea5d1c948d4a6",
     googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || "11169483347-r2iqvfmful9qm0pqq6fpjuepvbcip17u.apps.googleusercontent.com",
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-PS4MNCTWL6",
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-DFEJHTZDLQ",
   };
 }
 
 let app = getApps().length > 0 ? getApp() : initializeApp(getFirebaseConfig());
 let auth = getAuth(app);
 let db = getFirestore(app);
+let analytics = null;
+
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  }).catch(() => {});
+}
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
@@ -388,5 +398,5 @@ export async function verifyFirebasePhoneOtp(confirmationResult, otpCode) {
   return userData;
 }
 
-export { app, auth, db, googleProvider };
+export { app, auth, db, googleProvider, analytics };
 
