@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { ELEMENT_PROPERTIES } from '../data/moleculeData';
-import { RotateCw, ZoomIn, ZoomOut, Eye, Sparkles, Maximize2, Layers, Ruler } from 'lucide-react';
+import { RotateCw, ZoomIn, ZoomOut, Eye, Maximize2, Layers, Ruler } from 'lucide-react';
 
 export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick', onSelectAtom }) {
   const mountRef = useRef(null);
@@ -235,7 +235,7 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
 
       {/* Mode Tag */}
       <div className="absolute top-4 left-4 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs text-slate-300 z-10 font-mono">
-        <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+        <Layers className="w-3.5 h-3.5 text-cyan-400" />
         <span>Mode: <strong className="text-cyan-400 capitalize">{styleMode.replace('-', ' ')}</strong></span>
       </div>
 

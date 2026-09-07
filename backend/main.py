@@ -274,7 +274,9 @@ else:
         "https://che445.com",
         "https://chemistry-46c1c-4dac1.web.app",
         "https://maruthii-5b928.firebaseapp.com",
-        "https://maruthii-5b928.web.app"
+        "https://maruthii-5b928.web.app",
+        "https://chemistry1-e2723.firebaseapp.com",
+        "https://chemistry1-e2723.web.app"
     ]
 
 app.add_middleware(

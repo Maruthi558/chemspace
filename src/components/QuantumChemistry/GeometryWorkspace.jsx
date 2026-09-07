@@ -8,7 +8,6 @@ import {
   Plus,
   Trash2,
   Upload,
-  Sparkles,
   Layers,
   ChevronRight,
   Info,

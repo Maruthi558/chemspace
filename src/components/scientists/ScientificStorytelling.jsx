@@ -4,7 +4,6 @@ import {
   Activity,
   Zap,
   Layers,
-  Sparkles,
   Flame,
   Radio,
   Sliders,

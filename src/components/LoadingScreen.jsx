@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Atom, Sparkles } from 'lucide-react';
+import { Atom } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 export default function LoadingScreen({ onFinish, duration = 1200 }) {

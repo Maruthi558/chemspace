@@ -19,7 +19,6 @@ import {
   Terminal,
   X,
   Search,
-  Sparkles,
   TrendingUp,
   MessageSquare,
   Upload,

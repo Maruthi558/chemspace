@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Clock, ChevronRight, Calendar, Filter, Star, Sparkles } from 'lucide-react';
+import { Clock, ChevronRight, Calendar, Filter } from 'lucide-react';
 import { FAMOUS_CHEMISTS, SCIENTIST_ERAS } from '../../data/chemistsData';
 import ScientistPortrait, { getFieldColor } from './ScientistPortrait';
 

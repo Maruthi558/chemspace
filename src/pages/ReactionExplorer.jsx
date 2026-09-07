@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, ArrowRight, Plus, Sparkles, Save, ShieldAlert, Layers, Check, Database } from 'lucide-react';
+import { Activity, ArrowRight, Plus, Save, ShieldAlert, Layers, Check, Database } from 'lucide-react';
 import ThreeMoleculeViewer from '../components/ThreeMoleculeViewer';
 import { MOLECULES } from '../data/moleculeData';
 

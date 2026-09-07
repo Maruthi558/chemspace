@@ -6,7 +6,6 @@ import {
   Sun,
   Eye,
   Search,
-  Sparkles,
   Download,
   AlertTriangle,
   X,
@@ -200,7 +199,7 @@ export default function SpectroscopySuite() {
             disabled={isCalculating}
             className="btn-horizontal btn-primary text-xs shrink-0"
           >
-            <Sparkles className={`w-3.5 h-3.5 ${isCalculating ? 'animate-spin' : ''}`} />
+            <Activity className={`w-3.5 h-3.5 ${isCalculating ? 'animate-spin' : ''}`} />
             <span>{isCalculating ? 'Computing Spectra...' : 'Analyze Structure'}</span>
           </button>
         </div>

@@ -3,7 +3,6 @@ import {
   FlaskConical,
   Activity,
   Layers,
-  Sparkles,
   Award,
   BookOpen,
   FileText,

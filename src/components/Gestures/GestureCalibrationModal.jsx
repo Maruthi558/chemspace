@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Sliders, RotateCcw, Check, Sparkles } from 'lucide-react';
+import { X, Sliders, RotateCcw, Check } from 'lucide-react';
 import { useGestures } from '../../context/GestureContext';
 
 export default function GestureCalibrationModal() {
@@ -158,7 +158,7 @@ export default function GestureCalibrationModal() {
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-3.5 h-3.5" />
+                  <Sliders className="w-3.5 h-3.5" />
                   <span>Apply Calibration</span>
                 </>
               )}

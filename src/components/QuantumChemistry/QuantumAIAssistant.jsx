@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Sparkles,
+  Bot,
   Send,
   Mic,
   MicOff,
@@ -114,7 +114,7 @@ export default function QuantumAIAssistant({ config, onApplyConfig, onRunCalcula
       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center shadow-inner">
-            <Sparkles className="w-5 h-5 text-cyan-400" />
+            <Bot className="w-5 h-5 text-cyan-400" />
           </div>
           <div>
             <h3 className="text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
@@ -174,7 +174,7 @@ export default function QuantumAIAssistant({ config, onApplyConfig, onRunCalcula
         ))}
         {isThinking && (
           <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono font-bold animate-pulse">
-            <Sparkles className="w-3.5 h-3.5" /> Quantum AI reasoning in progress...
+            <Bot className="w-3.5 h-3.5" /> Quantum AI reasoning in progress...
           </div>
         )}
       </div>

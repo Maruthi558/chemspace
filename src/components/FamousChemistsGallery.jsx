@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import {
   Award,
   BookOpen,
-  Sparkles,
   Quote,
   Globe,
   ArrowRight,
@@ -25,7 +24,6 @@ import {
   List,
   Compass,
   X,
-  Star,
   Eye,
   Bot,
   Zap,
@@ -310,13 +308,13 @@ export default function FamousChemistsGallery() {
               value: `${totalScientists} Icons`
             },
             {
-              icon: Star,
+              icon: Award,
               color: '#f59e0b',
               label: 'Nobel Laureates',
               value: `${totalNobelLaureates} Laureates`
             },
             {
-              icon: Sparkles,
+              icon: FlaskConical,
               color: '#10b981',
               label: 'Milestone Discoveries',
               value: `${totalDiscoveries} Discoveries`
@@ -418,7 +416,7 @@ export default function FamousChemistsGallery() {
                   }`}
                   title="Filter to Nobel Laureates only"
                 >
-                  <Star className={`w-3.5 h-3.5 ${nobelOnly ? 'fill-current text-black' : 'text-amber-400'}`} />
+                  <Award className={`w-3.5 h-3.5 ${nobelOnly ? 'text-black' : 'text-amber-400'}`} />
                   <span>Nobel Only</span>
                 </button>
               </div>
@@ -495,7 +493,7 @@ export default function FamousChemistsGallery() {
                             backdropFilter: 'blur(8px)'
                           }}
                         >
-                          <Star className="w-3.5 h-3.5 fill-current text-amber-400" />
+                          <Award className="w-3.5 h-3.5 text-amber-400" />
                         </div>
                       )}
 

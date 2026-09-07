@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import {
   Plus,
   Trash2,
-  Sparkles,
   Sliders,
   CheckCircle2,
   FlaskConical,

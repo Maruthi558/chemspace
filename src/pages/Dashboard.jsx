@@ -11,7 +11,6 @@ import {
   Grid,
   CheckCircle2,
   Clock,
-  Sparkles,
   RefreshCw,
   Sliders,
   Layers,
@@ -121,7 +120,7 @@ export default function Dashboard() {
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                <Atom className="w-3.5 h-3.5 text-cyan-400" />
                 CHEMNOVA 3D PLATFORM
               </span>
               <span className="text-[10px] text-[var(--text-muted)] font-mono">
@@ -335,7 +334,7 @@ export default function Dashboard() {
         <div className="lg:col-span-5 glass-panel p-5 rounded-3xl border border-[var(--border-subtle)] flex flex-col justify-between space-y-4 shadow-xl">
           <div className="border-b border-inherit pb-3">
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
+              <FlaskConical className="w-4 h-4 text-cyan-400" />
               <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
                 Interactive Chemical Workspaces
               </span>

@@ -5,7 +5,6 @@ import {
   Award,
   ArrowRight,
   GraduationCap,
-  Sparkles,
   Layers
 } from 'lucide-react';
 import { FAMOUS_CHEMISTS } from '../../data/chemistsData';

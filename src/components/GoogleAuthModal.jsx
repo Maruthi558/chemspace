@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ShieldCheck, AlertCircle, Key, ExternalLink, Loader2, CheckCircle2, Zap, ArrowRight, Sparkles, Building, User, Award, Sliders } from 'lucide-react';
+import { X, ShieldCheck, AlertCircle, Key, ExternalLink, Loader2, CheckCircle2, Zap, ArrowRight, Building, User, Award, Sliders } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import {
   loginWithGoogle,
@@ -101,7 +101,7 @@ export default function GoogleAuthModal({ onClose }) {
     if (isStillPlaceholder) {
       setError({
         code: 'auth/api-key-required',
-        message: 'A valid Firebase Web API Key is required for project "chemistry-46c1c". Please follow the quick steps below to get your key.'
+        message: `A valid Firebase Web API Key is required for project "${config.projectId || 'chemistry1-e2723'}". Please follow the quick steps below to get your key.`
       });
       setShowKeyInput(true);
       return;
@@ -136,13 +136,13 @@ export default function GoogleAuthModal({ onClose }) {
         isPlaceholderKey;
 
       if (err.code === 'auth/configuration-not-found') {
-        message = 'Firebase Authentication is not activated in project "chemistry-46c1c" yet. Click "Get Started" in the Firebase Console, or use Fast 1-Click Login below to continue immediately.';
+        message = `Firebase Authentication is not activated in project "${config.projectId || 'chemistry1-e2723'}" yet. Click "Get Started" in the Firebase Console to enable it.`;
       } else if (err.code === 'auth/popup-closed-by-user') {
         message = 'Sign-in popup was closed before completing.';
       } else if (err.code === 'auth/unauthorized-domain') {
         message = 'Domain not authorized. In Firebase Console (Authentication > Settings > Authorized Domains), ensure "localhost" is listed.';
       } else if (isApiKeyErr) {
-        message = 'Invalid Firebase Web API Key for project "chemistry-46c1c". Please check your key from Firebase Console.';
+        message = `Invalid Firebase Web API Key for project "${config.projectId || 'chemistry1-e2723'}". Please check your key from Firebase Console.`;
         setShowKeyInput(true);
       } else if (err.code === 'auth/operation-not-allowed') {
         message = 'Google provider is not enabled yet. In Firebase Console, navigate to Authentication > Sign-in method and enable Google.';
@@ -200,7 +200,7 @@ export default function GoogleAuthModal({ onClose }) {
           {/* Project Identity Pill */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-            <span>Firebase Project: <strong>{config.projectId || 'maruthii-5b928'}</strong></span>
+            <span>Firebase Project: <strong>{config.projectId || 'chemistry1-e2723'}</strong></span>
           </div>
         </div>
 
@@ -328,14 +328,14 @@ export default function GoogleAuthModal({ onClose }) {
             {error.code === 'auth/configuration-not-found' && (
               <div className="p-3 rounded-xl bg-black/40 border border-amber-500/30 space-y-2 text-slate-200">
                 <div className="text-[11px] font-bold text-amber-400 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" /> Quick Fix in 30 Seconds:
+                  <Zap className="w-3.5 h-3.5" /> Quick Fix in 30 Seconds:
                 </div>
                 <p className="text-[10px] leading-relaxed text-slate-300">
                   In a new Firebase project, Authentication must be initialized once by clicking <strong>"Get started"</strong> in the console.
                 </p>
                 <div className="flex gap-2 pt-1">
                   <a
-                    href="https://console.firebase.google.com/project/chemistry-46c1c/authentication"
+                    href={`https://console.firebase.google.com/project/${config.projectId || 'chemistry1-e2723'}/authentication`}
                     target="_blank"
                     rel="noreferrer"
                     className="w-full py-1.5 px-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-600 text-[10px] font-mono flex items-center justify-center gap-1 transition"
@@ -359,7 +359,7 @@ export default function GoogleAuthModal({ onClose }) {
             </div>
 
             <p className="text-[11px] text-slate-300 font-sans leading-relaxed">
-              Active Key: <code className="bg-black/40 px-1 py-0.5 rounded text-cyan-300 font-mono">AIzaSyAe-L6TXBigERe2gl7yVROpD-LwZRObePo</code>
+              Active Key: <code className="bg-black/40 px-1 py-0.5 rounded text-cyan-300 font-mono">{config.apiKey || 'AIzaSy...'}</code>
             </p>
 
             <form onSubmit={handleSaveKey} className="space-y-2 pt-1">
@@ -420,7 +420,7 @@ export default function GoogleAuthModal({ onClose }) {
         {/* Security Assurance Footer */}
         <div className="pt-2 border-t border-[var(--border-subtle)] text-[10px] font-mono text-center text-[var(--text-muted)] flex items-center justify-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Client ID: 904510224404 • OAuth 2.0 Identity Services</span>
+          <span>Client ID: {config.googleClientId ? config.googleClientId.split('.')[0] : '207628840301'} • OAuth 2.0 Identity Services</span>
         </div>
       </div>
     </div>

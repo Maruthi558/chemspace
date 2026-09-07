@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { Sparkles, Layers, RotateCcw, Eye, Sliders, Info, Zap } from 'lucide-react';
+import { Layers, RotateCcw, Eye, Sliders, Info, Zap } from 'lucide-react';
 
 export default function ThreeOrbitalViewer({ orbitalType = 'HOMO', orbitalEnergy = -5.85, isDark = true }) {
   const mountRef = useRef(null);

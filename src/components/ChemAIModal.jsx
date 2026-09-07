@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, X, Send, Sparkles, Mic, MicOff, Cpu } from 'lucide-react';
+import { Bot, X, Send, Loader2, Mic, MicOff, Cpu } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 
@@ -170,7 +170,7 @@ export default function ChemAIModal({ onClose }) {
 
           {loading && (
             <div className="flex items-center gap-2 text-xs font-mono p-2 opacity-80">
-              <Sparkles className="w-4 h-4 animate-spin text-cyan-400" />
+              <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
               <span>ChemAI processing query & computing descriptors...</span>
             </div>
           )}

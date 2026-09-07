@@ -27,7 +27,7 @@ export const SCIENTIST_ERAS = [
 ];
 
 export const CURATED_COLLECTIONS = [
-  { id: 'all', label: 'All Pioneers', icon: 'Sparkles' },
+  { id: 'all', label: 'All Pioneers', icon: 'Compass' },
   { id: 'nobel', label: 'Nobel Laureates', icon: 'Award' },
   { id: 'women', label: 'Women in Science', icon: 'Users' },
   { id: 'quantum', label: 'Quantum Revolution', icon: 'Atom' },

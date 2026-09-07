@@ -23,6 +23,7 @@ const Contact = React.lazy(() => import('./pages/Contact'));
 const PeriodicTable = React.lazy(() => import('./pages/PeriodicTable'));
 const ChemistsPage = React.lazy(() => import('./pages/ChemistsPage'));
 const Auth = React.lazy(() => import('./pages/Auth'));
+const FinishSignUp = React.lazy(() => import('./pages/FinishSignUp'));
 const Settings = React.lazy(() => import('./pages/Settings'));
 const ResearchProjects = React.lazy(() => import('./pages/ResearchProjects'));
 const ChromatographyPage = React.lazy(() => import('./pages/ChromatographyPage'));
@@ -83,6 +84,7 @@ export default function App() {
                 {/* Public Authentication Gateways */}
                 <Route path="/login" element={<Auth />} />
                 <Route path="/register" element={<Auth />} />
+                <Route path="/finish-signup" element={<FinishSignUp />} />
 
                 {/* Fallback Redirect */}
                 <Route path="*" element={<Navigate to="/" replace />} />

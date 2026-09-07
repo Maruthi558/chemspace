@@ -1,6 +1,21 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "auth": {
+    "authorizedDomains": [
+      "localhost",
+      "chemistry1-e2723.firebaseapp.com",
+      "chemistry1-e2723.web.app"
+    ],
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "ChemSpace"
+      }
+    }
+  },
   "hosting": {
-    "site": "chemistry-46c1c-4dac1",
     "public": "dist",
     "ignore": [
       "firebase.json",

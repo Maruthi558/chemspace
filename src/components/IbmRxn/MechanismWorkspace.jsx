@@ -3,7 +3,7 @@ import {
   GitBranch,
   Play,
   RotateCcw,
-  Sparkles,
+  Minus,
   Layers,
   Plus,
   Trash2,
@@ -957,7 +957,7 @@ ${currentStep.description}
                 { id: 'select', label: 'Select / Move', icon: MousePointer2 },
                 { id: 'bond', label: 'Bond', icon: Zap },
                 { id: 'charge_pos', label: '(+) Charge', icon: Plus },
-                { id: 'charge_neg', label: '(-) Charge', icon: Sparkles },
+                { id: 'charge_neg', label: '(-) Charge', icon: Minus },
                 { id: 'radical', label: '(•) Radical', icon: Atom },
                 { id: 'eraser', label: 'Eraser', icon: Trash2 }
               ].map(({ id, label, icon: Icon }) => (
@@ -1438,7 +1438,7 @@ ${currentStep.description}
 
               {isAiAnalyzing && (
                 <div className="p-3 rounded-2xl bg-cyan-500/5 text-cyan-400 border border-cyan-500/20 flex items-center gap-2 text-xs font-mono animate-pulse">
-                  <Sparkles className="w-4 h-4" />
+                  <Bot className="w-4 h-4" />
                   <span>Computing electron orbital transitions &amp; intermediate topologies...</span>
                 </div>
               )}

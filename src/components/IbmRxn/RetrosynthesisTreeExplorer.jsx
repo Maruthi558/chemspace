@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   GitBranch,
   ArrowRight,
-  Sparkles,
   Layers,
   CheckCircle2,
   Clock,

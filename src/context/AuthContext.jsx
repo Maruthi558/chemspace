@@ -3,10 +3,13 @@ import {
   onAuthChange,
   signInWithGoogle as authServiceSignInWithGoogle,
   signOut as authServiceSignOut,
-  requestEmailOtp,
-  confirmEmailOtp,
-  requestPhoneOtp,
-  confirmPhoneOtp,
+  signUpWithEmail as authServiceSignUpWithEmail,
+  signInWithEmail as authServiceSignInWithEmail,
+  resetPassword as authServiceResetPassword,
+  requestEmailLink as authServiceRequestEmailLink,
+  confirmEmailLink as authServiceConfirmEmailLink,
+  requestPhoneOtp as authServiceRequestPhoneOtp,
+  confirmPhoneOtp as authServiceConfirmPhoneOtp,
   initRecaptcha,
   checkEmailExists,
   getGoogleRedirectResult
@@ -100,15 +103,16 @@ export function AuthProvider({ children }) {
             await createUserProfile(firebaseUser.uid, {
               displayName: fullUser.name,
               email: fullUser.email,
-              photoURL: fullUser.avatar
+              photoURL: fullUser.avatar,
+              workplace: fullUser.workplace,
+              role: fullUser.role
             });
           }
           setProfile(prof);
-        } catch {
-          // Non-critical if firestore is offline
+        } catch (err) {
+          console.warn('[Firestore] Profile sync notice:', err.message);
         }
       } else {
-        // If not in Firebase auth, check if valid local token/user session exists
         const local = syncLocalUser();
         if (!local) {
           setUser(null);
@@ -135,7 +139,178 @@ export function AuthProvider({ children }) {
   // ── Actions ─────────────────────────────────────────────────────────────────
 
   /**
-   * Continue as Guest with temporary exploratory session
+   * 1. Email / Password Sign Up
+   */
+  async function handleSignUpWithEmail(email, password, displayName, profileMeta = {}) {
+    setError('');
+    try {
+      const userData = await authServiceSignUpWithEmail(email, password, displayName, profileMeta);
+      try {
+        await createUserProfile(userData.uid, {
+          displayName: userData.name,
+          email: userData.email,
+          workplace: userData.workplace,
+          role: userData.role
+        });
+      } catch (err) {
+        console.warn('[Firestore] Profile initialization notice:', err.message);
+      }
+      setUser({ ...userData, isGuest: false });
+      return userData;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 2. Email / Password Sign In
+   */
+  async function handleSignInWithEmail(email, password) {
+    setError('');
+    try {
+      const userData = await authServiceSignInWithEmail(email, password);
+      setUser({ ...userData, isGuest: false });
+      return userData;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 3. Password Reset
+   */
+  async function handleResetPassword(email) {
+    setError('');
+    try {
+      await authServiceResetPassword(email);
+      return true;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 4. Google Sign-In
+   */
+  async function handleGoogleSignIn(profileData = {}) {
+    setError('');
+    try {
+      const res = await authServiceSignInWithGoogle(profileData);
+      if (!res) return null;
+
+      try {
+        await createUserProfile(res.uid, {
+          displayName: res.name,
+          email: res.email,
+          photoURL: res.avatar,
+          workplace: res.workplace,
+          role: res.role
+        });
+      } catch {
+        // non-critical
+      }
+
+      const fullUser = { ...res, isGuest: false };
+      setUser(fullUser);
+      return fullUser;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 5. Email Link Passwordless Sign-In
+   */
+  async function handleSendEmailVerificationLink(email) {
+    setError('');
+    try {
+      return await authServiceRequestEmailLink(email);
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  async function handleCompleteEmailLinkSignIn(email, url) {
+    setError('');
+    try {
+      const userData = await authServiceConfirmEmailLink(email, url);
+      try {
+        await createUserProfile(userData.uid, {
+          displayName: userData.name,
+          email: userData.email,
+          photoURL: userData.avatar,
+          workplace: userData.workplace,
+          role: userData.role
+        });
+      } catch {
+        // non-critical
+      }
+      setUser({ ...userData, isGuest: false });
+      return userData;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 6. Phone SMS OTP
+   */
+  async function handleSendPhoneOtp(phoneNumber, verifier) {
+    setError('');
+    try {
+      return await authServiceRequestPhoneOtp(phoneNumber, verifier);
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  async function handleVerifyPhoneOtp(confirmationResult, otp, profileData = {}) {
+    setError('');
+    try {
+      const userData = await authServiceConfirmPhoneOtp(confirmationResult, otp);
+      if (profileData.name || profileData.workplace) {
+        saveScientistProfile({
+          name: profileData.name || userData.name,
+          workplace: profileData.workplace || userData.workplace,
+          title: profileData.role || userData.role
+        });
+      }
+      try {
+        await createUserProfile(userData.uid, {
+          displayName: userData.name,
+          phoneNumber: userData.phoneNumber,
+          workplace: userData.workplace,
+          role: userData.role
+        });
+      } catch {
+        // non-critical
+      }
+      const fullUser = { ...userData, isGuest: false };
+      setUser(fullUser);
+      return fullUser;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 7. Guest Session Handlers
    */
   function handleContinueAsGuest(customGuestName) {
     setError('');
@@ -157,9 +332,6 @@ export function AuthProvider({ children }) {
     return guestUser;
   }
 
-  /**
-   * Exit Guest Session
-   */
   function handleExitGuestSession() {
     setError('');
     localStorage.removeItem('chemspace_token');
@@ -167,125 +339,6 @@ export function AuthProvider({ children }) {
     setUser(null);
     setProfile(null);
     window.dispatchEvent(new Event('chemspace-auth-changed'));
-  }
-
-  async function handleSendEmailOtp(email) {
-    setError('');
-    try {
-      const res = await requestEmailOtp(email);
-      return res;
-    } catch (err) {
-      const msg = formatAuthError(err);
-      setError(msg);
-      throw new Error(msg);
-    }
-  }
-
-  async function handleVerifyEmailOtp(email, otp, profileData = {}) {
-    setError('');
-    try {
-      const res = await confirmEmailOtp(email, otp);
-      if (res.user) {
-        if (profileData.name || profileData.workplace) {
-          saveScientistProfile({
-            name: profileData.name || res.user.name,
-            workplace: profileData.workplace || res.user.workplace,
-            title: profileData.role || res.user.role
-          });
-        }
-        setUser({ ...res.user, isGuest: false });
-      }
-      return res;
-    } catch (err) {
-      const msg = formatAuthError(err);
-      setError(msg);
-      throw new Error(msg);
-    }
-  }
-
-  async function handleSendPhoneOtp(phoneNumber, verifier) {
-    setError('');
-    try {
-      const confirmationResult = await requestPhoneOtp(phoneNumber, verifier);
-      return confirmationResult;
-    } catch (err) {
-      const msg = formatAuthError(err);
-      setError(msg);
-      throw new Error(msg);
-    }
-  }
-
-  async function handleVerifyPhoneOtp(confirmationResult, otp, profileData = {}) {
-    setError('');
-    try {
-      const userData = await confirmPhoneOtp(confirmationResult, otp);
-      if (profileData.name || profileData.workplace) {
-        saveScientistProfile({
-          name: profileData.name || userData.name,
-          workplace: profileData.workplace || userData.workplace,
-          title: profileData.role || userData.role
-        });
-      }
-      const fullUser = { ...userData, isGuest: false };
-      setUser(fullUser);
-      return fullUser;
-    } catch (err) {
-      const msg = formatAuthError(err);
-      setError(msg);
-      throw new Error(msg);
-    }
-  }
-
-  async function handleCheckEmail(email) {
-    return checkEmailExists(email);
-  }
-
-  async function handleGoogleSignIn(profileData = {}) {
-    setError('');
-    try {
-      const res = await authServiceSignInWithGoogle();
-      if (!res || !res.user) {
-        // Redirect flow initiated
-        return null;
-      }
-
-      const googleUser = res.user;
-      const token = await googleUser.getIdToken();
-
-      const defaultProfile = getSavedScientistProfile();
-      const userData = {
-        uid: googleUser.uid,
-        name: profileData.name || googleUser.displayName || defaultProfile.name || 'Verified Scientist',
-        username: googleUser.displayName || defaultProfile.name || 'Scientist',
-        email: googleUser.email || defaultProfile.email || '',
-        avatar: googleUser.photoURL || defaultProfile.avatar || '',
-        workplace: profileData.workplace || defaultProfile.workplace || 'ChemNova Research Institute',
-        role: profileData.role || defaultProfile.title || 'Lead Research Chemist',
-        provider: 'google',
-        verified: true,
-        isGuest: false,
-        lastLoginAt: new Date().toISOString()
-      };
-
-      if (profileData.name || profileData.workplace) {
-        saveScientistProfile({
-          name: userData.name,
-          workplace: userData.workplace,
-          title: userData.role
-        });
-      }
-
-      setUser(userData);
-      localStorage.setItem('chemspace_token', token);
-      localStorage.setItem('chemspace_user', JSON.stringify(userData));
-      localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...defaultProfile, ...userData }));
-      window.dispatchEvent(new Event('chemspace-auth-changed'));
-      return userData;
-    } catch (err) {
-      const msg = formatAuthError(err);
-      setError(msg);
-      throw new Error(msg);
-    }
   }
 
   async function handleSignOut() {
@@ -314,16 +367,19 @@ export function AuthProvider({ children }) {
     isAuthenticated,
     isGuest,
     authStatus,
-    continueAsGuest: handleContinueAsGuest,
-    exitGuestSession: handleExitGuestSession,
-    sendEmailOtp: handleSendEmailOtp,
-    verifyEmailOtp: handleVerifyEmailOtp,
+    signUpWithEmail: handleSignUpWithEmail,
+    signInWithEmail: handleSignInWithEmail,
+    resetPassword: handleResetPassword,
+    signInWithGoogle: handleGoogleSignIn,
+    sendEmailVerificationLink: handleSendEmailVerificationLink,
+    completeEmailLinkSignIn: handleCompleteEmailLinkSignIn,
     sendPhoneOtp: handleSendPhoneOtp,
     verifyPhoneOtp: handleVerifyPhoneOtp,
-    signInWithGoogle: handleGoogleSignIn,
-    signOut: handleSignOut,
     setupRecaptcha: initRecaptcha,
-    checkEmailExists: handleCheckEmail
+    continueAsGuest: handleContinueAsGuest,
+    exitGuestSession: handleExitGuestSession,
+    signOut: handleSignOut,
+    checkEmailExists
   };
 
   return (
@@ -346,38 +402,47 @@ function formatAuthError(err) {
   const code = err.code || '';
   const message = err.message || '';
 
-  if (code === 'auth/invalid-verification-code' || message.includes('invalid-verification-code') || message.includes('Incorrect verification code') || message.includes('Invalid verification code')) {
+  if (code === 'auth/invalid-verification-code' || message.includes('invalid-verification-code')) {
     return 'Invalid verification code. Please check the code and try again.';
   }
   if (code === 'auth/code-expired' || message.includes('expired')) {
-    return 'Verification code expired. Please request a new code.';
+    return 'Verification code has expired. Please request a new code.';
   }
-  if (code === 'auth/too-many-requests' || message.includes('Too many') || message.includes('cooldown') || message.includes('wait')) {
-    return message || 'Too many attempts. Please wait before requesting another code.';
+  if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+    return 'Invalid email or password. Please verify your credentials or create an account.';
+  }
+  if (code === 'auth/email-already-in-use') {
+    return 'An account with this email address already exists. Please sign in instead.';
+  }
+  if (code === 'auth/weak-password') {
+    return 'Password is too weak. Please use at least 6 characters.';
+  }
+  if (code === 'auth/too-many-requests' || message.includes('Too many')) {
+    return 'Too many attempts. Please wait a moment before trying again.';
   }
   if (code === 'auth/invalid-phone-number' || message.includes('phone-number')) {
-    return 'Please enter a valid international mobile phone number starting with your country code.';
+    return 'Please enter a valid mobile phone number with country code.';
   }
   if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
-    return 'Google sign-in was cancelled.';
+    return 'Sign-in popup was closed before completing.';
   }
   if (code === 'auth/popup-blocked') {
-    return 'Sign-in popup was blocked by your browser. Please allow popups for this site.';
+    return 'Sign-in popup was blocked by your browser. Please enable popups for this site.';
   }
   if (code === 'auth/unauthorized-domain') {
-    return 'Authentication domain not authorized. Please add this domain to Authorized Domains in Firebase Console.';
+    return 'Authentication domain not authorized. In Firebase Console, ensure "localhost" is listed in Authorized Domains.';
   }
   if (code === 'auth/operation-not-allowed') {
-    return 'This authentication provider is disabled in Firebase Console. Please enable it in Authentication > Sign-in method.';
+    return 'This sign-in provider is not enabled in Firebase Console. Please enable it in Authentication > Sign-in method.';
   }
   if (code === 'auth/configuration-not-found') {
-    return 'Firebase Authentication is not activated in this project. Please click "Get Started" in Firebase Console.';
+    return 'Firebase Authentication is not activated in project chemistry1-e2723. Click "Get Started" in Firebase Console.';
   }
   if (code === 'auth/captcha-check-failed') {
     return 'Security reCAPTCHA verification failed. Please refresh and try again.';
   }
   if (code === 'auth/network-request-failed') {
-    return 'Network connection failed. Please verify your internet connection.';
+    return 'Network connection failed. Please check your internet connection.';
   }
 
   return message || 'Authentication failed. Please try again.';

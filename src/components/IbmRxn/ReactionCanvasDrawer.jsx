@@ -18,7 +18,6 @@ import {
   Hexagon,
   Minus,
   PenTool,
-  Sparkles,
   Plus,
   Compass,
   Layers,
@@ -724,7 +723,7 @@ export default function ReactionCanvasDrawer({
               className="p-2 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 transition"
               title="2D Structure Cleanup & Geometry Optimization"
             >
-              <Sparkles className="w-4 h-4" />
+              <Compass className="w-4 h-4" />
             </button>
           </div>
         </div>

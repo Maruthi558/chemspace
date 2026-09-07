@@ -12,7 +12,6 @@ import {
   Terminal,
   FileCode,
   Settings,
-  Sparkles,
   Box,
   Mic,
   MicOff,

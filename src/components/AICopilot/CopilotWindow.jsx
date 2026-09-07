@@ -5,7 +5,6 @@ import {
   Mic,
   MicOff,
   Bot,
-  Sparkles,
   Terminal,
   Activity,
   History,
@@ -376,7 +375,7 @@ export default function CopilotWindow({ onClose }) {
         {/* Action Notice Bar (when AI executes safe platform action) */}
         {actionNotice && (
           <div className="px-5 py-2 bg-cyan-500/10 border-b border-cyan-500/20 text-cyan-400 text-xs font-bold flex items-center gap-2 animate-pulse">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Bot className="w-3.5 h-3.5" />
             <span>{actionNotice}</span>
           </div>
         )}

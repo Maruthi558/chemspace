@@ -8,7 +8,6 @@ import {
   Cpu,
   FileText,
   AlertTriangle,
-  Sparkles,
   Layers,
   CheckCircle2,
   Info

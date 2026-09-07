@@ -2,7 +2,6 @@ import React from 'react';
 import {
   X,
   Workflow,
-  Sparkles,
   Layers,
   Thermometer,
   ShieldAlert,

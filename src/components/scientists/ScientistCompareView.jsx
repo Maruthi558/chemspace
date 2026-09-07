@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GitCompare, Award, Atom, Sparkles, BookOpen, Layers, ArrowRight } from 'lucide-react';
+import { GitCompare, Award, Atom, FlaskConical, BookOpen, Layers, ArrowRight } from 'lucide-react';
 import { FAMOUS_CHEMISTS } from '../../data/chemistsData';
 import ScientistPortrait, { getFieldColor } from './ScientistPortrait';
 
@@ -113,7 +113,7 @@ export default function ScientistCompareView({ onSelectScientist }) {
               {/* Major Discoveries */}
               <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
                 <span className="text-[10px] font-mono font-bold uppercase flex items-center gap-1" style={{ color: fc.accent }}>
-                  <Sparkles className="w-3 h-3" /> Breakthrough Discoveries:
+                  <FlaskConical className="w-3 h-3" /> Breakthrough Discoveries:
                 </span>
                 <ul className="space-y-1.5">
                   {scientist.discoveries?.slice(0, 3).map((d, i) => (

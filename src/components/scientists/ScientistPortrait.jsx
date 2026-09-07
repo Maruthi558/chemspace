@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Eye, ShieldCheck, Cpu } from 'lucide-react';
+import { Eye, ShieldCheck, Cpu } from 'lucide-react';
 
 /* ─── Field Color Map ─────────────────────────────────────────────────── */
 export const FIELD_COLORS = {
@@ -257,7 +257,7 @@ export default function ScientistPortrait({
         <div className="absolute top-3 left-3 z-30 flex items-center gap-1 px-2 py-0.5 rounded-md text-[9px] font-mono font-bold bg-black/75 backdrop-blur-md border border-white/15">
           {scientist.isAiPortrait ? (
             <>
-              <Sparkles className="w-2.5 h-2.5 text-amber-400" />
+              <Cpu className="w-2.5 h-2.5 text-amber-400" />
               <span className="text-amber-300">Illustrative Portrait</span>
             </>
           ) : (

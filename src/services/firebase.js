@@ -6,22 +6,30 @@ import {
   signInWithRedirect,
   getRedirectResult,
   signInWithCredential,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  sendSignInLinkToEmail,
+  isSignInWithEmailLink,
+  signInWithEmailLink,
   signOut,
   RecaptchaVerifier,
-  signInWithPhoneNumber
+  signInWithPhoneNumber,
+  updateProfile,
+  onAuthStateChanged
 } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Firebase Configuration for Project maruthii-5b928
+// Firebase Configuration for Project chemistry1-e2723
 // ─────────────────────────────────────────────────────────────────────────────
-export const OFFICIAL_FIREBASE_API_KEY = "AIzaSyAOiMjPfccNgrM-MjeJwJ0W2nHKNf7dqYA";
+export const OFFICIAL_FIREBASE_API_KEY = "AIzaSyD6wQ5O3OjTvP9T4EkmzTcvxkNfgmTbXaQ";
 
 // Automatically ensure client storage has the verified official key
 if (typeof window !== 'undefined') {
   const current = localStorage.getItem('chemspace_firebase_api_key');
-  if (!current || !current.startsWith('AIzaSy') || current.includes('BigERe2gl7yVROpD')) {
+  if (!current || !current.startsWith('AIzaSy') || current !== OFFICIAL_FIREBASE_API_KEY) {
     localStorage.setItem('chemspace_firebase_api_key', OFFICIAL_FIREBASE_API_KEY);
   }
 }
@@ -32,19 +40,19 @@ export function getFirebaseConfig() {
 
   const validApiKey = (envApiKey && envApiKey.startsWith('AIzaSy'))
     ? envApiKey
-    : (localApiKey && localApiKey.startsWith('AIzaSy') && !localApiKey.includes('BigERe2gl7yVROpD'))
+    : (localApiKey && localApiKey.startsWith('AIzaSy'))
       ? localApiKey
       : OFFICIAL_FIREBASE_API_KEY;
 
   return {
     apiKey: validApiKey,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "maruthii-5b928.firebaseapp.com",
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "maruthii-5b928",
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "maruthii-5b928.firebasestorage.app",
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "11169483347",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:11169483347:web:d6f6f119aea5d1c948d4a6",
-    googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || "11169483347-r2iqvfmful9qm0pqq6fpjuepvbcip17u.apps.googleusercontent.com",
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-DFEJHTZDLQ",
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "chemistry1-e2723.firebaseapp.com",
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "chemistry1-e2723",
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "chemistry1-e2723.firebasestorage.app",
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "207628840301",
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:207628840301:web:24c5fbe2c9b23297cfbe64",
+    googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || "207628840301.apps.googleusercontent.com",
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-86Q3K0PKEW",
   };
 }
 
@@ -165,10 +173,10 @@ export function saveScientistProfile(profileData) {
   }
 }
 
-/**
- * Perform real Google Sign-In with Firebase Popup
- */
-export async function loginWithGoogle() {
+// ─────────────────────────────────────────────────────────────────────────────
+// 1. Google Sign-In
+// ─────────────────────────────────────────────────────────────────────────────
+export const loginWithGoogle = async () => {
   ensureFreshFirebaseAuth();
   const profile = getSavedScientistProfile();
 
@@ -199,12 +207,13 @@ export async function loginWithGoogle() {
     localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
 
     window.dispatchEvent(new Event('chemspace-auth-changed'));
+    console.log("Successfully logged in with Google:", result.user);
     return userData;
   } catch (err) {
-    console.error('Firebase Google Auth error:', err);
+    console.error("Google Sign-In Error:", err);
     throw err;
   }
-}
+};
 
 /**
  * Check if the user is returning from a Google Sign-In redirect flow
@@ -287,35 +296,149 @@ export async function loginWithGoogleIdToken(idToken) {
   }
 }
 
-/**
- * Sign out user from Firebase and clear local session
- */
-export async function logoutUser() {
-  try {
-    await signOut(auth);
-  } catch (err) {
-    console.warn('Firebase signOut error:', err);
-  }
-  localStorage.removeItem('chemspace_token');
-  localStorage.removeItem('chemspace_user');
-  window.dispatchEvent(new Event('chemspace-auth-changed'));
-}
-
-/**
- * Save custom Firebase Web API key in local storage and reinitialize auth instance
- */
-export function setCustomFirebaseApiKey(key) {
-  if (!key) return;
-  localStorage.setItem('chemspace_firebase_api_key', key.trim());
+// ─────────────────────────────────────────────────────────────────────────────
+// 2. Email / Password Authentication
+// ─────────────────────────────────────────────────────────────────────────────
+export async function signUpWithEmailPassword(email, password, displayName, profileMeta = {}) {
   ensureFreshFirebaseAuth();
+  const profile = getSavedScientistProfile();
+  const credential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+  const user = credential.user;
+
+  if (displayName) {
+    try {
+      await updateProfile(user, { displayName });
+    } catch {
+      // ignore
+    }
+  }
+
+  const token = await user.getIdToken();
+  const userData = {
+    uid: user.uid,
+    name: displayName || user.displayName || profileMeta.name || profile.name || 'Research Scientist',
+    username: displayName || user.displayName || profileMeta.name || 'Scientist',
+    email: user.email,
+    workplace: profileMeta.workplace || profile.workplace || 'ChemNova Research Institute',
+    role: profileMeta.role || profile.title || 'Lead Research Chemist',
+    provider: 'password',
+    verified: true,
+    lastLoginAt: new Date().toISOString()
+  };
+
+  localStorage.setItem('chemspace_token', token);
+  localStorage.setItem('chemspace_user', JSON.stringify(userData));
+  localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
+  window.dispatchEvent(new Event('chemspace-auth-changed'));
+  return userData;
 }
 
+export async function signInWithEmailPassword(email, password) {
+  ensureFreshFirebaseAuth();
+  const profile = getSavedScientistProfile();
+  const credential = await signInWithEmailAndPassword(auth, email.trim(), password);
+  const user = credential.user;
+  const token = await user.getIdToken();
 
+  const userData = {
+    uid: user.uid,
+    name: user.displayName || profile.name || 'Research Scientist',
+    username: user.displayName || profile.name || 'Scientist',
+    email: user.email,
+    workplace: profile.workplace || 'ChemNova Research Institute',
+    role: profile.title || 'Lead Research Chemist',
+    avatar: user.photoURL || profile.avatar || '',
+    provider: 'password',
+    verified: true,
+    lastLoginAt: new Date().toISOString()
+  };
 
-/**
- * Setup invisible or standard RecaptchaVerifier for Phone OTP
- */
-export function setupRecaptchaVerifier(containerId = 'recaptcha-container') {
+  localStorage.setItem('chemspace_token', token);
+  localStorage.setItem('chemspace_user', JSON.stringify(userData));
+  localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
+  window.dispatchEvent(new Event('chemspace-auth-changed'));
+  return userData;
+}
+
+export async function resetUserPassword(email) {
+  ensureFreshFirebaseAuth();
+  await sendPasswordResetEmail(auth, email.trim());
+  return true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3. Email Link Passwordless Sign-In
+// ─────────────────────────────────────────────────────────────────────────────
+export const sendEmailVerificationLink = async (email) => {
+  ensureFreshFirebaseAuth();
+  const actionCodeSettings = {
+    url: (typeof window !== 'undefined' ? window.location.origin : '') + "/finish-signup",
+    handleCodeInApp: true,
+  };
+  try {
+    await sendSignInLinkToEmail(auth, email.trim(), actionCodeSettings);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem("emailForSignIn", email.trim());
+    }
+    console.log("Verification link sent to email:", email);
+    return true;
+  } catch (error) {
+    console.error("Email link error:", error);
+    throw error;
+  }
+};
+
+export const completeEmailLinkSignIn = async (emailToUse, hrefUrl) => {
+  ensureFreshFirebaseAuth();
+  const url = hrefUrl || (typeof window !== 'undefined' ? window.location.href : '');
+
+  if (!isSignInWithEmailLink(auth, url)) {
+    throw new Error('This link is invalid or has expired. Please request a new sign-in link.');
+  }
+
+  let email = emailToUse;
+  if (!email && typeof window !== 'undefined') {
+    email = window.localStorage.getItem('emailForSignIn');
+  }
+
+  if (!email) {
+    throw new Error('Please provide your email address to confirm sign-in.');
+  }
+
+  const result = await signInWithEmailLink(auth, email.trim(), url);
+  const user = result.user;
+  const token = await user.getIdToken();
+  const profile = getSavedScientistProfile();
+
+  const userData = {
+    uid: user.uid,
+    name: user.displayName || profile.name || 'Verified Scientist',
+    username: user.displayName || profile.name || 'Scientist',
+    email: user.email || email,
+    workplace: profile.workplace || 'ChemNova Research Institute',
+    role: profile.title || 'Lead Research Chemist',
+    avatar: user.photoURL || profile.avatar || '',
+    provider: 'email_link',
+    verified: true,
+    lastLoginAt: new Date().toISOString()
+  };
+
+  if (typeof window !== 'undefined') {
+    window.localStorage.removeItem('emailForSignIn');
+    localStorage.setItem('chemspace_token', token);
+    localStorage.setItem('chemspace_user', JSON.stringify(userData));
+    localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
+    window.dispatchEvent(new Event('chemspace-auth-changed'));
+  }
+
+  return userData;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. Phone OTP (SMS) Sign-In
+// ─────────────────────────────────────────────────────────────────────────────
+// Setup the reCAPTCHA verifier (containerId should point to an empty div in your HTML)
+export const setupRecaptcha = (containerId = 'recaptcha-container') => {
   ensureFreshFirebaseAuth();
   if (typeof window === 'undefined') return null;
 
@@ -328,7 +451,10 @@ export function setupRecaptchaVerifier(containerId = 'recaptcha-container') {
   }
 
   const container = document.getElementById(containerId);
-  if (!container) return null;
+  if (!container) {
+    console.warn(`[Firebase Phone Auth] Container element #${containerId} not found in DOM.`);
+    return null;
+  }
 
   try {
     window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
@@ -342,31 +468,31 @@ export function setupRecaptchaVerifier(containerId = 'recaptcha-container') {
     });
     return window.recaptchaVerifier;
   } catch (err) {
-    console.warn('RecaptchaVerifier init notice:', err);
+    console.warn('RecaptchaVerifier initialization notice:', err);
     return null;
   }
-}
+};
 
-/**
- * Send Phone OTP via Firebase Phone Auth
- */
-export async function sendFirebasePhoneOtp(phoneNumber, verifier) {
+export const sendSMS = async (phoneNumber, appVerifier) => {
   ensureFreshFirebaseAuth();
-  let appVerifier = verifier || window.recaptchaVerifier;
-  if (!appVerifier) {
-    appVerifier = setupRecaptchaVerifier('recaptcha-container');
+  try {
+    let verifier = appVerifier || window.recaptchaVerifier;
+    if (!verifier) {
+      verifier = setupRecaptcha('recaptcha-container');
+    }
+    if (!verifier) {
+      throw new Error('Security verification element not initialized. Please refresh and try again.');
+    }
+    const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier);
+    console.log("SMS Sent successfully!");
+    return confirmationResult;
+  } catch (error) {
+    console.error("SMS Sending Error:", error);
+    throw error;
   }
-  if (!appVerifier) {
-    throw new Error('Security verification element not initialized. Please refresh and try again.');
-  }
-  const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-  return confirmationResult;
-}
+};
 
-/**
- * Verify Phone OTP confirmationResult and store authenticated session
- */
-export async function verifyFirebasePhoneOtp(confirmationResult, otpCode) {
+export const confirmSMS = async (confirmationResult, otpCode) => {
   const profile = getSavedScientistProfile();
   const result = await confirmationResult.confirm(otpCode);
   const user = result.user;
@@ -396,7 +522,31 @@ export async function verifyFirebasePhoneOtp(confirmationResult, otpCode) {
   localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
   window.dispatchEvent(new Event('chemspace-auth-changed'));
   return userData;
+};
+
+// Aliases for backwards compatibility
+export const setupRecaptchaVerifier = setupRecaptcha;
+export const sendFirebasePhoneOtp = sendSMS;
+export const verifyFirebasePhoneOtp = confirmSMS;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sign Out
+// ─────────────────────────────────────────────────────────────────────────────
+export async function logoutUser() {
+  try {
+    await signOut(auth);
+  } catch (err) {
+    console.warn('Firebase signOut error:', err);
+  }
+  localStorage.removeItem('chemspace_token');
+  localStorage.removeItem('chemspace_user');
+  window.dispatchEvent(new Event('chemspace-auth-changed'));
+}
+
+export function setCustomFirebaseApiKey(key) {
+  if (!key) return;
+  localStorage.setItem('chemspace_firebase_api_key', key.trim());
+  ensureFreshFirebaseAuth();
 }
 
 export { app, auth, db, googleProvider, analytics };
-

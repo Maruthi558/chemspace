@@ -1,31 +1,20 @@
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signInWithRedirect,
-  GoogleAuthProvider,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  updateProfile,
-} from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   auth,
-  sendFirebasePhoneOtp,
-  verifyFirebasePhoneOtp,
-  setupRecaptchaVerifier,
-  getSavedScientistProfile,
-  checkGoogleRedirectResult
+  loginWithGoogle,
+  checkGoogleRedirectResult,
+  signUpWithEmailPassword,
+  signInWithEmailPassword,
+  resetUserPassword,
+  sendEmailVerificationLink,
+  completeEmailLinkSignIn,
+  setupRecaptcha,
+  sendSMS,
+  confirmSMS,
+  logoutUser,
+  getSavedScientistProfile
 } from './firebase';
-import {
-  sendEmailOtp as apiSendEmailOtp,
-  verifyEmailOtp as apiVerifyEmailOtp,
-  sendPhoneOtpApi,
-  verifyPhoneOtpApi,
-  checkEmailExistsApi
-} from './api';
-
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: 'select_account' });
+import { checkEmailExistsApi } from './api';
 
 /**
  * Check whether an account exists with the specified email.
@@ -35,167 +24,80 @@ export async function checkEmailExists(email) {
 }
 
 /**
- * Register a new user with email and password.
+ * Register a new user with email and password via Firebase Auth.
  */
-export async function signUpWithEmail(email, password, displayName) {
-  const credential = await createUserWithEmailAndPassword(auth, email, password);
-  if (displayName) {
-    await updateProfile(credential.user, { displayName });
-  }
-  return credential;
+export async function signUpWithEmail(email, password, displayName, profileMeta = {}) {
+  return signUpWithEmailPassword(email, password, displayName, profileMeta);
 }
 
 /**
- * Sign in an existing user with email and password.
+ * Sign in an existing user with email and password via Firebase Auth.
  */
 export async function signInWithEmail(email, password) {
-  return signInWithEmailAndPassword(auth, email, password);
+  return signInWithEmailPassword(email, password);
 }
 
 /**
- * Sign in with a Google popup or redirect fallback.
+ * Trigger password reset email via Firebase Auth.
  */
-export async function signInWithGoogle() {
-  try {
-    return await signInWithPopup(auth, googleProvider);
-  } catch (err) {
-    if (err.code === 'auth/popup-blocked') {
-      console.warn('[ChemSpace Auth] Popup was blocked by browser. Attempting redirect mode...');
-      return await signInWithRedirect(auth, googleProvider);
-    }
-    throw err;
-  }
+export async function resetPassword(email) {
+  return resetUserPassword(email);
 }
 
 /**
- * Capture Google Sign-In result if redirected
+ * Sign in with Google (Popup with fallback)
+ */
+export async function signInWithGoogle(profileMeta = {}) {
+  return loginWithGoogle();
+}
+
+/**
+ * Capture Google Sign-In result if returning from redirect flow.
  */
 export async function getGoogleRedirectResult() {
   return checkGoogleRedirectResult();
 }
 
 /**
- * Request Email OTP code.
+ * Send Passwordless Email Magic Link via Firebase Auth.
  */
-export async function requestEmailOtp(email) {
-  return apiSendEmailOtp(email);
+export async function requestEmailLink(email) {
+  return sendEmailVerificationLink(email);
 }
 
 /**
- * Verify Email OTP code and receive session.
+ * Complete Passwordless Email Link Sign-In.
  */
-export async function confirmEmailOtp(email, otp) {
-  const result = await apiVerifyEmailOtp(email, otp);
-  if (result.token) {
-    const profile = getSavedScientistProfile();
-    const userData = {
-      uid: result.user.uid,
-      name: result.user.name || profile.name || 'Researcher',
-      username: result.user.username || profile.name,
-      email: result.user.email,
-      avatar: profile.avatar || '',
-      workplace: profile.workplace || 'ChemNova Research Institute',
-      role: profile.title || 'Lead Research Chemist',
-      department: profile.department,
-      safetyLevel: profile.safetyLevel,
-      workingCondition: profile.workingCondition,
-      researchField: profile.researchField,
-      provider: 'email_otp',
-      verified: true,
-      lastLoginAt: new Date().toISOString()
-    };
-    localStorage.setItem('chemspace_token', result.token);
-    localStorage.setItem('chemspace_user', JSON.stringify(userData));
-    localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
-    window.dispatchEvent(new Event('chemspace-auth-changed'));
-    return { token: result.token, user: userData };
-  }
-  return result;
+export async function confirmEmailLink(email, url) {
+  return completeEmailLinkSignIn(email, url);
 }
 
 /**
- * Initialize reCAPTCHA for Phone OTP.
+ * Initialize reCAPTCHA for Phone Auth.
  */
-export function initRecaptcha(containerId) {
-  return setupRecaptchaVerifier(containerId);
+export function initRecaptcha(containerId = 'recaptcha-container') {
+  return setupRecaptcha(containerId);
 }
 
 /**
- * Send Phone OTP via Firebase SMS or Backend Provider
+ * Send Phone OTP via Firebase SMS.
  */
 export async function requestPhoneOtp(phoneNumber, verifier) {
-  try {
-    const confirmationResult = await sendFirebasePhoneOtp(phoneNumber, verifier);
-    return confirmationResult;
-  } catch (firebaseErr) {
-    console.warn('[ChemSpace Auth] Firebase Phone Auth error:', firebaseErr.message || firebaseErr);
-    // If backend SMS configured, attempt fallback
-    try {
-      const apiRes = await sendPhoneOtpApi(phoneNumber);
-      if (apiRes && apiRes.status === 'success') {
-        return {
-          isBackend: true,
-          phone: phoneNumber,
-          message: apiRes.message
-        };
-      }
-    } catch {
-      // Backend SMS not configured or failed; propagate primary Firebase error
-    }
-    throw firebaseErr;
-  }
+  return sendSMS(phoneNumber, verifier);
 }
 
 /**
- * Confirm Phone OTP.
+ * Confirm Phone OTP via Firebase confirmationResult.
  */
 export async function confirmPhoneOtp(confirmationResult, otpCode) {
-  if (confirmationResult && typeof confirmationResult.confirm === 'function') {
-    return verifyFirebasePhoneOtp(confirmationResult, otpCode);
-  }
-
-  const phone = confirmationResult?.phone || (typeof confirmationResult === 'string' ? confirmationResult : '');
-  const result = await verifyPhoneOtpApi(phone, otpCode);
-  if (result.token) {
-    const profile = getSavedScientistProfile();
-    const userData = {
-      uid: result.user.uid,
-      name: result.user.name || profile.name || `Researcher (${phone.slice(-4)})`,
-      username: result.user.username || profile.name,
-      email: profile.email || '',
-      phoneNumber: phone,
-      avatar: profile.avatar || '',
-      workplace: profile.workplace || 'ChemNova Research Institute',
-      role: profile.title || 'Lead Research Chemist',
-      department: profile.department,
-      safetyLevel: profile.safetyLevel,
-      workingCondition: profile.workingCondition,
-      researchField: profile.researchField,
-      provider: 'phone_otp',
-      verified: true,
-      lastLoginAt: new Date().toISOString()
-    };
-    localStorage.setItem('chemspace_token', result.token);
-    localStorage.setItem('chemspace_user', JSON.stringify(userData));
-    localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
-    window.dispatchEvent(new Event('chemspace-auth-changed'));
-    return userData;
-  }
-  return result;
+  return confirmSMS(confirmationResult, otpCode);
 }
 
 /**
  * Sign out the currently authenticated user.
  */
 export async function signOut() {
-  try {
-    await firebaseSignOut(auth);
-  } catch {
-    // ignore
-  }
-  localStorage.removeItem('chemspace_token');
-  localStorage.removeItem('chemspace_user');
-  window.dispatchEvent(new Event('chemspace-auth-changed'));
+  return logoutUser();
 }
 
 /**
@@ -204,3 +106,12 @@ export async function signOut() {
 export function onAuthChange(callback) {
   return onAuthStateChanged(auth, callback);
 }
+
+export {
+  loginWithGoogle,
+  sendEmailVerificationLink,
+  completeEmailLinkSignIn,
+  setupRecaptcha,
+  sendSMS,
+  confirmSMS
+};

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, MapPin, Send, Sparkles, Bot, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Mail, MapPin, Send, Bot, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function Contact() {
   const [message, setMessage] = useState('');

@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -25,7 +26,12 @@ function spaFallbackPlugin() {
 }
 
 export default defineConfig({
-  plugins: [react(), spaFallbackPlugin()],
+  plugins: [react(), tailwindcss(), spaFallbackPlugin()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+  },
   server: {
     proxy: {
       '/api': {

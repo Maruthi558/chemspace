@@ -3,7 +3,6 @@ import {
   X,
   Search,
   Plus,
-  Sparkles,
   FlaskConical,
   Filter,
   CheckCircle2,

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PERIODIC_ELEMENTS, CATEGORY_COLORS, CATEGORY_THEMES } from '../data/periodicData';
 import ThreeAtomShell from '../components/ThreeAtomShell';
-import { Grid, Sparkles, Layers, Search, Info, Atom, Eye, CheckCircle2, Sliders, Flame, Droplets, Wind, Zap } from 'lucide-react';
+import { Grid, Layers, Search, Info, Atom, Eye, CheckCircle2, Sliders, Flame, Droplets, Wind, Zap } from 'lucide-react';
 import { logActivity } from '../services/activityStore';
 
 export default function PeriodicTable() {

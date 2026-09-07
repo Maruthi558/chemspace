@@ -3,7 +3,6 @@ import {
   Plus,
   Trash2,
   Layers,
-  Sparkles,
   RotateCcw,
   CheckCircle2,
   Download,

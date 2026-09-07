@@ -10,7 +10,6 @@ import {
   Copy,
   Terminal,
   Layers,
-  Sparkles,
   Search,
   Download,
   Share2,
@@ -148,7 +147,7 @@ export default function QuantumResultDashboard({ result }) {
             {/* AI Interpretation Card */}
             <div className="p-6 rounded-[28px] bg-slate-800/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 relative overflow-hidden shadow-inner">
               <div className="flex items-center gap-2.5 mb-3">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <Cpu className="w-4 h-4 text-cyan-400" />
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">
                   AI Quantum Mechanistic Analysis
                 </h4>

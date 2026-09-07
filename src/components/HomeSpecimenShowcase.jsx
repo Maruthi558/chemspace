@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import {
   RotateCw,
-  Sparkles,
   Maximize2,
   Layers,
   ArrowRight,

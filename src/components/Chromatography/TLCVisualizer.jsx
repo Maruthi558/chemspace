@@ -5,7 +5,6 @@ import {
   Plus,
   Trash2,
   Sliders,
-  Sparkles,
   RotateCcw,
   CheckCircle2,
   Info
@@ -176,7 +175,7 @@ export default function TLCVisualizer({
         {/* TLC Plate Canvas Box */}
         <div className="w-full md:w-[480px] shrink-0 p-4 rounded-3xl inner-box border border-[var(--border-subtle)] bg-[#03060c] flex flex-col items-center justify-center shadow-2xl">
           <div className="text-[10px] font-mono text-cyan-400 font-bold mb-2 flex items-center gap-1.5">
-            <Sparkles className="w-3 h-3 text-cyan-400" />
+            <Eye className="w-3 h-3 text-cyan-400" />
             <span>Mode: {plateBgStyle.label}</span>
           </div>
 

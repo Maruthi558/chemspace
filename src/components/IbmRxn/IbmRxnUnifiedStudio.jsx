@@ -4,7 +4,6 @@ import {
   Activity,
   Play,
   ArrowRight,
-  Sparkles,
   Layers,
   Cpu,
   PenTool,
@@ -280,7 +279,7 @@ export default function IbmRxnUnifiedStudio() {
           <div className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] space-y-5 shadow-2xl bg-gradient-to-r from-cyan-500/5 via-violet-500/5 to-transparent">
             <div className="flex items-center justify-between border-b border-inherit pb-3">
               <span className="text-xs font-black uppercase text-[var(--text-primary)] flex items-center gap-1.5">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
+                <Workflow className="w-4 h-4 text-cyan-400" />
                 Reaction Definition (Reactants + Reagents → Product)
               </span>
 

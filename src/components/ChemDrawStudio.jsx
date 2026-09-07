@@ -23,7 +23,6 @@ import {
   ShieldCheck,
   Search,
   PenTool,
-  Sparkles,
   RefreshCw,
   Plus,
   Compass,
@@ -1374,7 +1373,7 @@ export default function ChemDrawStudio() {
               className="p-2 hover:bg-white dark:hover:bg-white/10 rounded-xl transition text-cyan-600 dark:text-cyan-400 font-bold"
               title="Clean Up Structure (Intelligent Geometry Layout)"
             >
-              <Sparkles className="w-4 h-4" />
+              <Compass className="w-4 h-4" />
             </button>
             <button
               onClick={() => handleRotate(30)}

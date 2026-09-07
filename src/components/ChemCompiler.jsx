@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Terminal, Play, RotateCcw, Copy, Check, Code, Sparkles, FileText, Cpu, ShieldAlert } from 'lucide-react';
+import { Terminal, Play, RotateCcw, Copy, Check, Code, FileText, Cpu, ShieldAlert } from 'lucide-react';
 
 const PRESET_SCRIPTS = [
   {

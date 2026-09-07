@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, CheckCircle, HelpCircle, Sparkles, Award, ArrowRight, Box } from 'lucide-react';
+import { BookOpen, CheckCircle, HelpCircle, Award, ArrowRight, Box } from 'lucide-react';
 import ThreeMoleculeViewer from '../components/ThreeMoleculeViewer';
 import { MOLECULES } from '../data/moleculeData';
 

@@ -3,14 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import {
   Award,
   BookOpen,
-  Sparkles,
   Atom,
   Clock,
   FileText,
   Bookmark,
   Users,
   X,
-  Star,
   FlaskConical,
   Zap,
   CheckCircle2,
@@ -84,7 +82,7 @@ export default function ScientistDetailModal({
 
   const tabs = [
     { id: 'story', label: 'Scientific Contributions', icon: BookOpen },
-    { id: 'discoveries', label: 'Discoveries & Experiments', icon: Sparkles },
+    { id: 'discoveries', label: 'Discoveries & Experiments', icon: FlaskConical },
     { id: 'visual', label: 'Interactive Simulation', icon: Zap },
     { id: 'molecule', label: 'Signature Molecule', icon: Atom },
     { id: 'equations', label: 'Formulations & Models', icon: FileText },
@@ -174,7 +172,7 @@ export default function ScientistDetailModal({
                 backdropFilter: 'blur(8px)'
               }}
             >
-              <Star className="w-3.5 h-3.5 fill-current" />
+              <Award className="w-3.5 h-3.5" />
               <span>Nobel Laureate</span>
             </div>
           )}
