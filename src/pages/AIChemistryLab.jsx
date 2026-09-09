@@ -592,10 +592,10 @@ export default function AIChemistryLab() {
         </div>
       )}
 
-      {/* 3. MAIN WORKSPACE GRID — Code Editor (Left) & Professional Output (Right) */}
+      {/* 3. MAIN WORKSPACE GRID — Balanced Code Editor (Left) & Professional Output (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start">
-        {/* Left Column: Python Code Editor & Execution Console (5 Cols) */}
-        <div className="lg:col-span-5 flex flex-col gap-4">
+        {/* Left Column: Python Code Editor & Execution Console (6 Cols) */}
+        <div className="lg:col-span-6 flex flex-col gap-4">
           {/* Code Editor */}
           <div className="glass-panel rounded-3xl overflow-hidden flex flex-col border border-[var(--border-subtle)] shadow-xl">
             <div className="px-4 py-2.5 border-b border-inherit flex items-center justify-between text-xs text-[var(--text-secondary)]">
@@ -615,7 +615,7 @@ export default function AIChemistryLab() {
             </div>
 
             {/* Textarea & Line Numbers */}
-            <div className="relative flex min-h-[260px] max-h-[340px] overflow-auto font-mono text-xs leading-relaxed inner-box border-none">
+            <div className="relative flex min-h-[340px] max-h-[420px] overflow-auto font-mono text-xs leading-relaxed inner-box border-none">
               <div className="w-10 py-3 opacity-40 text-right pr-2 select-none border-r border-inherit shrink-0 font-bold">
                 {lines.map((_, i) => (
                   <div key={i}>{i + 1}</div>
@@ -652,7 +652,7 @@ export default function AIChemistryLab() {
               <span className="text-[10px] opacity-60">Status: {kernelStatus.toUpperCase()}</span>
             </div>
 
-            <div className="p-3.5 space-y-1 bg-[#04060b] text-xs font-mono max-h-[180px] min-h-[120px] overflow-y-auto custom-scrollbar">
+            <div className="p-3.5 space-y-1 bg-[#04060b] text-xs font-mono max-h-[200px] min-h-[140px] overflow-y-auto custom-scrollbar">
               {consoleOutput.length === 0 ? (
                 <div className="text-slate-500 italic">Click "Run Code" or press Ctrl+Enter to execute RDKit Python code...</div>
               ) : (
@@ -677,8 +677,8 @@ export default function AIChemistryLab() {
           </div>
         </div>
 
-        {/* Right Column: Professional Molecular Output Workspace (7 Cols) */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
+        {/* Right Column: Professional Molecular Output Workspace (6 Cols) */}
+        <div className="lg:col-span-6 flex flex-col gap-4">
           {/* Main Visualizer Container with [2D View] and [3D View] tabs */}
           <div className="glass-panel rounded-3xl p-5 border border-[var(--border-subtle)] space-y-4 shadow-xl flex flex-col justify-between">
             {/* View Mode Switcher Header */}

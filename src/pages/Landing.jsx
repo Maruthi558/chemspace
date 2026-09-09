@@ -18,10 +18,12 @@ import {
   Database,
   ExternalLink,
   Code2,
-  Lock
+  Lock,
+  Mail,
+  MessageCircle,
+  Globe
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import HomeSpecimenShowcase from '../components/HomeSpecimenShowcase';
 
 const SCIENTIFIC_MODULES = [
   {
@@ -96,46 +98,46 @@ export default function Landing() {
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16 sm:space-y-24">
 
         {/* ───────────────────────────────────────────────────────────────────────
-            1. HERO SECTION
+            1. HERO & QUICK-ACCESS LAUNCHER
            ─────────────────────────────────────────────────────────────────────── */}
-        <section className="space-y-8 pt-2 sm:pt-6">
-          <div className="max-w-3xl space-y-4">
-            {/* Status indicator */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-[var(--border-medium)] bg-[var(--bg-inner)] text-[var(--text-secondary)]">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>ChemSpace Research Platform • v2.4 Production</span>
+        <section className="space-y-6 pt-2 sm:pt-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-[var(--border-subtle)] pb-8">
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-mono border border-[var(--border-subtle)] bg-[var(--bg-inner)] text-[var(--text-secondary)]">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>ChemSpace Research Environment • Chemistry Software Suite</span>
+              </div>
+
+              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+                Chemical Computing &amp; Molecular Studio
+              </h1>
+
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-sans max-w-xl">
+                A unified scientific workbench for 2D/3D structure drafting, RDKit physicochemical descriptors, quantum electronic orbital modeling, spectroscopy prediction, and retrosynthetic route planning.
+              </p>
             </div>
 
-            {/* Main title */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-[var(--text-primary)]">
-              Advanced Chemical Computing &amp; Molecular Intelligence
-            </h1>
-
-            {/* Description */}
-            <p className="text-sm sm:text-base lg:text-lg text-[var(--text-secondary)] leading-relaxed font-sans max-w-2xl">
-              An integrated scientific platform for 2D/3D structure drawing, RDKit topological descriptors, quantum orbital simulations, spectroscopy prediction, and retrosynthetic route planning.
-            </p>
-
-            {/* Action buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
               <button
                 onClick={() => navigate('/chemdraw')}
-                className="btn-primary py-3 px-5 text-xs uppercase tracking-wider font-bold"
+                className="btn-primary py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2 shadow-sm"
               >
-                <span>Launch ChemDraw Studio</span>
-                <ArrowRight className="w-4 h-4" />
+                <PenTool className="w-4 h-4" />
+                <span>Open ChemDraw</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </button>
 
               <button
                 onClick={() => navigate('/rdkit-lab')}
-                className="btn-secondary py-3 px-5 text-xs uppercase tracking-wider font-bold"
+                className="btn-secondary py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2"
               >
-                <span>Cheminformatics Lab</span>
+                <Cpu className="w-4 h-4" />
+                <span>RDKit Lab</span>
               </button>
 
               <button
                 onClick={() => navigate('/workspace')}
-                className="btn-outline py-3 px-5 text-xs uppercase tracking-wider font-bold"
+                className="btn-outline py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2"
               >
                 <FolderLock className="w-4 h-4" />
                 <span>My Workspace</span>
@@ -143,9 +145,40 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* 3D Specimen Showcase Embedding */}
-          <div className="w-full">
-            <HomeSpecimenShowcase />
+          {/* Quick Access Tool Strip */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {[
+              { label: 'ChemDraw CAD', path: '/chemdraw', icon: PenTool, desc: '2D/3D Molecular Sketch' },
+              { label: 'RDKit Lab', path: '/rdkit-lab', icon: Cpu, desc: 'Physicochemical Descriptors' },
+              { label: 'Spectroscopy', path: '/spectroscopy', icon: Radio, desc: 'FTIR, UV-Vis, NMR & MS' },
+              { label: 'Quantum Lab', path: '/quantum-library', icon: Zap, desc: 'DFT & Molecular Orbitals' },
+              { label: 'IBM Retrosynthesis', path: '/ibm-rxn', icon: Activity, desc: 'Multi-step Reaction Trees' },
+              { label: 'Periodic Table', path: '/periodic-table', icon: Grid, desc: '118 Elements & Isotopes' }
+            ].map((tool) => {
+              const Icon = tool.icon;
+              return (
+                <div
+                  key={tool.label}
+                  onClick={() => navigate(tool.path)}
+                  className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-card)] hover:border-[var(--border-strong)] transition cursor-pointer group flex flex-col justify-between space-y-2"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="w-8 h-8 rounded-lg bg-[var(--bg-inner)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-primary)] group-hover:border-cyan-500/40 group-hover:text-cyan-400 transition">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-[var(--text-muted)] group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-[var(--text-primary)] block group-hover:text-cyan-400 transition">
+                      {tool.label}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-muted)] line-clamp-1">
+                      {tool.desc}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 
@@ -439,12 +472,53 @@ export default function Landing() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-[var(--text-muted)]">
-            <div className="flex items-center gap-2">
+          <div className="pt-6 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono">
+            <div className="flex items-center gap-2 text-[var(--text-muted)]">
               <Atom className="w-4 h-4 text-cyan-400" />
               <span>ChemSpace Research Platform</span>
             </div>
-            <span>© {new Date().getFullYear()} ChemSpace. All rights reserved.</span>
+
+            {/* Clickable Social & Contact Symbols */}
+            <div className="flex items-center gap-3">
+              <a
+                href="mailto:contact@chemnova.org"
+                className="p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-inner)] text-[var(--text-secondary)] hover:text-cyan-400 hover:border-cyan-500/40 transition"
+                title="Send Email"
+              >
+                <Mail className="w-4 h-4" />
+              </a>
+              <a
+                href="https://google.com"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-inner)] text-[var(--text-secondary)] hover:text-cyan-400 hover:border-cyan-500/40 transition"
+                title="Google Search / Scholar"
+              >
+                <Globe className="w-4 h-4" />
+              </a>
+              <a
+                href="https://wa.me/"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-inner)] text-[var(--text-secondary)] hover:text-emerald-400 hover:border-emerald-500/40 transition"
+                title="WhatsApp Support"
+              >
+                <MessageCircle className="w-4 h-4" />
+              </a>
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-inner)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition"
+                title="GitHub Repository"
+              >
+                <Code2 className="w-4 h-4" />
+              </a>
+            </div>
+
+            <span className="text-[11px] text-[var(--text-muted)]">
+              © {new Date().getFullYear()} ChemSpace. All rights reserved.
+            </span>
           </div>
         </div>
       </footer>

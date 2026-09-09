@@ -36,7 +36,7 @@ class HandLandmarkerService {
     this.isLoading = true;
     try {
       const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm'
       );
 
       this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
@@ -56,7 +56,7 @@ class HandLandmarkerService {
     } catch (err) {
       console.warn('[HandLandmarker] GPU delegate fallback to CPU:', err.message);
       const vision = await FilesetResolver.forVisionTasks(
-        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm'
+        'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.0.1/wasm'
       );
       this.handLandmarker = await HandLandmarker.createFromOptions(vision, {
         baseOptions: {

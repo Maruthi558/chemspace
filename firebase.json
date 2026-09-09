@@ -5,8 +5,12 @@
   "auth": {
     "authorizedDomains": [
       "localhost",
+      "127.0.0.1",
       "chemistry1-e2723.firebaseapp.com",
-      "chemistry1-e2723.web.app"
+      "chemistry1-e2723.web.app",
+      "chemspace.pages.dev",
+      "chemnova.com",
+      "www.chemnova.com"
     ],
     "providers": {
       "emailPassword": true,

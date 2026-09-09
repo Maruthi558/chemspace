@@ -84,6 +84,23 @@ const RING_TEMPLATES = [
 // Common Elements for quick palette
 const COMMON_ELEMENTS = ['C', 'H', 'N', 'O', 'F', 'P', 'S', 'Cl', 'Br', 'I', 'B', 'Si'];
 
+// Chemistry Functional Groups & Fragment Templates
+export const FUNCTIONAL_GROUPS = [
+  { id: 'ch3', label: '-CH3', name: 'Methyl', formula: 'CH3', desc: 'Methyl alkyl group' },
+  { id: 'ch2', label: '-CH2-', name: 'Methylene', formula: 'CH2', desc: 'Methylene carbon spacer' },
+  { id: 'oh', label: '-OH', name: 'Hydroxyl', formula: 'OH', desc: 'Alcohol / hydroxyl group' },
+  { id: 'nh2', label: '-NH2', name: 'Amino', formula: 'NH2', desc: 'Primary amine group' },
+  { id: 'cooh', label: '-COOH', name: 'Carboxyl', formula: 'COOH', desc: 'Carboxylic acid group' },
+  { id: 'no2', label: '-NO2', name: 'Nitro', formula: 'NO2', desc: 'Nitro functional group' },
+  { id: 'oxo', label: '=O', name: 'Carbonyl', formula: 'O', desc: 'Carbonyl oxo group' },
+  { id: 'f', label: '-F', name: 'Fluoro', formula: 'F', desc: 'Fluorine halogen group' },
+  { id: 'cl', label: '-Cl', name: 'Chloro', formula: 'Cl', desc: 'Chlorine halogen group' },
+  { id: 'br', label: '-Br', name: 'Bromo', formula: 'Br', desc: 'Bromine halogen group' },
+  { id: 'i', label: '-I', name: 'Iodo', formula: 'I', desc: 'Iodine halogen group' },
+  { id: 'ph', label: '-Ph', name: 'Phenyl', formula: 'C6H5', desc: 'Aromatic phenyl ring' },
+  { id: 'cn', label: '-CN', name: 'Cyano', formula: 'CN', desc: 'Cyano / nitrile group' }
+];
+
 const STANDARD_BOND_LENGTH = 50;
 
 export default function ChemDrawStudio() {
@@ -94,11 +111,12 @@ export default function ChemDrawStudio() {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
 
-  // Studio Tools: 'select', 'eraser', 'bond', 'atom', 'ring', 'lasso', 'charge_pos', 'charge_neg'
+  // Studio Tools: 'select', 'eraser', 'bond', 'atom', 'ring', 'fragment', 'lasso', 'charge_pos', 'charge_neg'
   const [selectedTool, setSelectedTool] = useState('bond');
   const [activeBondType, setActiveBondType] = useState('single');
   const [activeElement, setActiveElement] = useState('C');
   const [activeRing, setActiveRing] = useState('benzene');
+  const [activeFragment, setActiveFragment] = useState('ch3');
 
   // Molecular Graph State
   const [atoms, setAtoms] = useState([
@@ -853,6 +871,19 @@ export default function ChemDrawStudio() {
         // PLACE STANDALONE RING
         placeStandaloneRing(world.x, world.y, activeRing);
       }
+      return;
+    }
+
+    // 7. FUNCTIONAL GROUP / FRAGMENT TEMPLATE TOOL
+    if (selectedTool === 'fragment') {
+      if (clickedAtom) {
+        // ATTACH FRAGMENT TO ATOM (OPTIMAL BOND VECTOR)
+        attachFragmentToAtom(clickedAtom, activeFragment);
+      } else {
+        // STAMP STANDALONE FRAGMENT ONTO CANVAS
+        stampStandaloneFragment(world.x, world.y, activeFragment);
+      }
+      return;
     }
   };
 
@@ -1138,6 +1169,235 @@ export default function ChemDrawStudio() {
 
     const nextAtoms = [...atoms, ...newAtoms];
     const nextBonds = [...bonds, ...newBonds];
+    setAtoms(nextAtoms);
+    setBonds(nextBonds);
+    pushHistory(nextAtoms, nextBonds);
+  };
+
+  // ----------------- FUNCTIONAL GROUP / FRAGMENT OPERATIONS -----------------
+
+  const getOptimalAttachmentAngle = (atom) => {
+    const connectedBonds = bonds.filter((b) => b.from === atom.id || b.to === atom.id);
+    if (connectedBonds.length === 0) {
+      return 0; // Default rightward
+    }
+    let sumDx = 0;
+    let sumDy = 0;
+    connectedBonds.forEach((b) => {
+      const otherId = b.from === atom.id ? b.to : b.from;
+      const other = atoms.find((a) => a.id === otherId);
+      if (other) {
+        sumDx += other.x - atom.x;
+        sumDy += other.y - atom.y;
+      }
+    });
+
+    if (Math.hypot(sumDx, sumDy) < 1e-3) {
+      // Symmetrically bonded (e.g. straight chain), branch at 60 degrees
+      return -Math.PI / 3;
+    }
+    // Opposite direction from average neighbor position
+    const rawAngle = Math.atan2(sumDy, sumDx) + Math.PI;
+    // Snap to standard 30 degrees (Math.PI / 6)
+    return Math.round(rawAngle / (Math.PI / 6)) * (Math.PI / 6);
+  };
+
+  const attachFragmentToAtom = (atom, fragmentId) => {
+    const angle = getOptimalAttachmentAngle(atom);
+    const BL = STANDARD_BOND_LENGTH;
+    const baseId = Date.now();
+    const nextAtoms = [...atoms];
+    const nextBonds = [...bonds];
+
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+
+    switch (fragmentId) {
+      case 'ch3':
+      case 'ch2': {
+        const newAtomId = baseId;
+        nextAtoms.push({ id: newAtomId, element: 'C', x: Math.round(atom.x + BL * cos), y: Math.round(atom.y + BL * sin), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: newAtomId, type: 'single', order: 1 });
+        break;
+      }
+      case 'oh': {
+        const newAtomId = baseId;
+        nextAtoms.push({ id: newAtomId, element: 'O', x: Math.round(atom.x + BL * cos), y: Math.round(atom.y + BL * sin), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: newAtomId, type: 'single', order: 1 });
+        break;
+      }
+      case 'nh2': {
+        const newAtomId = baseId;
+        nextAtoms.push({ id: newAtomId, element: 'N', x: Math.round(atom.x + BL * cos), y: Math.round(atom.y + BL * sin), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: newAtomId, type: 'single', order: 1 });
+        break;
+      }
+      case 'f':
+      case 'cl':
+      case 'br':
+      case 'i': {
+        const el = fragmentId.toUpperCase();
+        const newAtomId = baseId;
+        nextAtoms.push({ id: newAtomId, element: el, x: Math.round(atom.x + BL * cos), y: Math.round(atom.y + BL * sin), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: newAtomId, type: 'single', order: 1 });
+        break;
+      }
+      case 'oxo': {
+        const newAtomId = baseId;
+        nextAtoms.push({ id: newAtomId, element: 'O', x: Math.round(atom.x + BL * cos), y: Math.round(atom.y + BL * sin), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: newAtomId, type: 'double', order: 2 });
+        break;
+      }
+      case 'cooh': {
+        const cId = baseId;
+        const cX = Math.round(atom.x + BL * cos);
+        const cY = Math.round(atom.y + BL * sin);
+        nextAtoms.push({ id: cId, element: 'C', x: cX, y: cY, charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: cId, type: 'single', order: 1 });
+
+        const o1Id = baseId + 1;
+        const angO1 = angle + Math.PI / 3;
+        nextAtoms.push({ id: o1Id, element: 'O', x: Math.round(cX + BL * Math.cos(angO1)), y: Math.round(cY + BL * Math.sin(angO1)), charge: 0 });
+        nextBonds.push({ id: baseId + 101, from: cId, to: o1Id, type: 'double', order: 2 });
+
+        const o2Id = baseId + 2;
+        const angO2 = angle - Math.PI / 3;
+        nextAtoms.push({ id: o2Id, element: 'O', x: Math.round(cX + BL * Math.cos(angO2)), y: Math.round(cY + BL * Math.sin(angO2)), charge: 0 });
+        nextBonds.push({ id: baseId + 102, from: cId, to: o2Id, type: 'single', order: 1 });
+        break;
+      }
+      case 'no2': {
+        const nId = baseId;
+        const nX = Math.round(atom.x + BL * cos);
+        const nY = Math.round(atom.y + BL * sin);
+        nextAtoms.push({ id: nId, element: 'N', x: nX, y: nY, charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: nId, type: 'single', order: 1 });
+
+        const o1Id = baseId + 1;
+        const angO1 = angle + Math.PI / 3;
+        nextAtoms.push({ id: o1Id, element: 'O', x: Math.round(nX + BL * Math.cos(angO1)), y: Math.round(nY + BL * Math.sin(angO1)), charge: 0 });
+        nextBonds.push({ id: baseId + 101, from: nId, to: o1Id, type: 'double', order: 2 });
+
+        const o2Id = baseId + 2;
+        const angO2 = angle - Math.PI / 3;
+        nextAtoms.push({ id: o2Id, element: 'O', x: Math.round(nX + BL * Math.cos(angO2)), y: Math.round(nY + BL * Math.sin(angO2)), charge: 0 });
+        nextBonds.push({ id: baseId + 102, from: nId, to: o2Id, type: 'single', order: 1 });
+        break;
+      }
+      case 'cn': {
+        const cId = baseId;
+        const cX = Math.round(atom.x + BL * cos);
+        const cY = Math.round(atom.y + BL * sin);
+        nextAtoms.push({ id: cId, element: 'C', x: cX, y: cY, charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: cId, type: 'single', order: 1 });
+
+        const nId = baseId + 1;
+        const nX = Math.round(cX + BL * cos);
+        const nY = Math.round(cY + BL * sin);
+        nextAtoms.push({ id: nId, element: 'N', x: nX, y: nY, charge: 0 });
+        nextBonds.push({ id: baseId + 101, from: cId, to: nId, type: 'triple', order: 3 });
+        break;
+      }
+      case 'ph': {
+        const r = 45;
+        const ringCenterX = atom.x + (BL + r) * cos;
+        const ringCenterY = atom.y + (BL + r) * sin;
+
+        const ringAtoms = [];
+        for (let i = 0; i < 6; i++) {
+          const theta = angle + Math.PI + (i * Math.PI) / 3;
+          ringAtoms.push({
+            id: baseId + i,
+            element: 'C',
+            x: Math.round(ringCenterX + r * Math.cos(theta)),
+            y: Math.round(ringCenterY + r * Math.sin(theta)),
+            charge: 0
+          });
+        }
+        nextAtoms.push(...ringAtoms);
+        nextBonds.push({ id: baseId + 100, from: atom.id, to: ringAtoms[0].id, type: 'single', order: 1 });
+        for (let i = 0; i < 6; i++) {
+          const nextI = (i + 1) % 6;
+          nextBonds.push({
+            id: baseId + 110 + i,
+            from: ringAtoms[i].id,
+            to: ringAtoms[nextI].id,
+            type: 'aromatic',
+            order: 1.5
+          });
+        }
+        break;
+      }
+      default:
+        break;
+    }
+
+    setAtoms(nextAtoms);
+    setBonds(nextBonds);
+    pushHistory(nextAtoms, nextBonds);
+  };
+
+  const stampStandaloneFragment = (cx, cy, fragmentId) => {
+    const BL = STANDARD_BOND_LENGTH;
+    const baseId = Date.now();
+    const nextAtoms = [...atoms];
+    const nextBonds = [...bonds];
+
+    switch (fragmentId) {
+      case 'ch3':
+      case 'ch2': {
+        nextAtoms.push({ id: baseId, element: 'C', x: Math.round(cx), y: Math.round(cy), charge: 0 });
+        break;
+      }
+      case 'oh': {
+        nextAtoms.push({ id: baseId, element: 'O', x: Math.round(cx), y: Math.round(cy), charge: 0 });
+        break;
+      }
+      case 'nh2': {
+        nextAtoms.push({ id: baseId, element: 'N', x: Math.round(cx), y: Math.round(cy), charge: 0 });
+        break;
+      }
+      case 'f':
+      case 'cl':
+      case 'br':
+      case 'i': {
+        nextAtoms.push({ id: baseId, element: fragmentId.toUpperCase(), x: Math.round(cx), y: Math.round(cy), charge: 0 });
+        break;
+      }
+      case 'oxo': {
+        nextAtoms.push({ id: baseId, element: 'O', x: Math.round(cx), y: Math.round(cy), charge: 0 });
+        break;
+      }
+      case 'cooh': {
+        nextAtoms.push({ id: baseId, element: 'C', x: Math.round(cx), y: Math.round(cy), charge: 0 });
+        nextAtoms.push({ id: baseId + 1, element: 'O', x: Math.round(cx + BL * 0.866), y: Math.round(cy - BL * 0.5), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: baseId, to: baseId + 1, type: 'double', order: 2 });
+        nextAtoms.push({ id: baseId + 2, element: 'O', x: Math.round(cx + BL * 0.866), y: Math.round(cy + BL * 0.5), charge: 0 });
+        nextBonds.push({ id: baseId + 101, from: baseId, to: baseId + 2, type: 'single', order: 1 });
+        break;
+      }
+      case 'no2': {
+        nextAtoms.push({ id: baseId, element: 'N', x: Math.round(cx), y: Math.round(cy), charge: 0 });
+        nextAtoms.push({ id: baseId + 1, element: 'O', x: Math.round(cx + BL * 0.866), y: Math.round(cy - BL * 0.5), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: baseId, to: baseId + 1, type: 'double', order: 2 });
+        nextAtoms.push({ id: baseId + 2, element: 'O', x: Math.round(cx + BL * 0.866), y: Math.round(cy + BL * 0.5), charge: 0 });
+        nextBonds.push({ id: baseId + 101, from: baseId, to: baseId + 2, type: 'single', order: 1 });
+        break;
+      }
+      case 'cn': {
+        nextAtoms.push({ id: baseId, element: 'C', x: Math.round(cx - BL / 2), y: Math.round(cy), charge: 0 });
+        nextAtoms.push({ id: baseId + 1, element: 'N', x: Math.round(cx + BL / 2), y: Math.round(cy), charge: 0 });
+        nextBonds.push({ id: baseId + 100, from: baseId, to: baseId + 1, type: 'triple', order: 3 });
+        break;
+      }
+      case 'ph': {
+        placeStandaloneRing(cx, cy, 'benzene');
+        return;
+      }
+      default:
+        break;
+    }
+
     setAtoms(nextAtoms);
     setBonds(nextBonds);
     pushHistory(nextAtoms, nextBonds);
@@ -1474,6 +1734,41 @@ export default function ChemDrawStudio() {
         </div>
       </header>
 
+      {/* QUICK FUNCTIONAL GROUPS / FRAGMENT TEMPLATES RIBBON */}
+      <div className="px-6 py-2 bg-slate-100/90 dark:bg-black/40 border-b border-slate-200 dark:border-white/5 flex items-center gap-3 overflow-x-auto no-scrollbar shrink-0 shadow-inner">
+        <div className="flex items-center gap-1.5 shrink-0 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-wider pr-1">
+          <Layers className="w-3.5 h-3.5 text-cyan-500" />
+          <span>Fragments</span>
+        </div>
+        <div className="h-4 w-px bg-slate-300 dark:bg-white/10 shrink-0" />
+        <div className="flex items-center gap-1.5 shrink-0">
+          {FUNCTIONAL_GROUPS.map((fg) => {
+            const isActive = selectedTool === 'fragment' && activeFragment === fg.id;
+            return (
+              <button
+                key={fg.id}
+                onClick={() => {
+                  setSelectedTool('fragment');
+                  setActiveFragment(fg.id);
+                }}
+                className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1 border relative group ${
+                  isActive
+                    ? 'bg-cyan-500 text-white border-cyan-400 shadow-md shadow-cyan-500/20 scale-105 z-10'
+                    : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-cyan-500/40 hover:bg-cyan-500/5'
+                }`}
+                title={`${fg.name} (${fg.label}): ${fg.desc}`}
+              >
+                <span>{fg.label}</span>
+                <span className="text-[9px] font-sans font-normal opacity-60 hidden xl:inline">{fg.name}</span>
+                <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2.5 py-1 rounded-lg bg-slate-900 text-white text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none font-bold uppercase tracking-wider shadow-xl">
+                  {fg.name} ({fg.label}) — Click atom to attach or canvas to place
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 2. MAIN CAD WORKSPACE */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT TOOLBAR: Tools, Comprehensive Bonds, Rings, and Quick Elements */}
@@ -1540,6 +1835,30 @@ export default function ChemDrawStudio() {
                 </span>
               </button>
             ))}
+          </div>
+
+          <div className="w-10 h-px bg-slate-200 dark:bg-white/10" />
+
+          {/* Functional Groups Quick Section */}
+          <div className="flex flex-col gap-2">
+            <span className="text-[8px] font-black uppercase text-slate-400 tracking-wider text-center block">Groups</span>
+            <button
+              onClick={() => {
+                setSelectedTool('fragment');
+              }}
+              className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center transition-all relative group shadow-sm ${
+                selectedTool === 'fragment'
+                  ? 'bg-cyan-500 text-white shadow-xl scale-105'
+                  : 'text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/5 border border-transparent'
+              }`}
+              title="Functional Groups Palette"
+            >
+              <Layers className="w-5 h-5" />
+              <span className="text-[7px] uppercase font-bold tracking-tighter opacity-80 mt-0.5">Groups</span>
+              <span className="absolute left-full ml-3 px-2.5 py-1 rounded-lg bg-slate-900 text-white text-[10px] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none font-bold uppercase tracking-wider shadow-xl">
+                Functional Groups ({FUNCTIONAL_GROUPS.find((f) => f.id === activeFragment)?.label || activeFragment})
+              </span>
+            </button>
           </div>
 
           <div className="w-10 h-px bg-slate-200 dark:bg-white/10" />
@@ -1629,7 +1948,9 @@ export default function ChemDrawStudio() {
           {/* Top Center Real-Time Interaction Guide */}
           <div className="absolute top-6 left-1/2 -translate-x-1/2 pointer-events-none">
             <div className="bg-slate-900/80 dark:bg-white/10 backdrop-blur-xl px-5 py-2 rounded-2xl border border-white/10 text-white dark:text-slate-200 text-[10px] font-bold uppercase tracking-[0.2em] shadow-2xl opacity-75">
-              Press & Drag from Atom to Create Bond • Release to Commit • Snap to Angles (30°)
+              {selectedTool === 'fragment'
+                ? `Fragment: ${FUNCTIONAL_GROUPS.find((f) => f.id === activeFragment)?.label || activeFragment} (${FUNCTIONAL_GROUPS.find((f) => f.id === activeFragment)?.name}) • Click Atom to Attach • Click Canvas to Place`
+                : 'Press & Drag from Atom to Create Bond • Release to Commit • Snap to Angles (30°)'}
             </div>
           </div>
         </main>

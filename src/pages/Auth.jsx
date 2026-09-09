@@ -7,23 +7,24 @@ import {
   ShieldCheck,
   ArrowRight,
   RefreshCw,
-  Edit2,
   CheckCircle2,
   AlertCircle,
   Loader2,
   User,
   Building,
-  ChevronDown,
   Lock,
   Eye,
   EyeOff,
   KeyRound,
-  Send
+  Send,
+  ChevronLeft,
+  Sparkles,
+  Smartphone
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import OtpInput from '../components/OtpInput';
-import { setupRecaptcha } from '../services/firebase';
+import { setupRecaptcha, clearRecaptcha } from '../services/firebase';
 
 const COUNTRY_CODES = [
   { code: '+1', country: 'US/CA', flag: '🇺🇸' },
@@ -55,10 +56,13 @@ export default function Auth() {
     signUpWithEmail,
     signInWithEmail,
     resetPassword,
+    sendEmailOtp,
+    verifyEmailOtp,
     sendEmailVerificationLink,
     sendPhoneOtp,
     verifyPhoneOtp,
-    signInWithGoogle
+    signInWithGoogle,
+    resetRecaptcha
   } = useAuth();
 
   // Target redirect destination
@@ -76,10 +80,10 @@ export default function Auth() {
     return searchParams.get('mode') === 'signup' || location.pathname === '/register' ? 'signup' : 'signin';
   });
 
-  // Auth Method: 'email' (password) | 'phone' (SMS) | 'magic_link' (passwordless)
-  const [authMode, setAuthMode] = useState('email');
+  // Auth Method: 'password' | 'email_otp' | 'phone_otp' | 'email_link'
+  const [authMethod, setAuthMethod] = useState('password');
 
-  // Step: 'input' | 'otp' | 'success'
+  // Step: 'input' | 'verify_otp' | 'success'
   const [step, setStep] = useState('input');
 
   // Form inputs
@@ -91,25 +95,33 @@ export default function Auth() {
   const [countryCode, setCountryCode] = useState('+1');
   const [phoneNumber, setPhoneNumber] = useState('');
 
-  // Password reset state
+  // Password reset modal state
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
 
-  // Magic link state
+  // Email magic link state
   const [magicLinkSent, setMagicLinkSent] = useState(false);
 
-  // OTP inputs state
+  // OTP inputs state (for both Email OTP and Phone SMS)
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
   const [confirmationResult, setConfirmationResult] = useState(null);
+  const [otpTargetType, setOtpTargetType] = useState('phone'); // 'phone' | 'email'
 
-  // States
+  // Loading & Error States
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [guestLoading, setGuestLoading] = useState(false);
   const [error, setError] = useState('');
   const [cooldown, setCooldown] = useState(0);
+
+  // Clean up reCAPTCHA verifier on unmount
+  useEffect(() => {
+    return () => {
+      clearRecaptcha('recaptcha-container');
+    };
+  }, []);
 
   // Cooldown countdown timer
   useEffect(() => {
@@ -128,7 +140,7 @@ export default function Auth() {
     return digits.length >= 7 && digits.length <= 15;
   };
 
-  // ── 1. EMAIL / PASSWORD SIGN IN OR SIGN UP ─────────────────────────────────
+  // ── 1. EMAIL & PASSWORD SUBMIT ──────────────────────────────────────────────
   async function handleEmailPasswordSubmit(e) {
     if (e) e.preventDefault();
     setError('');
@@ -145,7 +157,7 @@ export default function Auth() {
     }
 
     if (viewMode === 'signup' && (!fullName.trim() || fullName.trim().length < 2)) {
-      setError('Please enter your full scientist name or title.');
+      setError('Please enter your scientist name or title.');
       return;
     }
 
@@ -163,7 +175,7 @@ export default function Auth() {
       setStep('success');
       setTimeout(() => {
         navigate(fromDestination, { replace: true });
-      }, 700);
+      }, 600);
     } catch (err) {
       setError(err.message || 'Authentication failed. Please verify your credentials.');
     } finally {
@@ -171,14 +183,137 @@ export default function Auth() {
     }
   }
 
-  // ── 2. EMAIL MAGIC LINK (PASSWORDLESS) ──────────────────────────────────────
+  // ── 2. REAL EMAIL OTP ───────────────────────────────────────────────────────
+  async function handleSendEmailOtpSubmit(e) {
+    if (e) e.preventDefault();
+    setError('');
+
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !isValidEmail(cleanEmail)) {
+      setError('Please enter a valid email address to receive your verification code.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await sendEmailOtp(cleanEmail);
+      setOtpTargetType('email');
+      setStep('verify_otp');
+      setCooldown(60);
+      setOtpDigits(['', '', '', '', '', '']);
+    } catch (err) {
+      setError(err.message || 'Could not send verification code. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyEmailOtpSubmit(codeToVerify) {
+    const code = codeToVerify || otpDigits.join('');
+    setError('');
+
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+      setError('Please enter the 6-digit numeric verification code sent to your email.');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await verifyEmailOtp(email.trim().toLowerCase(), code, {
+        name: fullName.trim(),
+        workplace: workplace.trim() || 'ChemNova Research Institute'
+      });
+      setStep('success');
+      setTimeout(() => {
+        navigate(fromDestination, { replace: true });
+      }, 600);
+    } catch (err) {
+      setError(err.message || 'Verification code invalid or expired. Please check and try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // ── 3. REAL PHONE SMS OTP ───────────────────────────────────────────────────
+  async function handleSendPhoneSms(e) {
+    if (e) e.preventDefault();
+    setError('');
+
+    const cleanDigits = phoneNumber.replace(/\D/g, '');
+    if (!cleanDigits || !isValidPhone(cleanDigits)) {
+      setError('Please enter a valid mobile phone number (7 to 15 digits).');
+      return;
+    }
+
+    const fullNumber = `${countryCode}${cleanDigits}`;
+    setLoading(true);
+    try {
+      // Re-use or initialize single verified instance without duplicate DOM clash
+      const verifier = setupRecaptcha('recaptcha-container');
+      const confirmResult = await sendPhoneOtp(fullNumber, verifier);
+      setConfirmationResult(confirmResult);
+      setOtpTargetType('phone');
+      setStep('verify_otp');
+      setCooldown(60);
+      setOtpDigits(['', '', '', '', '', '']);
+    } catch (err) {
+      console.error('Phone Auth Error:', err);
+      setError(err.message || 'Failed to dispatch SMS verification code.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleVerifyPhoneOtpSubmit(codeToVerify) {
+    const code = codeToVerify || otpDigits.join('');
+    setError('');
+
+    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
+      setError('Please enter the complete 6-digit SMS code.');
+      return;
+    }
+
+    if (!confirmationResult) {
+      setError('SMS session has expired. Please request a new verification code.');
+      setStep('input');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const profilePayload = {
+        name: fullName.trim() || 'Research Chemist',
+        workplace: workplace.trim() || 'ChemNova Research Institute'
+      };
+      await verifyPhoneOtp(confirmationResult, code, profilePayload);
+      setStep('success');
+      setTimeout(() => {
+        navigate(fromDestination, { replace: true });
+      }, 600);
+    } catch (err) {
+      setError(err.message || 'Invalid SMS verification code. Please check and try again.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Unified OTP verification trigger
+  function handleGenericVerifyOtp(codeToVerify) {
+    if (otpTargetType === 'email') {
+      handleVerifyEmailOtpSubmit(codeToVerify);
+    } else {
+      handleVerifyPhoneOtpSubmit(codeToVerify);
+    }
+  }
+
+  // ── 4. EMAIL MAGIC LINK (PASSWORDLESS) ──────────────────────────────────────
   async function handleSendMagicLink(e) {
     if (e) e.preventDefault();
     setError('');
 
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail || !isValidEmail(cleanEmail)) {
-      setError('Please enter a valid email address to receive your sign-in link.');
+      setError('Please enter a valid email address.');
       return;
     }
 
@@ -194,62 +329,43 @@ export default function Auth() {
     }
   }
 
-  // ── 3. PHONE SMS OTP ────────────────────────────────────────────────────────
-  async function handleSendPhoneSms(e) {
-    if (e) e.preventDefault();
+  // ── 5. GOOGLE SINGLE SIGN-ON ────────────────────────────────────────────────
+  async function handleGoogleLogin() {
     setError('');
-
-    const cleanDigits = phoneNumber.replace(/\D/g, '');
-    if (!cleanDigits || !isValidPhone(cleanDigits)) {
-      setError('Please enter a valid phone number (7 to 15 digits).');
-      return;
-    }
-
-    const fullNumber = `${countryCode}${cleanDigits}`;
-    setLoading(true);
+    setGoogleLoading(true);
     try {
-      const verifier = setupRecaptcha('recaptcha-container');
-      const confirmResult = await sendPhoneOtp(fullNumber, verifier);
-      setConfirmationResult(confirmResult);
-      setStep('otp');
-      setCooldown(60);
-      setOtpDigits(['', '', '', '', '', '']);
-    } catch (err) {
-      console.error('Phone Auth Error:', err);
-      setError(err.message || 'Failed to send SMS verification code.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleVerifyOtp(codeToVerify) {
-    const code = codeToVerify || otpDigits.join('');
-    setError('');
-
-    if (code.length !== 6 || !/^\d{6}$/.test(code)) {
-      setError('Please enter the complete 6-digit code received via SMS.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const profilePayload = {
-        name: fullName.trim() || 'Research Chemist',
+      const res = await signInWithGoogle({
+        name: fullName.trim(),
         workplace: workplace.trim() || 'ChemNova Research Institute'
-      };
-      await verifyPhoneOtp(confirmationResult, code, profilePayload);
-      setStep('success');
-      setTimeout(() => {
-        navigate(fromDestination, { replace: true });
-      }, 700);
+      });
+      if (res) {
+        setStep('success');
+        setTimeout(() => {
+          navigate(fromDestination, { replace: true });
+        }, 600);
+      }
     } catch (err) {
-      setError(err.message || 'Invalid verification code. Please check and try again.');
+      setError(err.message || 'Google sign-in could not be completed.');
     } finally {
-      setLoading(false);
+      setGoogleLoading(false);
     }
   }
 
-  // ── 4. FORGOT PASSWORD ──────────────────────────────────────────────────────
+  // ── 6. GUEST ACCESS ─────────────────────────────────────────────────────────
+  function handleGuestAccess() {
+    setGuestLoading(true);
+    setError('');
+    try {
+      continueAsGuest(fullName.trim() || 'Guest Researcher');
+      setGuestLoading(false);
+      navigate(fromDestination, { replace: true });
+    } catch {
+      setError('Could not start guest preview.');
+      setGuestLoading(false);
+    }
+  }
+
+  // ── 7. FORGOT PASSWORD ──────────────────────────────────────────────────────
   async function handleForgotPasswordSubmit(e) {
     e.preventDefault();
     if (!forgotEmail.trim() || !isValidEmail(forgotEmail.trim())) {
@@ -269,78 +385,43 @@ export default function Auth() {
     }
   }
 
-  // ── 5. GOOGLE SIGN-IN ───────────────────────────────────────────────────────
-  async function handleGoogleLogin() {
-    setError('');
-    setGoogleLoading(true);
-    try {
-      const res = await signInWithGoogle({
-        name: fullName.trim(),
-        workplace: workplace.trim() || 'ChemNova Research Institute'
-      });
-      if (res) {
-        setStep('success');
-        setTimeout(() => {
-          navigate(fromDestination, { replace: true });
-        }, 700);
-      }
-    } catch (err) {
-      setError(err.message || 'Google sign-in could not be completed.');
-    } finally {
-      setGoogleLoading(false);
-    }
-  }
-
-  // ── 6. GUEST ACCESS ─────────────────────────────────────────────────────────
-  function handleGuestAccess() {
-    setGuestLoading(true);
-    setError('');
-    try {
-      continueAsGuest(fullName.trim() || 'Guest Researcher');
-      setGuestLoading(false);
-      navigate(fromDestination, { replace: true });
-    } catch {
-      setError('Could not start guest session.');
-      setGuestLoading(false);
-    }
-  }
-
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 transition-colors relative select-none ${
-      isDark ? 'bg-[#06080d] text-slate-100' : 'bg-slate-50 text-slate-900'
+    <div className={`min-h-screen w-full flex items-center justify-center p-4 transition-colors relative select-none ${
+      isDark ? 'bg-[#08090d] text-slate-100' : 'bg-[#f8f9fb] text-slate-900'
     }`}>
       {/* Invisible reCAPTCHA container for Phone Auth */}
       <div id="recaptcha-container" className="hidden"></div>
 
-      <div className={`w-full max-w-lg rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative border transition-all ${
-        isDark ? 'bg-[#0a0e17]/95 border-cyan-500/20' : 'bg-white border-slate-200'
+      {/* Main Authentication Card */}
+      <div className={`w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-xl border transition-all space-y-6 ${
+        isDark ? 'bg-[#0f121a] border-white/10' : 'bg-white border-slate-200 shadow-slate-200/50'
       }`}>
         {/* Top Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400 shadow-lg shadow-cyan-500/5">
-            <Atom className="w-7 h-7 animate-spin [animation-duration:15s]" />
+          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 flex items-center justify-center mx-auto">
+            <Atom className="w-6 h-6" />
           </div>
 
           <div>
-            <h2 className="text-2xl font-black font-serif-editorial tracking-tight">
-              {viewMode === 'signup' ? 'Create Scientist Account' : 'Sign in to ChemSpace'}
-            </h2>
-            <p className="text-xs opacity-70 font-sans mt-0.5">
+            <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
+              {viewMode === 'signup' ? 'Create ChemSpace Account' : 'Sign In to ChemSpace'}
+            </h1>
+            <p className="text-xs text-[var(--text-secondary)] mt-0.5">
               Secure Laboratory Cloud • Project: <span className="font-mono text-cyan-400">chemistry1-e2723</span>
             </p>
           </div>
 
-          {/* Mode Switcher: Sign In vs Sign Up */}
+          {/* Mode Switcher: Sign In vs Create Account */}
           <div className={`p-1 rounded-xl flex max-w-xs mx-auto border text-xs font-mono ${
-            isDark ? 'bg-black/40 border-slate-800' : 'bg-slate-100 border-slate-200'
+            isDark ? 'bg-black/40 border-white/10' : 'bg-slate-100 border-slate-200'
           }`}>
             <button
               type="button"
               onClick={() => { setViewMode('signin'); setError(''); setStep('input'); }}
               className={`flex-1 py-1.5 rounded-lg font-bold transition ${
                 viewMode === 'signin'
-                  ? 'bg-cyan-500 text-black shadow-md'
-                  : 'text-slate-400 hover:text-inherit'
+                  ? (isDark ? 'bg-white text-black shadow' : 'bg-slate-900 text-white shadow')
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
               Sign In
@@ -350,8 +431,8 @@ export default function Auth() {
               onClick={() => { setViewMode('signup'); setError(''); setStep('input'); }}
               className={`flex-1 py-1.5 rounded-lg font-bold transition ${
                 viewMode === 'signup'
-                  ? 'bg-cyan-500 text-black shadow-md'
-                  : 'text-slate-400 hover:text-inherit'
+                  ? (isDark ? 'bg-white text-black shadow' : 'bg-slate-900 text-white shadow')
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
               Sign Up
@@ -361,26 +442,26 @@ export default function Auth() {
 
         {/* Error Notification */}
         {error && (
-          <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2.5 animate-in fade-in duration-150">
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-start gap-2.5 animate-in fade-in duration-150">
             <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <span className="font-bold block">Authentication Notice</span>
+              <span className="font-bold block">Notice</span>
               <p className="opacity-90 leading-relaxed">{error}</p>
             </div>
           </div>
         )}
 
-        {/* Success State */}
+        {/* ── SUCCESS STATE ── */}
         {step === 'success' && (
           <div className="py-8 text-center space-y-3 animate-in zoom-in-95 duration-200">
-            <div className="w-14 h-14 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-8 h-8" />
+            <div className="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto">
+              <CheckCircle2 className="w-7 h-7" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-emerald-400 font-mono">
-                {viewMode === 'signup' ? 'Account Created & Session Verified!' : 'Authenticated Successfully!'}
-              </h3>
-              <p className="text-xs opacity-70">Entering ChemSpace laboratory workspace...</p>
+              <h2 className="text-base font-bold text-emerald-400 font-mono">
+                {viewMode === 'signup' ? 'Account Created & Verified' : 'Authentication Successful'}
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)]">Entering ChemSpace laboratory workspace...</p>
             </div>
           </div>
         )}
@@ -389,56 +470,58 @@ export default function Auth() {
         {step === 'input' && (
           <div className="space-y-5">
             {/* Auth Method Selector Tabs */}
-            <div className={`p-1 rounded-2xl flex border text-xs font-mono ${
-              isDark ? 'bg-black/40 border-slate-800' : 'bg-slate-100 border-slate-200'
+            <div className={`p-1 rounded-xl grid grid-cols-3 border text-xs font-mono ${
+              isDark ? 'bg-black/30 border-white/10' : 'bg-slate-100 border-slate-200'
             }`}>
               <button
                 type="button"
-                onClick={() => { setAuthMode('email'); setError(''); setMagicLinkSent(false); }}
-                className={`flex-1 py-2 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
-                  authMode === 'email'
-                    ? (isDark ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30 shadow' : 'bg-white text-cyan-700 shadow')
-                    : 'text-slate-400 hover:text-inherit'
+                onClick={() => { setAuthMethod('password'); setError(''); setMagicLinkSent(false); }}
+                className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition ${
+                  authMethod === 'password'
+                    ? (isDark ? 'bg-white/10 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'bg-white text-cyan-700 shadow-sm')
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>Password</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setAuthMethod('email_otp'); setError(''); }}
+                className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition ${
+                  authMethod === 'email_otp'
+                    ? (isDark ? 'bg-white/10 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'bg-white text-cyan-700 shadow-sm')
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 <Mail className="w-3.5 h-3.5" />
-                <span>Email &amp; Password</span>
+                <span>Email OTP</span>
               </button>
 
               <button
                 type="button"
-                onClick={() => { setAuthMode('phone'); setError(''); }}
-                className={`flex-1 py-2 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
-                  authMode === 'phone'
-                    ? (isDark ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30 shadow' : 'bg-white text-cyan-700 shadow')
-                    : 'text-slate-400 hover:text-inherit'
+                onClick={() => { setAuthMethod('phone_otp'); setError(''); }}
+                className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition ${
+                  authMethod === 'phone_otp'
+                    ? (isDark ? 'bg-white/10 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'bg-white text-cyan-700 shadow-sm')
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
-                <Phone className="w-3.5 h-3.5" />
+                <Smartphone className="w-3.5 h-3.5" />
                 <span>Phone SMS</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => { setAuthMode('magic_link'); setError(''); }}
-                className={`flex-1 py-2 rounded-xl font-bold flex items-center justify-center gap-1.5 transition ${
-                  authMode === 'magic_link'
-                    ? (isDark ? 'bg-slate-800 text-cyan-300 border border-cyan-500/30 shadow' : 'bg-white text-cyan-700 shadow')
-                    : 'text-slate-400 hover:text-inherit'
-                }`}
-              >
-                <Send className="w-3.5 h-3.5" />
-                <span>Email Link</span>
               </button>
             </div>
 
-            {/* TAB 1: EMAIL & PASSWORD */}
-            {authMode === 'email' && (
+            {/* METHOD 1: EMAIL & PASSWORD */}
+            {authMethod === 'password' && (
               <form onSubmit={handleEmailPasswordSubmit} className="space-y-4">
                 {viewMode === 'signup' && (
                   <div className="space-y-3 animate-in fade-in duration-150">
                     <div>
-                      <label className="text-[11px] font-mono opacity-80 block mb-1">Scientist Full Name / Title</label>
+                      <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
+                        Scientist Full Name / Title
+                      </label>
                       <div className="relative">
                         <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
                         <input
@@ -447,15 +530,15 @@ export default function Auth() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Dr. Maruthi Chemist"
-                          className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                            isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                          }`}
+                          className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-[11px] font-mono opacity-80 block mb-1">Research Institution / Workplace</label>
+                      <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
+                        Research Institution / Workplace
+                      </label>
                       <div className="relative">
                         <Building className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
                         <input
@@ -463,9 +546,7 @@ export default function Auth() {
                           value={workplace}
                           onChange={(e) => setWorkplace(e.target.value)}
                           placeholder="ChemNova Advanced Institute"
-                          className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                            isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                          }`}
+                          className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
                         />
                       </div>
                     </div>
@@ -473,7 +554,9 @@ export default function Auth() {
                 )}
 
                 <div>
-                  <label className="text-[11px] font-mono opacity-80 block mb-1">Institutional or Personal Email</label>
+                  <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
+                    Institutional / Personal Email
+                  </label>
                   <div className="relative">
                     <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
                     <input
@@ -482,16 +565,14 @@ export default function Auth() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="scientist@chemnova.org"
-                      className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                        isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                      }`}
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
                     />
                   </div>
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[11px] font-mono opacity-80">Password (min. 6 characters)</label>
+                    <label className="text-[11px] font-mono text-[var(--text-secondary)]">Password</label>
                     {viewMode === 'signin' && (
                       <button
                         type="button"
@@ -510,16 +591,14 @@ export default function Auth() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className={`w-full pl-9 pr-9 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                        isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                      }`}
+                      className="w-full pl-9 pr-9 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 hover:opacity-100"
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                     </button>
                   </div>
                 </div>
@@ -527,29 +606,31 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.99] disabled:opacity-50"
+                  className="w-full py-2.5 px-4 rounded-xl btn-primary text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
                 >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Authenticating with Firebase...</span>
+                      <span>Authenticating...</span>
                     </>
                   ) : (
                     <>
-                      <span>{viewMode === 'signup' ? 'Create Account & Enter Lab' : 'Sign In with Email'}</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <span>{viewMode === 'signup' ? 'Create Account' : 'Sign In'}</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </>
                   )}
                 </button>
               </form>
             )}
 
-            {/* TAB 2: PHONE SMS OTP */}
-            {authMode === 'phone' && (
-              <form onSubmit={handleSendPhoneSms} className="space-y-4">
+            {/* METHOD 2: REAL EMAIL OTP */}
+            {authMethod === 'email_otp' && (
+              <form onSubmit={handleSendEmailOtpSubmit} className="space-y-4">
                 {viewMode === 'signup' && (
                   <div>
-                    <label className="text-[11px] font-mono opacity-80 block mb-1">Scientist Full Name</label>
+                    <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
+                      Scientist Full Name
+                    </label>
                     <div className="relative">
                       <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
                       <input
@@ -557,23 +638,82 @@ export default function Auth() {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Dr. Maruthi Chemist"
-                        className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                          isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                        }`}
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
                       />
                     </div>
                   </div>
                 )}
 
                 <div>
-                  <label className="text-[11px] font-mono opacity-80 block mb-1">Mobile Phone Number</label>
+                  <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
+                    Email Address to Receive 6-Digit Code
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="scientist@chemnova.org"
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                    />
+                  </div>
+                  <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                    A secure 6-digit verification code will be generated and dispatched to your email inbox.
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-2.5 px-4 rounded-xl btn-primary text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Sending Verification Code...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Send 6-Digit Email Code</span>
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
+
+            {/* METHOD 3: REAL PHONE SMS OTP */}
+            {authMethod === 'phone_otp' && (
+              <form onSubmit={handleSendPhoneSms} className="space-y-4">
+                {viewMode === 'signup' && (
+                  <div>
+                    <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
+                      Scientist Full Name
+                    </label>
+                    <div className="relative">
+                      <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
+                      <input
+                        type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
+                        placeholder="Dr. Maruthi Chemist"
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="text-[11px] font-mono text-[var(--text-secondary)] block mb-1">
+                    Mobile Phone Number
+                  </label>
                   <div className="flex gap-2">
                     <select
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
-                      className={`py-2.5 px-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                        isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                      }`}
+                      className="py-2 px-2.5 rounded-xl text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
                     >
                       {COUNTRY_CODES.map((c) => (
                         <option key={c.code} value={c.code}>
@@ -590,120 +730,40 @@ export default function Auth() {
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         placeholder="9876543210"
-                        className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                          isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                        }`}
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
                       />
                     </div>
                   </div>
-                  <p className="text-[10px] opacity-60 mt-1">
-                    An SMS with a 6-digit verification code will be sent via Firebase Phone Auth.
+                  <p className="text-[10px] text-[var(--text-muted)] mt-1">
+                    An SMS with a 6-digit code will be sent via Firebase Phone Authentication.
                   </p>
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.99] disabled:opacity-50"
+                  className="w-full py-2.5 px-4 rounded-xl btn-primary text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
                 >
                   {loading ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Initializing reCAPTCHA &amp; Sending SMS...</span>
+                      <span>Sending SMS Code...</span>
                     </>
                   ) : (
                     <>
-                      <span>Send 6-Digit SMS Verification Code</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Send 6-Digit SMS Code</span>
                     </>
                   )}
                 </button>
               </form>
             )}
 
-            {/* TAB 3: PASSWORDLESS EMAIL LINK */}
-            {authMode === 'magic_link' && (
-              <div className="space-y-4">
-                {magicLinkSent ? (
-                  <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 space-y-3">
-                    <div className="flex items-center gap-2 font-mono font-bold text-xs">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400" />
-                      <span>Magic Link Dispatched!</span>
-                    </div>
-                    <p className="text-xs text-slate-300 leading-relaxed font-sans">
-                      We sent a secure sign-in link to <strong className="text-cyan-300 font-mono">{email}</strong>. Open your email inbox and click the link to automatically log into ChemSpace.
-                    </p>
-                    <div className="flex items-center justify-between text-[11px] font-mono pt-1">
-                      <button
-                        type="button"
-                        onClick={() => setMagicLinkSent(false)}
-                        className="text-slate-400 hover:text-white underline"
-                      >
-                        Change email
-                      </button>
-                      {cooldown > 0 ? (
-                        <span className="opacity-60">Resend in {cooldown}s</span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={handleSendMagicLink}
-                          disabled={loading}
-                          className="font-bold underline text-cyan-400"
-                        >
-                          Resend link
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSendMagicLink} className="space-y-4">
-                    <div>
-                      <label className="text-[11px] font-mono opacity-80 block mb-1">Your Email Address</label>
-                      <div className="relative">
-                        <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
-                        <input
-                          type="email"
-                          required
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="scientist@institution.org"
-                          className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                            isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
-                          }`}
-                        />
-                      </div>
-                      <p className="text-[10px] opacity-60 mt-1">
-                        No password needed! We will email you a 1-click passwordless sign-in link.
-                      </p>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="w-full py-3 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.99] disabled:opacity-50"
-                    >
-                      {loading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>Sending Magic Link...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>Send Passwordless Sign-In Link</span>
-                          <Send className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                )}
-              </div>
-            )}
-
             {/* Divider */}
-            <div className="relative flex items-center justify-center">
-              <div className="w-full border-t border-white/10" />
-              <span className={`px-3 text-[10px] font-mono uppercase tracking-wider absolute ${
-                isDark ? 'bg-[#0a0e17] text-slate-500' : 'bg-white text-slate-400'
+            <div className="relative flex items-center justify-center pt-1">
+              <div className="w-full border-t border-[var(--border-subtle)]" />
+              <span className={`px-2.5 text-[10px] font-mono uppercase tracking-wider absolute ${
+                isDark ? 'bg-[#0f121a] text-slate-500' : 'bg-white text-slate-400'
               }`}>
                 or continue with
               </span>
@@ -714,16 +774,16 @@ export default function Auth() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={googleLoading}
-              className={`w-full py-3 px-4 rounded-2xl font-bold text-xs flex items-center justify-center gap-3 transition shadow-lg border ${
+              className={`w-full py-2.5 px-4 rounded-xl font-bold text-xs flex items-center justify-center gap-2.5 transition border ${
                 isDark
-                  ? 'bg-white hover:bg-slate-100 text-slate-900 border-transparent shadow-cyan-500/5'
-                  : 'bg-white hover:bg-slate-50 text-slate-900 border-slate-300 shadow-sm'
+                  ? 'bg-white/5 hover:bg-white/10 text-white border-white/10'
+                  : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-300 shadow-sm'
               }`}
             >
               {googleLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-cyan-600" />
-                  <span>Connecting to Google SSO...</span>
+                  <Loader2 className="w-4 h-4 animate-spin text-cyan-500" />
+                  <span>Connecting to Google...</span>
                 </>
               ) : (
                 <>
@@ -752,13 +812,18 @@ export default function Auth() {
           </div>
         )}
 
-        {/* ── STEP 2: PHONE OTP VERIFICATION ── */}
-        {step === 'otp' && (
+        {/* ── STEP 2: OTP VERIFICATION (EMAIL OR PHONE) ── */}
+        {step === 'verify_otp' && (
           <div className="space-y-5 animate-in fade-in duration-200">
             <div className="text-center space-y-1">
-              <h3 className="text-sm font-bold font-mono">Verify 6-Digit SMS Code</h3>
-              <p className="text-xs opacity-70">
-                Sent to: <strong className="text-cyan-400">{countryCode} {phoneNumber}</strong>
+              <h2 className="text-sm font-bold font-mono text-[var(--text-primary)]">
+                {otpTargetType === 'email' ? 'Enter 6-Digit Email Verification Code' : 'Enter 6-Digit SMS Code'}
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)]">
+                Sent to:{' '}
+                <strong className="text-cyan-400 font-mono">
+                  {otpTargetType === 'email' ? email : `${countryCode} ${phoneNumber}`}
+                </strong>
               </p>
             </div>
 
@@ -766,21 +831,21 @@ export default function Auth() {
               <OtpInput
                 digits={otpDigits}
                 onChange={setOtpDigits}
-                onComplete={handleVerifyOtp}
+                onComplete={handleGenericVerifyOtp}
                 disabled={loading}
               />
             </div>
 
             <button
               type="button"
-              onClick={() => handleVerifyOtp()}
+              onClick={() => handleGenericVerifyOtp()}
               disabled={loading || otpDigits.join('').length !== 6}
-              className="w-full py-3 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.99] disabled:opacity-50"
+              className="w-full py-2.5 px-4 rounded-xl btn-primary text-xs font-bold transition flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Verifying SMS Code...</span>
+                  <span>Verifying Code...</span>
                 </>
               ) : (
                 <>
@@ -794,22 +859,23 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => { setStep('input'); setOtpDigits(['', '', '', '', '', '']); }}
-                className="text-slate-400 hover:text-white underline"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)] underline flex items-center gap-1"
               >
-                ← Back
+                <ChevronLeft className="w-3.5 h-3.5" />
+                <span>Back</span>
               </button>
 
               {cooldown > 0 ? (
-                <span className="text-slate-400 text-[11px]">Resend code in {cooldown}s</span>
+                <span className="text-[var(--text-muted)] text-[11px]">Resend in {cooldown}s</span>
               ) : (
                 <button
                   type="button"
-                  onClick={handleSendPhoneSms}
+                  onClick={otpTargetType === 'email' ? handleSendEmailOtpSubmit : handleSendPhoneSms}
                   disabled={loading}
                   className="font-bold underline text-cyan-400 flex items-center gap-1"
                 >
                   <RefreshCw className="w-3 h-3" />
-                  <span>Resend SMS Code</span>
+                  <span>Resend Code</span>
                 </button>
               )}
             </div>
@@ -817,17 +883,17 @@ export default function Auth() {
         )}
 
         {/* Footer info */}
-        <div className="pt-2 border-t border-white/10 text-[10px] font-mono text-center opacity-60 flex items-center justify-center gap-1.5">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Firebase Auth &amp; Firestore • Protected Lab Environment</span>
+        <div className="pt-2 border-t border-[var(--border-subtle)] text-[10px] font-mono text-center text-[var(--text-muted)] flex items-center justify-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          <span>Firebase &amp; Firestore Encrypted Session</span>
         </div>
       </div>
 
       {/* Forgot Password Modal */}
       {showForgotModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className={`w-full max-w-sm rounded-3xl p-6 shadow-2xl space-y-4 border ${
-            isDark ? 'bg-[#0a0e17] border-cyan-500/30 text-white' : 'bg-white border-slate-200 text-slate-900'
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className={`w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 border ${
+            isDark ? 'bg-[#0f121a] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-sm">
@@ -837,7 +903,7 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(false)}
-                className="text-xs opacity-60 hover:opacity-100"
+                className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 ✕
               </button>
@@ -849,14 +915,14 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => { setShowForgotModal(false); setForgotSuccess(false); }}
-                  className="w-full py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs"
+                  className="w-full py-1.5 rounded-lg btn-primary text-xs font-bold"
                 >
                   Done
                 </button>
               </div>
             ) : (
               <form onSubmit={handleForgotPasswordSubmit} className="space-y-3">
-                <p className="text-xs opacity-70">
+                <p className="text-xs text-[var(--text-secondary)]">
                   Enter the email associated with your ChemSpace account to receive a secure reset link.
                 </p>
                 <input
@@ -864,15 +930,13 @@ export default function Auth() {
                   required
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="scientist@lab.org"
-                  className={`w-full px-3 py-2 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 ${
-                    isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300'
-                  }`}
+                  placeholder="scientist@chemnova.org"
+                  className="w-full px-3 py-2 rounded-xl text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)]"
                 />
                 <button
                   type="submit"
                   disabled={forgotLoading}
-                  className="w-full py-2 px-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition flex items-center justify-center gap-1.5"
+                  className="w-full py-2 px-3 rounded-xl btn-primary text-xs font-bold transition flex items-center justify-center gap-1.5"
                 >
                   {forgotLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <span>Send Reset Email</span>}
                 </button>

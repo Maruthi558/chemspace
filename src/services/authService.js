@@ -9,12 +9,17 @@ import {
   sendEmailVerificationLink,
   completeEmailLinkSignIn,
   setupRecaptcha,
+  clearRecaptcha,
   sendSMS,
   confirmSMS,
   logoutUser,
   getSavedScientistProfile
 } from './firebase';
-import { checkEmailExistsApi } from './api';
+import {
+  checkEmailExistsApi,
+  sendEmailOtp as apiSendEmailOtp,
+  verifyEmailOtp as apiVerifyEmailOtp
+} from './api';
 
 /**
  * Check whether an account exists with the specified email.
@@ -45,7 +50,7 @@ export async function resetPassword(email) {
 }
 
 /**
- * Sign in with Google (Popup with fallback)
+ * Sign in with Google (Popup with redirect fallback)
  */
 export async function signInWithGoogle(profileMeta = {}) {
   return loginWithGoogle();
@@ -56,6 +61,20 @@ export async function signInWithGoogle(profileMeta = {}) {
  */
 export async function getGoogleRedirectResult() {
   return checkGoogleRedirectResult();
+}
+
+/**
+ * Real Email OTP: Dispatch 6-digit cryptographically secure code to real email inbox
+ */
+export async function requestEmailOtp(email) {
+  return apiSendEmailOtp(email);
+}
+
+/**
+ * Real Email OTP: Verify 6-digit code against server authentication engine
+ */
+export async function confirmEmailOtp(email, otp) {
+  return apiVerifyEmailOtp(email, otp);
 }
 
 /**
@@ -73,10 +92,17 @@ export async function confirmEmailLink(email, url) {
 }
 
 /**
- * Initialize reCAPTCHA for Phone Auth.
+ * Initialize reCAPTCHA for Phone Auth with clean DOM container.
  */
 export function initRecaptcha(containerId = 'recaptcha-container') {
   return setupRecaptcha(containerId);
+}
+
+/**
+ * Clean up reCAPTCHA verifier and container DOM.
+ */
+export function resetRecaptcha(containerId = 'recaptcha-container') {
+  return clearRecaptcha(containerId);
 }
 
 /**
@@ -112,6 +138,8 @@ export {
   sendEmailVerificationLink,
   completeEmailLinkSignIn,
   setupRecaptcha,
+  clearRecaptcha,
   sendSMS,
   confirmSMS
 };
+

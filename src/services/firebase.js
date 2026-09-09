@@ -1,6 +1,8 @@
 import { initializeApp, getApps, getApp, deleteApp } from 'firebase/app';
 import {
   getAuth,
+  setPersistence,
+  browserLocalPersistence,
   GoogleAuthProvider,
   signInWithPopup,
   signInWithRedirect,
@@ -62,6 +64,9 @@ let db = getFirestore(app);
 let analytics = null;
 
 if (typeof window !== 'undefined') {
+  setPersistence(auth, browserLocalPersistence).catch((err) => {
+    console.warn('[Firebase Auth] Session persistence notice:', err?.message);
+  });
   isSupported().then((supported) => {
     if (supported) {
       analytics = getAnalytics(app);
@@ -210,7 +215,16 @@ export const loginWithGoogle = async () => {
     console.log("Successfully logged in with Google:", result.user);
     return userData;
   } catch (err) {
-    console.error("Google Sign-In Error:", err);
+    console.warn("Google Sign-In popup notice:", err.code || err.message);
+    if (
+      err.code === 'auth/popup-blocked' ||
+      err.code === 'auth/cancelled-popup-request' ||
+      (err.code === 'auth/popup-closed-by-user' && typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+    ) {
+      console.log("Switching to Google Sign-In redirect flow...");
+      await signInWithRedirect(auth, googleProvider);
+      return null;
+    }
     throw err;
   }
 };
@@ -435,26 +449,42 @@ export const completeEmailLinkSignIn = async (emailToUse, hrefUrl) => {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 4. Phone OTP (SMS) Sign-In
+// 4. Phone OTP (SMS) Sign-In with Resilient reCAPTCHA Lifecycle
 // ─────────────────────────────────────────────────────────────────────────────
-// Setup the reCAPTCHA verifier (containerId should point to an empty div in your HTML)
-export const setupRecaptcha = (containerId = 'recaptcha-container') => {
-  ensureFreshFirebaseAuth();
-  if (typeof window === 'undefined') return null;
 
+export const clearRecaptcha = (containerId = 'recaptcha-container') => {
+  if (typeof window === 'undefined') return;
   if (window.recaptchaVerifier) {
     try {
       window.recaptchaVerifier.clear();
     } catch {
       // ignore
     }
+    window.recaptchaVerifier = null;
   }
+  const container = document.getElementById(containerId);
+  if (container) {
+    container.innerHTML = '';
+  }
+};
+
+export const setupRecaptcha = (containerId = 'recaptcha-container') => {
+  ensureFreshFirebaseAuth();
+  if (typeof window === 'undefined') return null;
 
   const container = document.getElementById(containerId);
   if (!container) {
     console.warn(`[Firebase Phone Auth] Container element #${containerId} not found in DOM.`);
     return null;
   }
+
+  // Reuse existing valid verifier if still attached
+  if (window.recaptchaVerifier) {
+    return window.recaptchaVerifier;
+  }
+
+  // Clear any existing children from the container DOM
+  container.innerHTML = '';
 
   try {
     window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
@@ -463,13 +493,23 @@ export const setupRecaptcha = (containerId = 'recaptcha-container') => {
         // reCAPTCHA solved
       },
       'expired-callback': () => {
-        // reCAPTCHA expired
+        console.warn('[Firebase Phone Auth] reCAPTCHA expired, clearing verifier.');
+        clearRecaptcha(containerId);
       }
     });
     return window.recaptchaVerifier;
   } catch (err) {
     console.warn('RecaptchaVerifier initialization notice:', err);
-    return null;
+    try {
+      container.innerHTML = '';
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
+        size: 'invisible'
+      });
+      return window.recaptchaVerifier;
+    } catch (retryErr) {
+      console.error('RecaptchaVerifier recovery failed:', retryErr);
+      return null;
+    }
   }
 };
 
@@ -488,6 +528,9 @@ export const sendSMS = async (phoneNumber, appVerifier) => {
     return confirmationResult;
   } catch (error) {
     console.error("SMS Sending Error:", error);
+    if (error.message && (error.message.includes('reCAPTCHA') || error.message.includes('rendered') || error.message.includes('captcha'))) {
+      clearRecaptcha('recaptcha-container');
+    }
     throw error;
   }
 };

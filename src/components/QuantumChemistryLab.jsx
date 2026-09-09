@@ -408,8 +408,8 @@ export default function QuantumChemistryLab() {
           <>
             {hasMolecule ? (
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full animate-in fade-in duration-400">
-                {/* Left: Calculation Configuration (5 Cols) */}
-                <div className="lg:col-span-5 flex flex-col gap-4 overflow-y-auto custom-scrollbar pr-1">
+                {/* Left: Calculation Configuration (6 Cols) */}
+                <div className="lg:col-span-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar pr-1">
                   <QuantumConfigurator
                     config={config}
                     onUpdate={handleUpdateConfig}
@@ -420,8 +420,8 @@ export default function QuantumChemistryLab() {
                   />
                 </div>
 
-                {/* Right: 3D Geometry Workspace (7 Cols) */}
-                <div className="lg:col-span-7 flex flex-col overflow-hidden">
+                {/* Right: 3D Geometry Workspace (6 Cols) */}
+                <div className="lg:col-span-6 flex flex-col overflow-hidden">
                   <GeometryWorkspace
                     atoms={config.geometry_atoms}
                     coordinates={config.geometry_coords}

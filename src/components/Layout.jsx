@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   PenTool,
@@ -29,7 +29,6 @@ import {
 } from 'lucide-react';
 import CopilotWindow from './AICopilot/CopilotWindow';
 import GoogleAuthModal from './GoogleAuthModal';
-import Background3DCanvas from './Background3DCanvas';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useGestures } from '../context/GestureContext';
@@ -80,6 +79,7 @@ export default function Layout() {
   });
 
   const [recentActivities, setRecentActivities] = useState([]);
+  const searchInputRef = useRef(null);
 
   useEffect(() => {
     setRecentActivities(getRecentActivities().slice(0, 1));
@@ -89,6 +89,22 @@ export default function Layout() {
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location.pathname]);
+
+  // Keyboard shortcut listener (/ or Ctrl+K) to focus search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (
+        (e.key === '/' || (e.key === 'k' && (e.ctrlKey || e.metaKey))) &&
+        document.activeElement?.tagName !== 'INPUT' &&
+        document.activeElement?.tagName !== 'TEXTAREA'
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const toggleSidebar = () => {
     setSidebarCollapsed((prev) => {
@@ -130,9 +146,31 @@ export default function Layout() {
   }, []);
 
   function handleSearchSubmit(e) {
-    e.preventDefault();
-    if (!searchQuery.trim()) return;
-    navigate(`/chemdraw`);
+    if (e) e.preventDefault();
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return;
+
+    if (query.includes('draw') || query.includes('sketch') || query.includes('structure')) {
+      navigate('/chemdraw');
+    } else if (query.includes('rdkit') || query.includes('python') || query.includes('descriptor')) {
+      navigate('/rdkit-lab');
+    } else if (query.includes('spectr') || query.includes('nmr') || query.includes('ir') || query.includes('ftir')) {
+      navigate('/spectroscopy');
+    } else if (query.includes('quantum') || query.includes('dft') || query.includes('orbital') || query.includes('homo')) {
+      navigate('/quantum-library');
+    } else if (query.includes('rxn') || query.includes('reaction') || query.includes('retro') || query.includes('synthesis')) {
+      navigate('/ibm-rxn');
+    } else if (query.includes('periodic') || query.includes('element') || query.includes('table')) {
+      navigate('/periodic-table');
+    } else if (query.includes('scientist') || query.includes('nobel') || query.includes('pioneer')) {
+      navigate('/scientists');
+    } else if (query.includes('workspace') || query.includes('file') || query.includes('history') || query.includes('saved')) {
+      navigate('/workspace');
+    } else if (query.includes('chromatograph') || query.includes('hplc')) {
+      navigate('/chromatography');
+    } else {
+      navigate(`/chemdraw?search=${encodeURIComponent(query)}`);
+    }
   }
 
   async function handleLogout() {
@@ -149,9 +187,7 @@ export default function Layout() {
   const latestActivity = recentActivities[0];
 
   return (
-    <div className="relative min-h-screen w-full flex flex-col md:flex-row font-sans overflow-x-hidden bg-[var(--bg-page)] text-[var(--text-primary)]">
-      {/* 3D WebGL Background Canvas */}
-      <Background3DCanvas />
+    <div className="h-screen w-screen overflow-hidden flex flex-col md:flex-row font-sans bg-[var(--bg-page)] text-[var(--text-primary)] relative">
 
       {/* ───────────────────────────────────────────────────────────────────────
           MOBILE TOP APP BAR (< 768px)
@@ -299,12 +335,12 @@ export default function Layout() {
           DESKTOP SIDEBAR (>= 768px)
          ─────────────────────────────────────────────────────────────────────── */}
       <aside
-        className={`hidden md:flex sticky top-0 h-screen min-h-screen max-h-screen z-30 flex-col justify-between border-r transition-all duration-300 ease-in-out select-none backdrop-blur-xl shrink-0 overflow-hidden ${
+        className={`hidden md:flex h-full max-h-screen z-30 flex-col justify-between border-r transition-all duration-300 ease-in-out select-none backdrop-blur-xl shrink-0 overflow-hidden ${
           sidebarCollapsed ? 'w-20' : 'w-60'
         } ${
           isDark
-            ? 'bg-[#0a0c13]/95 border-white/10 text-slate-200'
-            : 'bg-white/95 border-slate-200 text-slate-800'
+            ? 'bg-[#0a0c13] border-white/10 text-slate-200'
+            : 'bg-white border-slate-200 text-slate-800'
         }`}
       >
         {/* Sidebar Top Header */}
@@ -453,24 +489,39 @@ export default function Layout() {
       </aside>
 
       {/* ───────────────────────────────────────────────────────────────────────
-          MAIN WORKSPACE WRAPPER
-          Takes full remaining width without horizontal overflow or compression
+          MAIN WORKSPACE WRAPPER (Independent Scroll Container)
+          Desktop sidebar remains fixed while this container scrolls
          ─────────────────────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0 w-full relative z-10">
+      <div className="flex-1 h-full min-w-0 w-full flex flex-col overflow-y-auto overflow-x-hidden relative z-10">
         {/* Desktop Top Header Bar */}
-        <header className={`hidden md:flex h-14 border-b px-6 items-center justify-between backdrop-blur-xl shrink-0 ${
-          isDark ? 'bg-[#08090d]/80 border-white/10' : 'bg-white/80 border-slate-200'
+        <header className={`hidden md:flex h-14 border-b px-6 items-center justify-between backdrop-blur-xl shrink-0 sticky top-0 z-20 ${
+          isDark ? 'bg-[#08090d]/90 border-white/10' : 'bg-white/90 border-slate-200'
         }`}>
           {/* Quick Search */}
-          <form onSubmit={handleSearchSubmit} className="relative w-72">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 opacity-40" />
+          <form onSubmit={handleSearchSubmit} className="relative w-80">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none" />
             <input
+              ref={searchInputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search molecular structures, SMILES, tools..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 transition text-[var(--text-primary)]"
+              placeholder="Search tools, molecules, SMILES..."
+              className="w-full pl-8 pr-10 py-1.5 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/30 transition text-[var(--text-primary)]"
             />
+            {searchQuery ? (
+              <button
+                type="button"
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 text-slate-400 hover:text-white"
+                title="Clear search"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            ) : (
+              <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-mono px-1.5 py-0.5 rounded border border-white/10 bg-white/5 text-slate-400 pointer-events-none select-none">
+                /
+              </kbd>
+            )}
           </form>
 
           {/* Quick Action Badges & Gestures */}
@@ -504,7 +555,7 @@ export default function Layout() {
       {/* Global Modals */}
       {aiModalOpen && <CopilotWindow isOpen={aiModalOpen} onClose={() => setAiModalOpen(false)} />}
       {googleModalOpen && <GoogleAuthModal onClose={() => setGoogleModalOpen(false)} />}
-      {gesturePanelOpen && <GestureControlPanel onClose={() => setGesturePanelOpen(false)} />}
+      {gesturePanelOpen && <GestureControlPanel isOpen={gesturePanelOpen} onClose={() => setGesturePanelOpen(false)} />}
     </div>
   );
 }

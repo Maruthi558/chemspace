@@ -6,11 +6,14 @@ import {
   signUpWithEmail as authServiceSignUpWithEmail,
   signInWithEmail as authServiceSignInWithEmail,
   resetPassword as authServiceResetPassword,
+  requestEmailOtp as authServiceRequestEmailOtp,
+  confirmEmailOtp as authServiceConfirmEmailOtp,
   requestEmailLink as authServiceRequestEmailLink,
   confirmEmailLink as authServiceConfirmEmailLink,
   requestPhoneOtp as authServiceRequestPhoneOtp,
   confirmPhoneOtp as authServiceConfirmPhoneOtp,
   initRecaptcha,
+  resetRecaptcha,
   checkEmailExists,
   getGoogleRedirectResult
 } from '../services/authService';
@@ -265,7 +268,52 @@ export function AuthProvider({ children }) {
   }
 
   /**
-   * 6. Phone SMS OTP
+   * 6. Real Email OTP Authentication
+   */
+  async function handleSendEmailOtp(email) {
+    setError('');
+    try {
+      return await authServiceRequestEmailOtp(email);
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  async function handleVerifyEmailOtp(email, otp, profileData = {}) {
+    setError('');
+    try {
+      const res = await authServiceConfirmEmailOtp(email, otp);
+      const savedProfile = getSavedScientistProfile();
+      const userData = {
+        uid: res.user?.id ? `user_${res.user.id}` : ('scientist_' + Date.now().toString(36)),
+        name: profileData.name || res.user?.name || res.user?.username || savedProfile.name || 'Research Scientist',
+        username: res.user?.username || email.split('@')[0],
+        email: email.trim().toLowerCase(),
+        workplace: profileData.workplace || savedProfile.workplace || 'ChemNova Research Institute',
+        role: profileData.role || savedProfile.title || 'Lead Research Chemist',
+        provider: 'email_otp',
+        verified: true,
+        lastLoginAt: new Date().toISOString()
+      };
+
+      const token = res.token || ('otp_session_' + Date.now());
+      localStorage.setItem('chemspace_token', token);
+      localStorage.setItem('chemspace_user', JSON.stringify(userData));
+      localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...savedProfile, ...userData }));
+      window.dispatchEvent(new Event('chemspace-auth-changed'));
+      setUser({ ...userData, isGuest: false });
+      return userData;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 7. Phone SMS OTP
    */
   async function handleSendPhoneOtp(phoneNumber, verifier) {
     setError('');
@@ -310,7 +358,7 @@ export function AuthProvider({ children }) {
   }
 
   /**
-   * 7. Guest Session Handlers
+   * 8. Guest Session Handlers
    */
   function handleContinueAsGuest(customGuestName) {
     setError('');
@@ -371,11 +419,14 @@ export function AuthProvider({ children }) {
     signInWithEmail: handleSignInWithEmail,
     resetPassword: handleResetPassword,
     signInWithGoogle: handleGoogleSignIn,
+    sendEmailOtp: handleSendEmailOtp,
+    verifyEmailOtp: handleVerifyEmailOtp,
     sendEmailVerificationLink: handleSendEmailVerificationLink,
     completeEmailLinkSignIn: handleCompleteEmailLinkSignIn,
     sendPhoneOtp: handleSendPhoneOtp,
     verifyPhoneOtp: handleVerifyPhoneOtp,
     setupRecaptcha: initRecaptcha,
+    resetRecaptcha,
     continueAsGuest: handleContinueAsGuest,
     exitGuestSession: handleExitGuestSession,
     signOut: handleSignOut,
