@@ -52,7 +52,6 @@ export default function Auth() {
 
   const {
     isAuthenticated,
-    continueAsGuest,
     signUpWithEmail,
     signInWithEmail,
     resetPassword,
@@ -100,6 +99,7 @@ export default function Auth() {
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotSuccess, setForgotSuccess] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotError, setForgotError] = useState('');
 
   // Email magic link state
   const [magicLinkSent, setMagicLinkSent] = useState(false);
@@ -112,7 +112,6 @@ export default function Auth() {
   // Loading & Error States
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [guestLoading, setGuestLoading] = useState(false);
   const [error, setError] = useState('');
   const [cooldown, setCooldown] = useState(0);
 
@@ -351,35 +350,22 @@ export default function Auth() {
     }
   }
 
-  // ── 6. GUEST ACCESS ─────────────────────────────────────────────────────────
-  function handleGuestAccess() {
-    setGuestLoading(true);
-    setError('');
-    try {
-      continueAsGuest(fullName.trim() || 'Guest Researcher');
-      setGuestLoading(false);
-      navigate(fromDestination, { replace: true });
-    } catch {
-      setError('Could not start guest preview.');
-      setGuestLoading(false);
-    }
-  }
-
-  // ── 7. FORGOT PASSWORD ──────────────────────────────────────────────────────
+  // ── 6. FORGOT PASSWORD ──────────────────────────────────────────────────────
   async function handleForgotPasswordSubmit(e) {
     e.preventDefault();
+    setForgotError('');
     if (!forgotEmail.trim() || !isValidEmail(forgotEmail.trim())) {
-      setError('Please enter a valid email address.');
+      setForgotError('Please enter a valid email address.');
       return;
     }
 
     setForgotLoading(true);
-    setError('');
     try {
       await resetPassword(forgotEmail.trim());
       setForgotSuccess(true);
+      setForgotError('');
     } catch (err) {
-      setError(err.message || 'Failed to send reset link.');
+      setForgotError(err.message || 'Failed to send reset link. Please check the email and try again.');
     } finally {
       setForgotLoading(false);
     }
@@ -387,27 +373,27 @@ export default function Auth() {
 
   return (
     <div className={`min-h-screen w-full flex items-center justify-center p-4 transition-colors relative select-none ${
-      isDark ? 'bg-[#08090d] text-slate-100' : 'bg-[#f8f9fb] text-slate-900'
+      isDark ? 'bg-[#090a0f] text-slate-100' : 'bg-[#f6f8fa] text-slate-900'
     }`}>
       {/* Invisible reCAPTCHA container for Phone Auth */}
       <div id="recaptcha-container" className="hidden"></div>
 
       {/* Main Authentication Card */}
-      <div className={`w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-xl border transition-all space-y-6 ${
-        isDark ? 'bg-[#0f121a] border-white/10' : 'bg-white border-slate-200 shadow-slate-200/50'
+      <div className={`w-full max-w-md rounded-2xl p-6 sm:p-8 shadow-2xl border transition-all space-y-6 ${
+        isDark ? 'bg-[#111319] border-white/10' : 'bg-white border-slate-200 shadow-slate-200/60'
       }`}>
         {/* Top Header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 flex items-center justify-center mx-auto">
+        <div className="text-center space-y-2.5">
+          <div className="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center justify-center mx-auto">
             <Atom className="w-6 h-6" />
           </div>
 
           <div>
             <h1 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
-              {viewMode === 'signup' ? 'Create ChemSpace Account' : 'Sign In to ChemSpace'}
+              {viewMode === 'signup' ? 'Create Research Account' : 'Sign In to ChemSpace'}
             </h1>
             <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-              Secure Laboratory Cloud • Project: <span className="font-mono text-cyan-400">chemistry1-e2723</span>
+              Secure Laboratory Cloud • Project: <span className="font-mono text-emerald-400">chemistry1-e2723</span>
             </p>
           </div>
 
@@ -420,7 +406,7 @@ export default function Auth() {
               onClick={() => { setViewMode('signin'); setError(''); setStep('input'); }}
               className={`flex-1 py-1.5 rounded-lg font-bold transition ${
                 viewMode === 'signin'
-                  ? (isDark ? 'bg-white text-black shadow' : 'bg-slate-900 text-white shadow')
+                  ? (isDark ? 'bg-white text-slate-950 shadow-sm' : 'bg-slate-900 text-white shadow-sm')
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -431,7 +417,7 @@ export default function Auth() {
               onClick={() => { setViewMode('signup'); setError(''); setStep('input'); }}
               className={`flex-1 py-1.5 rounded-lg font-bold transition ${
                 viewMode === 'signup'
-                  ? (isDark ? 'bg-white text-black shadow' : 'bg-slate-900 text-white shadow')
+                  ? (isDark ? 'bg-white text-slate-950 shadow-sm' : 'bg-slate-900 text-white shadow-sm')
                   : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -478,7 +464,7 @@ export default function Auth() {
                 onClick={() => { setAuthMethod('password'); setError(''); setMagicLinkSent(false); }}
                 className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition ${
                   authMethod === 'password'
-                    ? (isDark ? 'bg-white/10 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'bg-white text-cyan-700 shadow-sm')
+                    ? (isDark ? 'bg-white/15 text-white border border-white/20 shadow-sm' : 'bg-white text-slate-950 shadow-sm')
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -491,7 +477,7 @@ export default function Auth() {
                 onClick={() => { setAuthMethod('email_otp'); setError(''); }}
                 className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition ${
                   authMethod === 'email_otp'
-                    ? (isDark ? 'bg-white/10 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'bg-white text-cyan-700 shadow-sm')
+                    ? (isDark ? 'bg-white/15 text-white border border-white/20 shadow-sm' : 'bg-white text-slate-950 shadow-sm')
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -504,7 +490,7 @@ export default function Auth() {
                 onClick={() => { setAuthMethod('phone_otp'); setError(''); }}
                 className={`py-1.5 rounded-lg font-bold flex items-center justify-center gap-1 transition ${
                   authMethod === 'phone_otp'
-                    ? (isDark ? 'bg-white/10 text-cyan-300 border border-cyan-500/30 shadow-sm' : 'bg-white text-cyan-700 shadow-sm')
+                    ? (isDark ? 'bg-white/15 text-white border border-white/20 shadow-sm' : 'bg-white text-slate-950 shadow-sm')
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -530,7 +516,7 @@ export default function Auth() {
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Dr. Maruthi Chemist"
-                          className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                          className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                         />
                       </div>
                     </div>
@@ -546,7 +532,7 @@ export default function Auth() {
                           value={workplace}
                           onChange={(e) => setWorkplace(e.target.value)}
                           placeholder="ChemNova Advanced Institute"
-                          className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                          className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                         />
                       </div>
                     </div>
@@ -565,7 +551,7 @@ export default function Auth() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="scientist@chemnova.org"
-                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                     />
                   </div>
                 </div>
@@ -577,7 +563,7 @@ export default function Auth() {
                       <button
                         type="button"
                         onClick={() => { setShowForgotModal(true); setForgotEmail(email); }}
-                        className="text-[10px] font-mono text-cyan-400 hover:underline"
+                        className="text-[10px] font-mono text-emerald-400 hover:underline"
                       >
                         Forgot password?
                       </button>
@@ -591,7 +577,7 @@ export default function Auth() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full pl-9 pr-9 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                      className="w-full pl-9 pr-9 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                     />
                     <button
                       type="button"
@@ -638,7 +624,7 @@ export default function Auth() {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Dr. Maruthi Chemist"
-                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                       />
                     </div>
                   </div>
@@ -656,7 +642,7 @@ export default function Auth() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="scientist@chemnova.org"
-                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                      className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                     />
                   </div>
                   <p className="text-[10px] text-[var(--text-muted)] mt-1">
@@ -699,7 +685,7 @@ export default function Auth() {
                         value={fullName}
                         onChange={(e) => setFullName(e.target.value)}
                         placeholder="Dr. Maruthi Chemist"
-                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                       />
                     </div>
                   </div>
@@ -713,7 +699,7 @@ export default function Auth() {
                     <select
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
-                      className="py-2 px-2.5 rounded-xl text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                      className="py-2 px-2.5 rounded-xl text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 text-[var(--text-primary)] transition"
                     >
                       {COUNTRY_CODES.map((c) => (
                         <option key={c.code} value={c.code}>
@@ -730,7 +716,7 @@ export default function Auth() {
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         placeholder="9876543210"
-                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)] transition"
+                        className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] transition"
                       />
                     </div>
                   </div>
@@ -763,7 +749,7 @@ export default function Auth() {
             <div className="relative flex items-center justify-center pt-1">
               <div className="w-full border-t border-[var(--border-subtle)]" />
               <span className={`px-2.5 text-[10px] font-mono uppercase tracking-wider absolute ${
-                isDark ? 'bg-[#0f121a] text-slate-500' : 'bg-white text-slate-400'
+                isDark ? 'bg-[#111319] text-slate-500' : 'bg-white text-slate-400'
               }`}>
                 or continue with
               </span>
@@ -782,7 +768,7 @@ export default function Auth() {
             >
               {googleLoading ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin text-cyan-500" />
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
                   <span>Connecting to Google...</span>
                 </>
               ) : (
@@ -798,16 +784,31 @@ export default function Auth() {
               )}
             </button>
 
-            {/* Quick Guest Exploration Button */}
-            <div className="pt-1 text-center">
-              <button
-                type="button"
-                onClick={handleGuestAccess}
-                disabled={guestLoading}
-                className="text-xs font-mono text-cyan-400 hover:text-cyan-300 transition underline"
-              >
-                {guestLoading ? 'Starting guest preview...' : '⚡ Explore ChemSpace as Guest Researcher'}
-              </button>
+            {/* Create New Account / Sign In switcher prompt */}
+            <div className="pt-2 text-center text-xs text-[var(--text-secondary)]">
+              {viewMode === 'signin' ? (
+                <div>
+                  <span>Need an account? </span>
+                  <button
+                    type="button"
+                    onClick={() => { setViewMode('signup'); setError(''); setStep('input'); }}
+                    className="font-bold text-emerald-500 hover:text-emerald-400 underline transition cursor-pointer"
+                  >
+                    Create New Account
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <span>Already have an account? </span>
+                  <button
+                    type="button"
+                    onClick={() => { setViewMode('signin'); setError(''); setStep('input'); }}
+                    className="font-bold text-emerald-500 hover:text-emerald-400 underline transition cursor-pointer"
+                  >
+                    Sign In to Existing Account
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -821,7 +822,7 @@ export default function Auth() {
               </h2>
               <p className="text-xs text-[var(--text-secondary)]">
                 Sent to:{' '}
-                <strong className="text-cyan-400 font-mono">
+                <strong className="text-emerald-400 font-mono">
                   {otpTargetType === 'email' ? email : `${countryCode} ${phoneNumber}`}
                 </strong>
               </p>
@@ -872,7 +873,7 @@ export default function Auth() {
                   type="button"
                   onClick={otpTargetType === 'email' ? handleSendEmailOtpSubmit : handleSendPhoneSms}
                   disabled={loading}
-                  className="font-bold underline text-cyan-400 flex items-center gap-1"
+                  className="font-bold underline text-emerald-400 flex items-center gap-1"
                 >
                   <RefreshCw className="w-3 h-3" />
                   <span>Resend Code</span>
@@ -893,11 +894,11 @@ export default function Auth() {
       {showForgotModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-in fade-in duration-150">
           <div className={`w-full max-w-sm rounded-2xl p-6 shadow-2xl space-y-4 border ${
-            isDark ? 'bg-[#0f121a] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
+            isDark ? 'bg-[#111319] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-900'
           }`}>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-sm">
-                <KeyRound className="w-4 h-4 text-cyan-400" />
+                <KeyRound className="w-4 h-4 text-emerald-400" />
                 <span>Reset Password</span>
               </div>
               <button
@@ -925,13 +926,19 @@ export default function Auth() {
                 <p className="text-xs text-[var(--text-secondary)]">
                   Enter the email associated with your ChemSpace account to receive a secure reset link.
                 </p>
+                {forgotError && (
+                  <div className="p-2.5 rounded-lg bg-rose-500/10 border border-rose-500/25 text-rose-400 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>{forgotError}</span>
+                  </div>
+                )}
                 <input
                   type="email"
                   required
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   placeholder="scientist@chemnova.org"
-                  className="w-full px-3 py-2 rounded-xl text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-cyan-500 text-[var(--text-primary)]"
+                  className="w-full px-3 py-2 rounded-xl text-xs font-mono bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:outline-none focus:border-emerald-500 text-[var(--text-primary)]"
                 />
                 <button
                   type="submit"

@@ -51,9 +51,16 @@ export default function ResearchProjects() {
   return (
     <div className="w-full space-y-6">
       {/* Header */}
-      <div className="bg-slate-900/80 backdrop-blur-md p-6 rounded-2xl border border-cyan-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-[#111319]/90 backdrop-blur-md p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-amber-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent flex items-center gap-3">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="telemetry-pill">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+              COLLABORATIVE REPOSITORY
+            </span>
+            <span className="text-[10px] font-mono text-slate-500 uppercase">Multi-Target Campaigns</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
             <FolderGit2 className="w-7 h-7 text-amber-400" />
             Research Projects Workspace
           </h1>
@@ -63,7 +70,7 @@ export default function ResearchProjects() {
         </div>
         <button
           onClick={() => setShowNewModal(true)}
-          className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-cyan-500 text-slate-950 font-extrabold rounded-xl shadow-lg flex items-center gap-2 transition text-xs"
+          className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-4 h-4" /> Create Research Project
         </button>
@@ -72,23 +79,23 @@ export default function ResearchProjects() {
       {/* Projects Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {projects.map((proj) => (
-          <div key={proj.id} className="glass-panel glass-panel-hover rounded-2xl p-6 border border-slate-800 space-y-4 flex flex-col justify-between">
+          <div key={proj.id} className="card-scientific p-6 space-y-4 flex flex-col justify-between hover:border-emerald-500/40 transition">
             <div className="space-y-2">
               <div className="flex items-start justify-between gap-2">
-                <h3 className="text-base font-bold text-slate-100">{proj.title}</h3>
-                <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full border ${proj.status === 'Active' ? 'bg-emerald-950 text-emerald-400 border-emerald-500/30' : 'bg-slate-950 text-slate-400 border-slate-800'}`}>
+                <h3 className="text-base font-bold text-white tracking-tight">{proj.title}</h3>
+                <span className={`text-[10px] font-mono px-2.5 py-1 rounded-full border ${proj.status === 'Active' ? 'bg-emerald-950/70 text-emerald-400 border-emerald-500/30' : 'bg-[#181b24] text-slate-400 border-white/10'}`}>
                   {proj.status}
                 </span>
               </div>
               <p className="text-xs text-slate-400 leading-relaxed">{proj.description}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-2 border-t border-slate-800">
-              <div className="p-2 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div className="grid grid-cols-2 gap-2 text-xs font-mono pt-2 border-t border-white/10">
+              <div className="p-2.5 bg-[#090a0f] rounded-xl border border-white/10 flex items-center justify-between">
                 <span className="text-slate-500">Molecules:</span>
-                <span className="text-cyan-400 font-bold">{proj.moleculesCount}</span>
+                <span className="text-emerald-400 font-bold">{proj.moleculesCount}</span>
               </div>
-              <div className="p-2 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+              <div className="p-2.5 bg-[#090a0f] rounded-xl border border-white/10 flex items-center justify-between">
                 <span className="text-slate-500">ML Runs:</span>
                 <span className="text-violet-400 font-bold">{proj.experimentsCount}</span>
               </div>
@@ -97,7 +104,7 @@ export default function ResearchProjects() {
             <div className="flex items-center gap-2 pt-2">
               <button
                 onClick={() => navigate('/molecular-lab')}
-                className="flex-1 py-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 text-cyan-300 rounded-xl font-bold flex items-center justify-center gap-1.5 transition text-xs"
+                className="flex-1 py-2.5 bg-[#181b24] hover:bg-[#202532] border border-white/10 text-emerald-400 hover:text-emerald-300 rounded-xl font-bold flex items-center justify-center gap-1.5 transition text-xs"
               >
                 <span>Open Project Lab</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -109,10 +116,10 @@ export default function ResearchProjects() {
 
       {/* New Project Modal */}
       {showNewModal && (
-        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4">
-          <form onSubmit={handleCreateProject} className="w-full max-w-lg bg-slate-900 border border-cyan-500/40 rounded-2xl p-6 space-y-4 shadow-2xl">
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <FolderGit2 className="w-5 h-5 text-cyan-400" /> Create New Research Project
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <form onSubmit={handleCreateProject} className="w-full max-w-lg bg-[#111319] border border-white/15 rounded-2xl p-6 space-y-4 shadow-2xl">
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <FolderGit2 className="w-5 h-5 text-emerald-400" /> Create New Research Project
             </h3>
             <div className="space-y-3 text-xs font-mono">
               <div>
@@ -123,7 +130,7 @@ export default function ResearchProjects() {
                   value={newTitle}
                   onChange={(e) => setNewTitle(e.target.value)}
                   placeholder="e.g. Lead Discovery for Kinase Inhibitors"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none"
+                  className="w-full bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -132,7 +139,7 @@ export default function ResearchProjects() {
                   value={newDescription}
                   onChange={(e) => setNewDescription(e.target.value)}
                   placeholder="Briefly state project objectives..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:border-cyan-500 focus:outline-none h-24"
+                  className="w-full bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-slate-100 focus:border-emerald-500 focus:outline-none h-24"
                 />
               </div>
             </div>
@@ -140,13 +147,13 @@ export default function ResearchProjects() {
               <button
                 type="button"
                 onClick={() => setShowNewModal(false)}
-                className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl text-xs font-bold"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-cyan-500 text-slate-950 rounded-xl text-xs font-bold shadow-md"
+                className="btn-primary"
               >
                 Create Project
               </button>

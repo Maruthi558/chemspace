@@ -9,7 +9,7 @@ import { useTheme } from '../context/ThemeContext';
  * Allows both authenticated users and guest users while preserving the intended location.
  */
 export default function ProtectedRoute({ children }) {
-  const { isAuthenticated, isGuest, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
   const { theme } = useTheme();
   const location = useLocation();
   const isDark = theme === 'dark';
@@ -38,8 +38,8 @@ export default function ProtectedRoute({ children }) {
     );
   }
 
-  // If neither authenticated nor in active guest mode, redirect to login
-  if (!isAuthenticated && !isGuest) {
+  // If not authenticated, redirect to login
+  if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

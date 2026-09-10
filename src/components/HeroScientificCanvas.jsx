@@ -196,8 +196,14 @@ export default function HeroScientificCanvas() {
     // 8. Animation Loop
     let animId;
     let clock = new THREE.Clock();
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const animate = () => {
+      if (prefersReducedMotion) {
+        renderer.render(scene, camera);
+        return;
+      }
+
       animId = requestAnimationFrame(animate);
       if (document.hidden) return;
       const elapsedTime = clock.getElapsedTime();

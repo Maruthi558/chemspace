@@ -64,7 +64,7 @@ export default function Dashboard() {
       {/* 1. WORKSPACE HEADER & TELEMETRY */}
       <div className="workspace-header">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+          <div className="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
             <Atom className="w-5 h-5 animate-spin-slow" />
           </div>
           <div>
@@ -90,7 +90,7 @@ export default function Dashboard() {
                   ? 'bg-amber-400 animate-pulse'
                   : serverStatus.online
                   ? 'bg-emerald-400'
-                  : 'bg-cyan-400'
+                  : 'bg-emerald-400/80'
               }`}
             />
             <span className="font-bold">
@@ -103,11 +103,11 @@ export default function Dashboard() {
               logActivity('ChemDraw', 'Started New 2D Sketch', 'Initialized blank canvas workspace', 'sketch');
               navigate('/chemdraw');
             }}
-            className="btn-horizontal btn-primary text-xs shadow-lg shadow-cyan-500/20 flex items-center gap-2"
+            className="btn-horizontal btn-primary text-xs shadow-md flex items-center gap-2"
           >
             <PenTool className="w-3.5 h-3.5" />
             <span>Launch ChemDraw</span>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/30 text-cyan-200 border border-cyan-400/30">
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/30 text-slate-300 border border-white/20">
               CH₃-C(=O)OH
             </span>
           </button>
@@ -115,20 +115,20 @@ export default function Dashboard() {
       </div>
 
       {/* 2. SCIENTIFIC 3D HERO OVERVIEW BANNER */}
-      <div className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] relative overflow-hidden shadow-2xl bg-gradient-to-r from-cyan-500/5 via-violet-500/5 to-transparent">
+      <div className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] relative overflow-hidden shadow-2xl bg-gradient-to-r from-emerald-500/5 via-violet-500/5 to-transparent">
         <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 flex items-center gap-1.5">
-                <Atom className="w-3.5 h-3.5 text-cyan-400" />
-                CHEMNOVA 3D PLATFORM
+              <span className="px-2.5 py-1 rounded-xl text-[10px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+                <Atom className="w-3.5 h-3.5 text-emerald-400" />
+                CHEMSPACE PLATFORM
               </span>
               <span className="text-[10px] text-[var(--text-muted)] font-mono">
                 RDKit • Three.js WebGL • DFT • NMR • FTIR
               </span>
             </div>
             <h2 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] leading-tight">
-              Next-Gen Computational Chemistry & Molecular Engineering
+              Next-Gen Computational Chemistry &amp; Molecular Engineering
             </h2>
             <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
               Design molecules with continuous 2D CAD drafting, compute Lipinski matrices in Python, solve electronic orbitals with ab initio DFT, deconvolute multi-modal spectra, and plan multi-step organic synthesis pathways.
@@ -136,7 +136,7 @@ export default function Dashboard() {
 
             {/* Signature Formula Pills Banner */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="telemetry-pill text-[9px] text-cyan-300">
+              <span className="telemetry-pill text-[9px] text-slate-300">
                 CH₃-COOH (Acetic Acid)
               </span>
               <span className="telemetry-pill text-[9px] text-emerald-300">
@@ -189,20 +189,20 @@ export default function Dashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div
           onClick={() => navigate('/rdkit-lab')}
-          className="glass-panel p-4 rounded-2xl space-y-2 border border-[var(--border-subtle)] hover:border-cyan-500/40 cursor-pointer transition-all hover:-translate-y-1 shadow-lg"
+          className="glass-panel p-4 rounded-2xl space-y-2 border border-[var(--border-subtle)] hover:border-emerald-500/40 cursor-pointer transition-all hover:-translate-y-1 shadow-lg"
         >
           <div className="flex items-center justify-between">
             <span className="text-xs text-[var(--text-secondary)] flex items-center gap-1.5 font-sans font-bold">
-              <Cpu className="w-4 h-4 text-cyan-400" /> RDKit Python Core
+              <Cpu className="w-4 h-4 text-emerald-400" /> RDKit Python Core
             </span>
-            <span className="text-[9px] font-mono font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20">
+            <span className="text-[9px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
               C₉H₈O₄
             </span>
           </div>
-          <div className="text-2xl font-black text-cyan-400">{stats.rdkitExecutions} Computes</div>
+          <div className="text-2xl font-black text-emerald-400">{stats.rdkitExecutions} Computes</div>
           <div className="text-[10px] text-[var(--text-muted)] flex items-center justify-between font-mono">
             <span>Lipinski Rule of 5</span>
-            <span className="text-cyan-300 font-bold">MW ≤ 500</span>
+            <span className="text-emerald-300 font-bold">MW ≤ 500</span>
           </div>
         </div>
 
@@ -270,7 +270,7 @@ export default function Dashboard() {
         <div className="lg:col-span-7 glass-panel p-5 rounded-3xl border border-[var(--border-subtle)] flex flex-col justify-between space-y-4 shadow-xl">
           <div className="flex items-center justify-between border-b border-inherit pb-3">
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-cyan-400" />
+              <Clock className="w-4 h-4 text-slate-400" />
               <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
                 Recent Research Telemetry Stream
               </span>
@@ -295,18 +295,18 @@ export default function Dashboard() {
           <div className="space-y-2.5 overflow-y-auto max-h-[380px] pr-1 custom-scrollbar">
             {activities.length === 0 ? (
               <div className="p-8 text-center text-xs opacity-50 italic space-y-2">
-                <Compass className="w-8 h-8 mx-auto text-cyan-400/40" />
+                <Compass className="w-8 h-8 mx-auto text-slate-400/40" />
                 <p>No telemetry recorded yet. Sketch a molecule, run an RDKit script, or calculate spectra to log computes.</p>
               </div>
             ) : (
               activities.map((act) => (
                 <div
                   key={act.id}
-                  className="p-3.5 rounded-2xl inner-box border border-[var(--border-subtle)] flex items-start justify-between gap-3 hover:border-cyan-500/30 transition shadow-sm"
+                  className="p-3.5 rounded-2xl inner-box border border-[var(--border-subtle)] flex items-start justify-between gap-3 hover:border-[var(--border-medium)] transition shadow-sm"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-[9px] px-2 py-0.5 rounded-md font-bold font-mono uppercase bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+                      <span className="text-[9px] px-2 py-0.5 rounded-md font-bold font-mono uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
                         {act.module}
                       </span>
                       <span className="text-xs font-bold text-[var(--text-primary)]">{act.title}</span>
@@ -334,7 +334,7 @@ export default function Dashboard() {
         <div className="lg:col-span-5 glass-panel p-5 rounded-3xl border border-[var(--border-subtle)] flex flex-col justify-between space-y-4 shadow-xl">
           <div className="border-b border-inherit pb-3">
             <div className="flex items-center gap-2">
-              <FlaskConical className="w-4 h-4 text-cyan-400" />
+              <FlaskConical className="w-4 h-4 text-emerald-400" />
               <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
                 Interactive Chemical Workspaces
               </span>
@@ -351,14 +351,14 @@ export default function Dashboard() {
                 logActivity('ChemDraw', 'Opened ChemDraw CAD Studio', 'Preloaded Aspirin molecular graph', 'sketch');
                 navigate('/chemdraw');
               }}
-              className="p-3.5 rounded-2xl inner-box hover:border-cyan-400/50 transition flex items-center justify-between text-left group shadow-sm"
+              className="p-3.5 rounded-2xl inner-box hover:border-slate-500/50 transition flex items-center justify-between text-left group shadow-sm"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:scale-105 transition-transform">
+                <div className="p-2.5 rounded-xl bg-slate-500/10 text-slate-300 border border-slate-500/20 group-hover:scale-105 transition-transform">
                   <PenTool className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-black group-hover:text-cyan-300 transition text-[var(--text-primary)]">
+                  <div className="text-xs font-black group-hover:text-white transition text-[var(--text-primary)]">
                     ChemDraw 2D/3D CAD Studio
                   </div>
                   <div className="text-[10px] text-[var(--text-secondary)] font-sans">
@@ -367,10 +367,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-slate-500/15 text-slate-300 border border-slate-500/30">
                   CH₃-C(=O)OH
                 </span>
-                <ArrowRight className="w-4 h-4 text-cyan-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-4 h-4 text-slate-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
               </div>
             </button>
 
@@ -467,14 +467,14 @@ export default function Dashboard() {
                 logActivity('Scientists', 'Explored Chemists Encyclopedia', 'Reviewed Nobel breakthroughs', 'general');
                 navigate('/scientists');
               }}
-              className="p-3.5 rounded-2xl inner-box hover:border-cyan-400/50 transition flex items-center justify-between text-left group shadow-sm"
+              className="p-3.5 rounded-2xl inner-box hover:border-amber-400/50 transition flex items-center justify-between text-left group shadow-sm"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 group-hover:scale-105 transition-transform">
+                <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform">
                   <Award className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-black group-hover:text-cyan-300 transition text-[var(--text-primary)]">
+                  <div className="text-xs font-black group-hover:text-amber-300 transition text-[var(--text-primary)]">
                     Scientists &amp; Discoveries Gallery
                   </div>
                   <div className="text-[10px] text-[var(--text-secondary)] font-sans">
@@ -483,17 +483,17 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30">
                   Nobel Archive
                 </span>
-                <ArrowRight className="w-4 h-4 text-cyan-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-4 h-4 text-amber-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
               </div>
             </button>
           </div>
 
           <div className="pt-3 border-t border-inherit flex items-center justify-between text-[11px] text-[var(--text-muted)]">
             <span>Hardware Context: WebGL 2.0 GPU</span>
-            <span className="text-cyan-400 font-bold">60 FPS Cluster Active</span>
+            <span className="text-emerald-400 font-bold">60 FPS Cluster Active</span>
           </div>
         </div>
       </div>

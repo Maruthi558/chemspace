@@ -429,7 +429,7 @@ export default function AIChemistryLab() {
         {/* Left: IDE Title & RDKit Kernel Badge */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="p-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+            <div className="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
               <FileCode className="w-5 h-5" />
             </div>
             <div>
@@ -488,7 +488,7 @@ export default function AIChemistryLab() {
             className="btn-horizontal btn-secondary text-xs"
             title="Load active molecule drawn in ChemDraw Studio"
           >
-            <PenTool className="w-3.5 h-3.5 text-cyan-400" />
+            <PenTool className="w-3.5 h-3.5 text-emerald-400" />
             <span className="hidden md:inline">From ChemDraw</span>
           </button>
 
@@ -558,7 +558,7 @@ export default function AIChemistryLab() {
       {/* 2. TOP INPUT BAR — Direct SMILES / Structure Entry */}
       <div className="glass-panel p-3.5 rounded-2xl border border-[var(--border-subtle)] flex flex-col sm:flex-row items-center gap-3">
         <div className="flex-1 relative w-full">
-          <Search className="w-4 h-4 text-cyan-500 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-emerald-500 absolute left-3.5 top-3" />
           <input
             type="text"
             value={targetSmiles}
@@ -572,7 +572,7 @@ export default function AIChemistryLab() {
               }
             }}
             placeholder="Enter a SMILES string to calculate (e.g. CCO, c1ccccc1, CC(=O)OC1=CC=CC=C1C(=O)O)..."
-            className="input-control rounded-xl pl-10 pr-4 py-2.5 text-xs font-mono font-bold text-cyan-400"
+            className="input-control rounded-xl pl-10 pr-4 py-2.5 text-xs font-mono font-bold text-emerald-400"
           />
         </div>
 
@@ -600,7 +600,7 @@ export default function AIChemistryLab() {
           <div className="glass-panel rounded-3xl overflow-hidden flex flex-col border border-[var(--border-subtle)] shadow-xl">
             <div className="px-4 py-2.5 border-b border-inherit flex items-center justify-between text-xs text-[var(--text-secondary)]">
               <div className="flex items-center gap-2">
-                <Code className="w-4 h-4 text-cyan-400" />
+                <Code className="w-4 h-4 text-emerald-400" />
                 <span className="font-bold text-[var(--text-primary)]">main_rdkit_workflow.py</span>
                 <span className="text-[10px] opacity-60 font-mono">({lines.length} lines)</span>
               </div>
@@ -663,7 +663,7 @@ export default function AIChemistryLab() {
                       log.type === 'info'
                         ? 'text-slate-400'
                         : log.type === 'stdout'
-                        ? 'text-cyan-300 font-bold'
+                        ? 'text-emerald-300 font-bold'
                         : log.type === 'success'
                         ? 'text-emerald-400 font-bold'
                         : 'text-rose-400 font-bold'
@@ -692,7 +692,7 @@ export default function AIChemistryLab() {
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5 border border-transparent'
                   }`}
                 >
-                  <Eye className="w-3.5 h-3.5 text-cyan-400" /> 2D Structure
+                  <Eye className="w-3.5 h-3.5 text-emerald-400" /> 2D Structure
                 </button>
                 <button
                   onClick={() => setViewMode('3d')}
@@ -772,7 +772,7 @@ export default function AIChemistryLab() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-3.5 rounded-2xl inner-box space-y-1">
                   <span className="text-[10px] text-[var(--text-secondary)] font-sans">Formula</span>
-                  <div className="text-base font-black text-cyan-400 font-mono">{descriptors.formula}</div>
+                  <div className="text-base font-black text-emerald-400 font-mono">{descriptors.formula}</div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl inner-box space-y-1">
@@ -818,10 +818,10 @@ export default function AIChemistryLab() {
       {/* Settings Modal */}
       {showSettingsModal && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#040814] border border-white/20 rounded-3xl p-6 max-w-md w-full space-y-4 text-xs font-mono shadow-2xl">
+          <div className="bg-[#111319] border border-white/20 rounded-3xl p-6 max-w-md w-full space-y-4 text-xs font-mono shadow-2xl">
             <div className="flex items-center justify-between border-b border-white/10 pb-3">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Settings className="w-4 h-4 text-cyan-400" /> RDKit Python Kernel Settings
+                <Settings className="w-4 h-4 text-emerald-400" /> RDKit Python Kernel Settings
               </h3>
               <button
                 onClick={() => setShowSettingsModal(false)}
@@ -833,7 +833,7 @@ export default function AIChemistryLab() {
             <div className="space-y-3">
               <div>
                 <label className="text-slate-400 block mb-1">Python Environment:</label>
-                <select className="w-full bg-[#02040a] border border-white/15 rounded-xl p-2.5 text-cyan-300">
+                <select className="w-full bg-[#02040a] border border-white/15 rounded-xl p-2.5 text-emerald-400">
                   <option>Python 3.14 (Active Local RDKit Server)</option>
                   <option>Pyodide WebAssembly Kernel (In-Browser)</option>
                 </select>

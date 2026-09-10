@@ -22,7 +22,8 @@ import {
   Code,
   Compass,
   Zap,
-  Play
+  Play,
+  Atom
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { aiCopilot } from '../../services/aiCopilotService';
@@ -286,11 +287,11 @@ export default function CopilotWindow({ onClose }) {
     return (
       <div
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 right-6 z-50 p-4 rounded-3xl bg-cyan-500 text-slate-950 shadow-2xl cursor-pointer hover:scale-105 transition flex items-center gap-3 font-mono font-bold"
+        className="fixed bottom-6 right-6 z-50 py-2.5 px-4 rounded-2xl bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-subtle)] shadow-2xl cursor-pointer hover:opacity-95 transition flex items-center gap-2.5 font-mono text-xs font-bold"
       >
-        <Bot className="w-5 h-5 animate-pulse" />
-        <span className="text-xs">ChemAI Copilot (Active)</span>
-        <Maximize2 className="w-4 h-4" />
+        <Bot className="w-4 h-4 text-emerald-500 animate-pulse" />
+        <span>ChemAI Copilot</span>
+        <Maximize2 className="w-3.5 h-3.5 opacity-60" />
       </div>
     );
   }
@@ -305,16 +306,16 @@ export default function CopilotWindow({ onClose }) {
         {/* 1. COPILOT HEADER */}
         <div className="px-5 py-3.5 border-b border-inherit flex items-center justify-between bg-inherit shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center shadow-md">
-              <Bot className="w-5 h-5 animate-pulse" />
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 flex items-center justify-center shadow-sm">
+              <Bot className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-black text-[var(--text-primary)]">ChemBot AI Assistant</h2>
+                <h2 className="text-sm font-bold text-[var(--text-primary)]">ChemBot AI Assistant</h2>
                 <span className="telemetry-pill text-[9px]">LAB COPILOT</span>
               </div>
-              <p className="text-[10px] text-[var(--text-secondary)] font-sans">
-                Context: <strong className="text-cyan-400">{location.pathname}</strong>
+              <p className="text-[10px] text-[var(--text-secondary)] font-mono">
+                Active Context: <strong className="text-emerald-500">{location.pathname}</strong>
               </p>
             </div>
           </div>
@@ -374,7 +375,7 @@ export default function CopilotWindow({ onClose }) {
 
         {/* Action Notice Bar (when AI executes safe platform action) */}
         {actionNotice && (
-          <div className="px-5 py-2 bg-cyan-500/10 border-b border-cyan-500/20 text-cyan-400 text-xs font-bold flex items-center gap-2 animate-pulse">
+          <div className="px-5 py-2 bg-emerald-500/10 border-b border-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center gap-2 animate-pulse">
             <Bot className="w-3.5 h-3.5" />
             <span>{actionNotice}</span>
           </div>
@@ -414,19 +415,24 @@ export default function CopilotWindow({ onClose }) {
 
           {/* Loading / Generating Indicator */}
           {isLoading && (
-            <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] ml-1">
-              <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
-                <Bot className="w-4 h-4 text-cyan-400 animate-spin" />
+            <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] ml-1 py-1 animate-in fade-in duration-150">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shadow-sm">
+                <Atom className="w-4 h-4 animate-spin-slow" />
               </div>
-              <span className="animate-pulse font-medium">ChemAI is computing scientific response...</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-[var(--text-primary)]">ChemAI Molecular Engine</span>
+                <span className="text-[10px] font-mono text-[var(--text-muted)] animate-pulse">
+                  Computing chemical properties &amp; molecular descriptors...
+                </span>
+              </div>
             </div>
           )}
         </div>
 
         {/* 3. ATTACHED FILE BADGE */}
         {attachedFile && (
-          <div className="px-5 py-2 border-t border-inherit bg-white/5 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 text-cyan-400">
+          <div className="px-5 py-2 border-t border-inherit bg-[var(--bg-inner)] flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-emerald-500">
               <FileText className="w-4 h-4" />
               <span className="font-bold">{attachedFile.name}</span>
               <span className="text-[10px] opacity-60 font-mono">({attachedFile.size})</span>
@@ -455,7 +461,7 @@ export default function CopilotWindow({ onClose }) {
             {/* Attach File Button */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-cyan-400 transition"
+              className="p-3 rounded-2xl bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400 transition cursor-pointer"
               title="Attach File (.py, .mol, .sdf, .xyz, .csv, .log)"
             >
               <Paperclip className="w-4 h-4" />
@@ -464,10 +470,10 @@ export default function CopilotWindow({ onClose }) {
             {/* Voice Dictation Button */}
             <button
               onClick={toggleMic}
-              className={`p-3 rounded-2xl border transition-all ${
+              className={`p-3 rounded-2xl border transition-all cursor-pointer ${
                 micState === 'listening'
-                  ? 'bg-rose-500 text-white border-rose-400 animate-pulse shadow-lg'
-                  : 'bg-white/5 hover:bg-white/10 border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-cyan-400'
+                  ? 'bg-rose-500 text-white border-rose-400 animate-pulse shadow-md'
+                  : 'bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400'
               }`}
               title={micState === 'listening' ? 'Stop Listening & Send' : 'Speak Voice Command'}
             >

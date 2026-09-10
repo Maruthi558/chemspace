@@ -64,9 +64,16 @@ export default function MySqlDatabasePage() {
   return (
     <div className="w-full space-y-6">
       {/* Header */}
-      <div className="bg-slate-900/80 backdrop-blur-md p-6 rounded-2xl border border-cyan-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-[#111319]/90 backdrop-blur-md p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-3">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="telemetry-pill">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              RELATIONAL PERSISTENCE
+            </span>
+            <span className="text-[10px] font-mono text-slate-500 uppercase">ACID Data Connect</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
             <Database className="w-7 h-7 text-emerald-400" />
             MySQL Relational Database Integration
           </h1>
@@ -77,7 +84,7 @@ export default function MySqlDatabasePage() {
 
         <button
           onClick={downloadSqlSchema}
-          className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-slate-950 font-extrabold rounded-xl shadow-lg flex items-center gap-2 transition text-xs"
+          className="btn-primary flex items-center gap-2"
         >
           <Download className="w-4 h-4" /> Download MySQL Schema (.sql)
         </button>
@@ -85,10 +92,10 @@ export default function MySqlDatabasePage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Connection Settings */}
-        <div className="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4 text-xs font-mono">
-          <h3 className="text-sm font-bold text-slate-100 flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="lg:col-span-5 bg-[#111319]/90 border border-white/10 rounded-2xl p-5 space-y-4 text-xs font-mono">
+          <h3 className="text-sm font-bold text-white flex items-center justify-between border-b border-white/10 pb-3">
             <span>MySQL Connection Credentials</span>
-            <span className="text-[10px] bg-emerald-950 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded">Connected</span>
+            <span className="text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded">Connected</span>
           </h3>
 
           <div>
@@ -97,7 +104,7 @@ export default function MySqlDatabasePage() {
               type="text"
               value={dbHost}
               onChange={(e) => setDbHost(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:border-cyan-500 focus:outline-none"
+              className="w-full bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -107,7 +114,7 @@ export default function MySqlDatabasePage() {
               type="text"
               value={dbName}
               onChange={(e) => setDbName(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:border-cyan-500 focus:outline-none"
+              className="w-full bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
             />
           </div>
 
@@ -117,22 +124,22 @@ export default function MySqlDatabasePage() {
               type="text"
               value={dbUser}
               onChange={(e) => setDbUser(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-200 focus:border-cyan-500 focus:outline-none"
+              className="w-full bg-[#090a0f] border border-white/10 rounded-xl p-2.5 text-slate-200 focus:border-emerald-500 focus:outline-none"
             />
           </div>
         </div>
 
         {/* SQL Schema Preview */}
-        <div className="lg:col-span-7 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-3">
-          <h3 className="text-sm font-mono font-bold text-cyan-300 flex items-center justify-between border-b border-slate-800 pb-3">
-            <span className="flex items-center gap-2"><Code className="w-4 h-4 text-cyan-400" /> MySQL DDL Schema Definition</span>
+        <div className="lg:col-span-7 bg-[#111319]/90 border border-white/10 rounded-2xl p-5 space-y-3">
+          <h3 className="text-sm font-mono font-bold text-emerald-400 flex items-center justify-between border-b border-white/10 pb-3">
+            <span className="flex items-center gap-2"><Code className="w-4 h-4 text-emerald-400" /> MySQL DDL Schema Definition</span>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(MYSQL_SCHEMA_SQL);
                 setCopied(true);
                 setTimeout(() => setCopied(false), 2000);
               }}
-              className="text-xs text-slate-400 hover:text-white"
+              className="text-xs text-slate-400 hover:text-white transition"
             >
               {copied ? 'Copied!' : 'Copy SQL'}
             </button>
@@ -141,7 +148,7 @@ export default function MySqlDatabasePage() {
           <textarea
             readOnly
             value={MYSQL_SCHEMA_SQL}
-            className="w-full h-80 bg-slate-950 border border-slate-800 rounded-xl p-4 text-emerald-400 font-mono text-xs leading-relaxed focus:outline-none"
+            className="w-full h-80 bg-[#090a0f] border border-white/10 rounded-xl p-4 text-emerald-400 font-mono text-xs leading-relaxed focus:outline-none"
           />
         </div>
       </div>

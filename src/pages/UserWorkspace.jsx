@@ -46,7 +46,7 @@ import SecurityWatermark from '../components/SecurityWatermark';
 
 export default function UserWorkspace() {
   const navigate = useNavigate();
-  const { user, isGuest, isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
@@ -114,7 +114,7 @@ export default function UserWorkspace() {
 
   return (
     <div className={`min-h-screen pt-20 pb-16 px-4 sm:px-6 lg:px-8 transition-colors ${
-      isDark ? 'bg-[#08080a] text-neutral-200' : 'bg-[#f8f9fa] text-neutral-800'
+      isDark ? 'bg-[var(--bg-page)] text-neutral-200' : 'bg-[var(--bg-page)] text-neutral-800'
     }`}>
       <SecurityWatermark label="CONFIDENTIAL LAB WORKSPACE" showBanner={true} />
 
@@ -124,7 +124,7 @@ export default function UserWorkspace() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-cyan-500">
+              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-emerald-500">
                 PERSONAL WORKSPACE
               </span>
               <span className="text-[10px] font-mono text-emerald-500 flex items-center gap-1 font-bold">
@@ -176,15 +176,15 @@ export default function UserWorkspace() {
                   onClick={() => navigate(item.link)}
                   className={`p-3 rounded-2xl border text-left flex flex-col justify-between transition cursor-pointer group ${
                     isDark
-                      ? 'bg-neutral-900/60 border-neutral-800 hover:border-cyan-500/50 hover:bg-neutral-900'
-                      : 'bg-white border-neutral-200 hover:border-cyan-500/50 hover:shadow-sm'
+                      ? 'bg-neutral-900/60 border-neutral-800 hover:border-neutral-600 hover:bg-neutral-900'
+                      : 'bg-white border-neutral-200 hover:border-neutral-400 hover:shadow-sm'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-cyan-500">
+                    <span className="text-[10px] font-mono uppercase tracking-wider font-bold text-emerald-500">
                       {item.module}
                     </span>
-                    <ArrowRight className="w-3 h-3 text-neutral-500 group-hover:text-cyan-400 group-hover:translate-x-0.5 transition" />
+                    <ArrowRight className="w-3 h-3 text-neutral-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition" />
                   </div>
                   <div className="text-xs font-bold font-mono text-neutral-900 dark:text-neutral-200 truncate">
                     {item.shortName}
@@ -272,7 +272,7 @@ export default function UserWorkspace() {
                     onClick={() => setActiveCategory(cat.id)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold tracking-wide shrink-0 transition cursor-pointer ${
                       active
-                        ? 'bg-cyan-600 text-white'
+                        ? isDark ? 'bg-white text-slate-950 font-bold shadow-sm' : 'bg-slate-900 text-white font-bold shadow-sm'
                         : isDark
                           ? 'bg-neutral-900 text-neutral-400 hover:text-white'
                           : 'bg-neutral-100 text-neutral-600 hover:text-black'
@@ -311,7 +311,7 @@ export default function UserWorkspace() {
                   >
                     <div className="space-y-1 truncate">
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                        <span className="px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                           {item.module}
                         </span>
                         <span className="font-bold text-neutral-900 dark:text-neutral-200 truncate">{item.title}</span>
@@ -373,7 +373,7 @@ export default function UserWorkspace() {
                         <td className="py-3 px-3 text-right space-x-2">
                           <button
                             onClick={() => triggerFileDownload(d)}
-                            className="px-2.5 py-1 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-400 border border-cyan-500/20 font-bold transition cursor-pointer"
+                            className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold transition cursor-pointer"
                           >
                             Download Again
                           </button>

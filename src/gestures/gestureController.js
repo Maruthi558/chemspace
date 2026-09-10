@@ -210,11 +210,20 @@ export class GestureController {
       result.gesture === GESTURE_TYPES.MOVE_DOWN
     ) {
       const scrollAmt = result.scrollDelta * this.sensitivity * 1.5;
-      window.scrollBy({
-        top: scrollAmt,
-        left: 0,
-        behavior: 'auto'
-      });
+      const scrollContainer = document.getElementById('main-scroll-container') || document.querySelector('main')?.parentElement || document.scrollingElement || window;
+      if (scrollContainer && scrollContainer.scrollBy) {
+        scrollContainer.scrollBy({
+          top: scrollAmt,
+          left: 0,
+          behavior: 'auto'
+        });
+      } else {
+        window.scrollBy({
+          top: scrollAmt,
+          left: 0,
+          behavior: 'auto'
+        });
+      }
 
       return {
         mode: 'SCROLL',

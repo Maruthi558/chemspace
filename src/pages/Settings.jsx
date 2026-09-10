@@ -50,7 +50,7 @@ const CATEGORIES = [
 export default function Settings() {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const { user, isAuthenticated, isGuest, signOut } = useAuth();
+  const { user, isAuthenticated, signOut } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentTab = searchParams.get('tab') || 'profile';
@@ -154,7 +154,7 @@ export default function Settings() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-cyan-500">
+              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-emerald-500">
                 CONTROL CENTER
               </span>
               {saveStatus && (
@@ -286,7 +286,7 @@ export default function Settings() {
               <div className="flex items-center gap-3 pt-2">
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl font-bold font-mono text-xs uppercase tracking-wider bg-cyan-600 hover:bg-cyan-500 text-white transition cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl font-bold font-mono text-xs uppercase tracking-wider bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:opacity-90 transition cursor-pointer shadow-sm"
                 >
                   Save Profile
                 </button>
@@ -313,7 +313,7 @@ export default function Settings() {
                   onClick={() => setTheme('dark')}
                   className={`p-4 rounded-2xl border flex flex-col items-center gap-3 transition cursor-pointer ${
                     theme === 'dark'
-                      ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400'
+                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
                       : 'border-neutral-700 hover:border-neutral-600 text-neutral-400'
                   }`}
                 >
@@ -329,7 +329,7 @@ export default function Settings() {
                   onClick={() => setTheme('light')}
                   className={`p-4 rounded-2xl border flex flex-col items-center gap-3 transition cursor-pointer ${
                     theme === 'light'
-                      ? 'border-cyan-500 bg-cyan-500/10 text-cyan-500'
+                      ? 'border-emerald-500 bg-emerald-500/10 text-emerald-600'
                       : 'border-neutral-300 dark:border-neutral-700 hover:border-neutral-400 text-neutral-600 dark:text-neutral-400'
                   }`}
                 >
@@ -365,7 +365,7 @@ export default function Settings() {
                     onClick={() => handleUpdatePref({ language: lang.code })}
                     className={`w-full p-3.5 rounded-2xl border flex items-center justify-between text-left font-mono transition cursor-pointer ${
                       prefs.language === lang.code
-                        ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400'
+                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
                         : isDark
                           ? 'border-neutral-800 hover:bg-neutral-900 text-neutral-300'
                           : 'border-neutral-200 hover:bg-neutral-50 text-neutral-700'
@@ -375,7 +375,7 @@ export default function Settings() {
                       <div className="text-xs font-bold">{lang.label}</div>
                       <div className="text-[10px] opacity-60">{lang.sub}</div>
                     </div>
-                    {prefs.language === lang.code && <Check className="w-4 h-4 text-cyan-400" />}
+                    {prefs.language === lang.code && <Check className="w-4 h-4 text-emerald-400" />}
                   </button>
                 ))}
               </div>
@@ -400,7 +400,7 @@ export default function Settings() {
                     type="checkbox"
                     checked={prefs.voiceEnabled}
                     onChange={(e) => handleUpdatePref({ voiceEnabled: e.target.checked })}
-                    className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
                   />
                 </div>
 
@@ -413,14 +413,14 @@ export default function Settings() {
                     type="checkbox"
                     checked={prefs.autoRead}
                     onChange={(e) => handleUpdatePref({ autoRead: e.target.checked })}
-                    className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
                   />
                 </div>
 
                 <div className="p-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-800 space-y-2">
                   <div className="flex justify-between font-bold">
                     <span>Speech Rate</span>
-                    <span className="text-cyan-400">{prefs.voiceSpeed}x</span>
+                    <span className="text-emerald-400">{prefs.voiceSpeed}x</span>
                   </div>
                   <input
                     type="range"
@@ -429,7 +429,7 @@ export default function Settings() {
                     step="0.25"
                     value={prefs.voiceSpeed}
                     onChange={(e) => handleUpdatePref({ voiceSpeed: parseFloat(e.target.value) })}
-                    className="w-full accent-cyan-500 cursor-pointer"
+                    className="w-full accent-emerald-500 cursor-pointer"
                   />
                   <div className="flex justify-between text-[10px] text-neutral-500">
                     <span>0.75x (Calm)</span>
@@ -464,7 +464,7 @@ export default function Settings() {
                         onClick={() => handleUpdatePref({ aiResponseMode: mode.id })}
                         className={`p-3 rounded-xl border text-left transition cursor-pointer ${
                           prefs.aiResponseMode === mode.id
-                            ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400'
+                            ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400'
                             : isDark
                               ? 'border-neutral-800 hover:bg-neutral-900 text-neutral-400'
                               : 'border-neutral-200 hover:bg-neutral-50 text-neutral-600'
@@ -486,7 +486,7 @@ export default function Settings() {
                     type="checkbox"
                     checked={prefs.webSearchEnabled}
                     onChange={(e) => handleUpdatePref({ webSearchEnabled: e.target.checked })}
-                    className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
                   />
                 </div>
               </div>
@@ -511,7 +511,7 @@ export default function Settings() {
                     type="checkbox"
                     checked={prefs.privacyBlurEnabled}
                     onChange={(e) => handleUpdatePref({ privacyBlurEnabled: e.target.checked })}
-                    className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
                   />
                 </div>
 
@@ -546,7 +546,7 @@ export default function Settings() {
                     type="checkbox"
                     checked={prefs.watermarkEnabled}
                     onChange={(e) => handleUpdatePref({ watermarkEnabled: e.target.checked })}
-                    className="w-4 h-4 accent-cyan-500 cursor-pointer"
+                    className="w-4 h-4 accent-emerald-500 cursor-pointer"
                   />
                 </div>
 
@@ -561,7 +561,7 @@ export default function Settings() {
                       {auditLogs.map((log) => (
                         <div key={log.id} className="p-2.5 rounded-xl border border-neutral-800 bg-neutral-900/40 flex items-center justify-between">
                           <div>
-                            <span className="font-bold text-cyan-400">{log.eventType}</span>
+                            <span className="font-bold text-emerald-400">{log.eventType}</span>
                             <span className="text-neutral-400 ml-2">{log.details}</span>
                           </div>
                           <span className="text-[10px] text-neutral-500 shrink-0">{log.date}</span>
@@ -644,7 +644,7 @@ export default function Settings() {
                           <td className="py-3 px-3 text-right space-x-2">
                             <button
                               onClick={() => triggerFileDownload(d)}
-                              className="px-2.5 py-1 rounded-lg bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-400 border border-cyan-500/20 font-bold transition cursor-pointer"
+                              className="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 font-bold transition cursor-pointer"
                             >
                               Download Again
                             </button>
@@ -699,7 +699,7 @@ export default function Settings() {
                     onClick={() => setHistoryCategory(c)}
                     className={`px-3 py-1 rounded-lg text-[11px] font-mono uppercase tracking-wider transition cursor-pointer ${
                       historyCategory === c
-                        ? 'bg-cyan-600 text-white font-bold'
+                        ? isDark ? 'bg-white text-slate-950 font-bold shadow-sm' : 'bg-slate-900 text-white font-bold shadow-sm'
                         : 'bg-neutral-800/60 text-neutral-400 hover:text-white'
                     }`}
                   >

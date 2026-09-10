@@ -46,7 +46,7 @@ export default function QuantumResultDashboard({ result }) {
           <div>
             <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
               Quantum Calculation Completed
-              <span className="text-[9px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-mono border border-cyan-500/20 font-bold">
+              <span className="text-[9px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 font-mono border border-emerald-500/20 font-bold">
                 {result.engine || 'PySCF Engine'}
               </span>
             </h2>
@@ -70,7 +70,7 @@ export default function QuantumResultDashboard({ result }) {
               onClick={() => setActiveTab(tab.id)}
               className={`px-3.5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
                 activeTab === tab.id
-                  ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 scale-105'
+                  ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20 scale-105'
                   : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
@@ -87,19 +87,19 @@ export default function QuantumResultDashboard({ result }) {
           <div className="space-y-6 animate-in fade-in duration-400">
             {/* Primary Ground State Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="p-6 rounded-[28px] bg-gradient-to-br from-cyan-600/15 via-blue-600/10 to-transparent border border-cyan-500/30 flex flex-col justify-between shadow-lg">
+              <div className="p-6 rounded-[28px] bg-gradient-to-br from-violet-600/15 via-purple-600/10 to-transparent border border-violet-500/30 flex flex-col justify-between shadow-lg">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="text-[10px] font-black text-cyan-400 uppercase tracking-widest">
+                  <span className="text-[10px] font-black text-violet-400 uppercase tracking-widest">
                     Total Ground-State Energy
                   </span>
-                  <Zap className="w-5 h-5 text-cyan-400" />
+                  <Zap className="w-5 h-5 text-violet-400" />
                 </div>
                 <div>
                   <div className="text-3xl font-black text-white font-mono tracking-tight">
                     {result.total_energy_hartree ? result.total_energy_hartree.toFixed(6) : '-76.421000'}
                     <span className="text-sm font-bold text-gray-400 ml-2">Hartree (E_h)</span>
                   </div>
-                  <div className="text-xs font-mono font-bold text-cyan-400 mt-1">
+                  <div className="text-xs font-mono font-bold text-violet-400 mt-1">
                     ≈ {result.total_energy_kcal_mol || (-76.421 * 627.509).toFixed(2)} kcal/mol (
                     {quantumService.hartreeToKjMol(result.total_energy_hartree || -76.421)} kJ/mol)
                   </div>
@@ -129,7 +129,7 @@ export default function QuantumResultDashboard({ result }) {
                   <span className="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 text-[9px] font-black uppercase border border-emerald-500/20">
                     High Chemical Stability
                   </span>
-                  <span className="px-2.5 py-1 rounded-lg bg-cyan-500/10 text-cyan-400 text-[9px] font-black uppercase border border-cyan-500/20">
+                  <span className="px-2.5 py-1 rounded-lg bg-violet-500/10 text-violet-400 text-[9px] font-black uppercase border border-violet-500/20">
                     Hard Molecule (η = {result.chemical_hardness || '2.43'} eV)
                   </span>
                 </div>
@@ -138,7 +138,7 @@ export default function QuantumResultDashboard({ result }) {
 
             {/* Frontier Orbital & Thermochemistry Matrix */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-              <ResultCard label="HOMO Energy" value={`${result.homo_energy_ev || -6.52} eV`} subtext={`alpha #${Math.floor((result.total_electrons || 10) / 2)}`} color="text-cyan-400" />
+              <ResultCard label="HOMO Energy" value={`${result.homo_energy_ev || -6.52} eV`} subtext={`alpha #${Math.floor((result.total_electrons || 10) / 2)}`} color="text-emerald-400" />
               <ResultCard label="LUMO Energy" value={`${result.lumo_energy_ev || -1.67} eV`} subtext={`alpha #${Math.floor((result.total_electrons || 10) / 2) + 1}`} color="text-violet-400" />
               <ResultCard label="Zero-Point Energy (ZPE)" value={`${result.zero_point_energy || '0.0215'} E_h`} subtext={`${((result.zero_point_energy || 0.0215) * 627.509).toFixed(2)} kcal/mol`} color="text-amber-400" />
               <ResultCard label="Gibbs Free Energy (G)" value={`${result.gibbs_free_energy_hartree || -76.415} E_h`} subtext="@ 298.15 K, 1 atm" color="text-emerald-400" />
@@ -147,7 +147,7 @@ export default function QuantumResultDashboard({ result }) {
             {/* AI Interpretation Card */}
             <div className="p-6 rounded-[28px] bg-slate-800/40 dark:bg-white/5 border border-slate-200 dark:border-white/10 relative overflow-hidden shadow-inner">
               <div className="flex items-center gap-2.5 mb-3">
-                <Cpu className="w-4 h-4 text-cyan-400" />
+                <Cpu className="w-4 h-4 text-violet-400" />
                 <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-900 dark:text-white">
                   AI Quantum Mechanistic Analysis
                 </h4>
@@ -178,7 +178,7 @@ export default function QuantumResultDashboard({ result }) {
               <div>
                 <h3 className="text-xs font-black text-white uppercase tracking-widest mb-3 flex items-center justify-between">
                   <span>Frontier Orbital Ladder</span>
-                  <span className="text-[9px] font-mono text-cyan-400 font-bold">24 Eigenvalues</span>
+                  <span className="text-[9px] font-mono text-violet-400 font-bold">24 Eigenvalues</span>
                 </h3>
 
                 <div className="rounded-2xl border border-white/10 overflow-hidden max-h-72 overflow-y-auto custom-scrollbar bg-black/40">
@@ -204,7 +204,7 @@ export default function QuantumResultDashboard({ result }) {
                               onClick={() => setSelectedOrbital(label)}
                               className={`cursor-pointer transition-colors ${
                                 isHomo
-                                  ? 'bg-cyan-500/20 text-cyan-300 font-bold'
+                                  ? 'bg-emerald-500/20 text-emerald-300 font-bold'
                                   : isLumo
                                   ? 'bg-pink-500/20 text-pink-300 font-bold'
                                   : 'hover:bg-white/5 text-gray-400'
@@ -212,13 +212,13 @@ export default function QuantumResultDashboard({ result }) {
                             >
                               <td className="p-2 font-bold">{label}</td>
                               <td className="p-2">
-                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${i < nOcc ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/10 text-gray-500'}`}>
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${i < nOcc ? 'bg-emerald-500/20 text-emerald-400' : 'bg-white/10 text-gray-500'}`}>
                                   {i < nOcc ? '2.0' : '0.0'}
                                 </span>
                               </td>
                               <td className="p-2">{energy.toFixed(3)}</td>
                               <td className="p-2 text-right">
-                                <button className="text-[10px] text-cyan-400 font-bold hover:underline">3D</button>
+                                <button className="text-[10px] text-emerald-400 font-bold hover:underline">3D</button>
                               </td>
                             </tr>
                           );
@@ -233,7 +233,7 @@ export default function QuantumResultDashboard({ result }) {
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-[10px] text-cyan-300 flex items-center gap-2 font-mono">
+              <div className="p-3.5 rounded-2xl bg-violet-500/10 border border-violet-500/20 text-[10px] text-violet-300 flex items-center gap-2 font-mono">
                 <Info className="w-4 h-4 shrink-0" />
                 Click any orbital in the ladder to project its 3D electron wavefunction isosurface ψ(r).
               </div>
@@ -253,7 +253,7 @@ export default function QuantumResultDashboard({ result }) {
                   Analytical Hessian eigenvalues computed at stationary equilibrium geometry.
                 </p>
               </div>
-              <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 px-3 py-1 rounded-xl border border-cyan-500/20">
+              <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-xl border border-emerald-500/20">
                 All Real Modes (Local Minimum Verified)
               </span>
             </div>
@@ -273,7 +273,7 @@ export default function QuantumResultDashboard({ result }) {
                     result.frequencies.map((freq, i) => (
                       <tr key={i} className="hover:bg-white/5 transition-colors">
                         <td className="p-3 text-gray-500">Mode {freq.mode || i + 1}</td>
-                        <td className="p-3 font-bold text-cyan-400">{freq.frequency_cm1 || freq.frequency || '1595.0'}</td>
+                        <td className="p-3 font-bold text-emerald-400">{freq.frequency_cm1 || freq.frequency || '1595.0'}</td>
                         <td className="p-3 text-emerald-400">{freq.intensity_km_mol || freq.intensity || '45.2'}</td>
                         <td className="p-3 text-gray-300 font-sans">{freq.symmetry || 'A1'}</td>
                       </tr>
@@ -294,7 +294,7 @@ export default function QuantumResultDashboard({ result }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in duration-400 font-mono">
             {/* Dipole Moment Card */}
             <div className="p-6 rounded-[28px] bg-white/5 border border-white/10 space-y-4">
-              <div className="flex items-center gap-2 text-cyan-400">
+              <div className="flex items-center gap-2 text-violet-400">
                 <Radio className="w-4 h-4" />
                 <h3 className="text-xs font-black uppercase tracking-widest text-white">Dipole Moment Vector</h3>
               </div>
@@ -336,7 +336,7 @@ export default function QuantumResultDashboard({ result }) {
                         <tr key={i} className="hover:bg-white/5">
                           <td className="p-2 text-gray-500">#{c.atom_index || i + 1}</td>
                           <td className="p-2 font-bold text-white">{c.element}</td>
-                          <td className={`p-2 text-right font-bold ${c.charge < 0 ? 'text-rose-400' : 'text-cyan-400'}`}>
+                          <td className={`p-2 text-right font-bold ${c.charge < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
                             {c.charge > 0 ? `+${c.charge}` : c.charge}
                           </td>
                         </tr>
@@ -358,7 +358,7 @@ export default function QuantumResultDashboard({ result }) {
           <div className="h-full flex flex-col space-y-3 animate-in fade-in duration-400 font-mono">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-cyan-400" />
+                <Terminal className="w-4 h-4 text-emerald-400" />
                 <h3 className="text-xs font-black text-white uppercase tracking-widest">
                   Standard Quantum Engine Output Log
                 </h3>

@@ -67,24 +67,31 @@ export default function LearningCenter() {
   return (
     <div className="w-full space-y-6">
       {/* Header */}
-      <div className="bg-slate-900/80 backdrop-blur-md p-6 rounded-2xl border border-cyan-500/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-[#111319]/90 backdrop-blur-md p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
         <div>
-          <h1 className="text-2xl md:text-3xl font-black bg-gradient-to-r from-cyan-400 via-blue-400 to-violet-400 bg-clip-text text-transparent flex items-center gap-3">
-            <BookOpen className="w-7 h-7 text-cyan-400" />
+          <div className="flex items-center gap-2 mb-1">
+            <span className="telemetry-pill">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              CURRICULUM & METHODOLOGY
+            </span>
+            <span className="text-[10px] font-mono text-slate-500 uppercase">Self-Paced Exploration</span>
+          </div>
+          <h1 className="text-2xl md:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
+            <BookOpen className="w-7 h-7 text-emerald-400" />
             Chemistry & AI Learning Center
           </h1>
           <p className="text-sm text-slate-400 mt-1">
             Interactive educational modules on VSEPR geometry, organic aromaticity, and QSAR machine-learning models.
           </p>
         </div>
-        <div className="flex items-center gap-2 font-mono text-xs text-emerald-400 bg-emerald-950/80 px-4 py-2 rounded-xl border border-emerald-500/30">
+        <div className="flex items-center gap-2 font-mono text-xs text-emerald-400 bg-emerald-950/60 px-4 py-2 rounded-xl border border-emerald-500/30">
           <Award className="w-4 h-4 text-emerald-400" /> Score: {score} Correct
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Lesson Navigation */}
-        <div className="lg:col-span-4 bg-slate-900/70 border border-slate-800 rounded-2xl p-4 space-y-3">
+        <div className="lg:col-span-4 bg-[#111319]/90 border border-white/10 rounded-2xl p-4 space-y-3">
           <span className="text-xs font-mono text-slate-400 block px-1">Curriculum Modules:</span>
           {LESSONS.map((l) => (
             <button
@@ -96,8 +103,8 @@ export default function LearningCenter() {
               }}
               className={`w-full text-left p-3.5 rounded-xl border text-xs transition ${
                 l.id === selectedLesson.id
-                  ? 'bg-gradient-to-r from-cyan-950 to-slate-900 border-cyan-400 text-cyan-300 shadow-md'
-                  : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'
+                  ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 shadow-md font-medium'
+                  : 'bg-[#090a0f] border-white/10 text-slate-300 hover:bg-[#181b24]'
               }`}
             >
               <div className="font-bold">{l.title}</div>
@@ -108,20 +115,20 @@ export default function LearningCenter() {
 
         {/* Right Lesson Content & Quiz */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <h2 className="text-xl font-bold text-slate-100">{selectedLesson.title}</h2>
+          <div className="bg-[#111319]/90 border border-white/10 rounded-2xl p-6 space-y-4">
+            <h2 className="text-xl font-bold text-white tracking-tight">{selectedLesson.title}</h2>
             <p className="text-xs text-slate-300 leading-relaxed font-sans">{selectedLesson.details}</p>
 
             {/* Interactive 3D Demonstration */}
             <div className="pt-2">
-              <span className="text-xs font-mono text-cyan-300 font-bold block mb-2">3D Molecular Demonstration ({demoMolecule.name}):</span>
-              <div className="h-64 w-full rounded-xl overflow-hidden border border-slate-800">
+              <span className="text-xs font-mono text-emerald-400 font-bold block mb-2">3D Molecular Demonstration ({demoMolecule.name}):</span>
+              <div className="h-64 w-full rounded-xl overflow-hidden border border-white/10 bg-[#090a0f]">
                 <ThreeMoleculeViewer molecule={demoMolecule} styleMode="ball-stick" />
               </div>
             </div>
 
             {/* Interactive Quiz Section */}
-            <div className="pt-4 border-t border-slate-800 space-y-3">
+            <div className="pt-4 border-t border-white/10 space-y-3">
               <h3 className="text-xs font-mono font-bold text-violet-300 flex items-center gap-1.5">
                 <HelpCircle className="w-4 h-4 text-violet-400" /> Interactive Knowledge Check
               </h3>

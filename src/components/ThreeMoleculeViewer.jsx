@@ -192,14 +192,14 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
   }, [molecule, styleMode]);
 
   return (
-    <div className="relative w-full h-full min-h-[440px] bg-gradient-to-b from-[#080c16] via-[#0c1424] to-[#070a12] rounded-2xl border border-cyan-500/25 overflow-hidden shadow-2xl group">
+    <div className="relative w-full h-full min-h-[440px] bg-[#090a0f] rounded-2xl border border-white/10 overflow-hidden shadow-2xl group">
       <div ref={mountRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
       {/* Control overlay */}
-      <div className="absolute top-4 right-4 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md border border-cyan-500/30 p-1.5 rounded-xl shadow-lg z-10">
+      <div className="absolute top-4 right-4 flex items-center gap-2 bg-[#111319]/90 backdrop-blur-md border border-white/15 p-1.5 rounded-xl shadow-lg z-10">
         <button
           onClick={() => setIsSpinning(!isSpinning)}
-          className={`p-2 rounded-lg transition-all ${isSpinning ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/40' : 'text-slate-400 hover:text-white'}`}
+          className={`p-2 rounded-lg transition-all ${isSpinning ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'text-slate-400 hover:text-white'}`}
           title={isSpinning ? "Pause Auto-Spin" : "Start Auto-Spin"}
         >
           <RotateCw className={`w-4 h-4 ${isSpinning ? 'animate-spin' : ''}`} />
@@ -208,7 +208,7 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
           onClick={() => {
             if (cameraRef.current) cameraRef.current.position.z = Math.max(3, cameraRef.current.position.z - 2);
           }}
-          className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition"
+          className="p-2 text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition"
           title="Zoom In"
         >
           <ZoomIn className="w-4 h-4" />
@@ -217,7 +217,7 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
           onClick={() => {
             if (cameraRef.current) cameraRef.current.position.z = Math.min(25, cameraRef.current.position.z + 2);
           }}
-          className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition"
+          className="p-2 text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition"
           title="Zoom Out"
         >
           <ZoomOut className="w-4 h-4" />
@@ -226,7 +226,7 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
           onClick={() => {
             if (moleculeGroupRef.current) moleculeGroupRef.current.rotation.set(0, 0, 0);
           }}
-          className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-slate-800 rounded-lg transition"
+          className="p-2 text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition"
           title="Reset View"
         >
           <Eye className="w-4 h-4" />
@@ -234,15 +234,15 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
       </div>
 
       {/* Mode Tag */}
-      <div className="absolute top-4 left-4 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs text-slate-300 z-10 font-mono">
-        <Layers className="w-3.5 h-3.5 text-cyan-400" />
-        <span>Mode: <strong className="text-cyan-400 capitalize">{styleMode.replace('-', ' ')}</strong></span>
+      <div className="absolute top-4 left-4 flex items-center gap-2 bg-[#111319]/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 text-xs text-slate-300 z-10 font-mono">
+        <Layers className="w-3.5 h-3.5 text-emerald-400" />
+        <span>Mode: <strong className="text-emerald-400 capitalize">{styleMode.replace('-', ' ')}</strong></span>
       </div>
 
       {/* Distance Measurement Badge */}
       {distanceMeasurement && (
-        <div className="absolute top-16 left-4 bg-cyan-950/90 backdrop-blur-md border border-cyan-500/50 px-3 py-2 rounded-xl text-xs text-cyan-200 shadow-xl z-10 flex items-center gap-2 font-mono">
-          <Ruler className="w-4 h-4 text-cyan-400 shrink-0" />
+        <div className="absolute top-16 left-4 bg-[#111319]/95 backdrop-blur-md border border-emerald-500/50 px-3 py-2 rounded-xl text-xs text-emerald-200 shadow-xl z-10 flex items-center gap-2 font-mono">
+          <Ruler className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>Distance ({distanceMeasurement.atom1.element}#{distanceMeasurement.atom1.id} ↔ {distanceMeasurement.atom2.element}#{distanceMeasurement.atom2.id}): <strong className="text-white">{distanceMeasurement.distance} Å</strong></span>
           <button onClick={() => setDistanceMeasurement(null)} className="ml-2 text-slate-400 hover:text-white">✕</button>
         </div>
@@ -250,13 +250,13 @@ export default function ThreeMoleculeViewer({ molecule, styleMode = 'ball-stick'
 
       {/* Selected Atom Info Panel */}
       {selectedAtomInfo && (
-        <div className="absolute bottom-4 left-4 right-4 md:right-auto md:max-w-xs bg-slate-900/90 backdrop-blur-md border border-cyan-500/40 p-4 rounded-xl shadow-xl z-10 text-xs text-slate-200">
-          <div className="flex items-center justify-between pb-2 border-b border-slate-700/60 mb-2">
+        <div className="absolute bottom-4 left-4 right-4 md:right-auto md:max-w-xs bg-[#111319]/95 backdrop-blur-md border border-white/15 p-4 rounded-xl shadow-xl z-10 text-xs text-slate-200">
+          <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
             <div className="flex items-center gap-2">
               <span className="w-6 h-6 rounded-full flex items-center justify-center font-bold text-slate-950 text-xs" style={{ backgroundColor: selectedAtomInfo.color || '#fff' }}>
                 {selectedAtomInfo.element}
               </span>
-              <span className="font-bold text-sm text-cyan-300">{selectedAtomInfo.name || selectedAtomInfo.element} Atom</span>
+              <span className="font-bold text-sm text-white">{selectedAtomInfo.name || selectedAtomInfo.element} Atom</span>
             </div>
             <button onClick={() => setSelectedAtomInfo(null)} className="text-slate-400 hover:text-white text-base">✕</button>
           </div>

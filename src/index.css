@@ -8,31 +8,32 @@
 /* ==========================================================================
    CHEMSPACE PROFESSIONAL SCIENTIFIC DESIGN SYSTEM
    Precision Dark (Obsidian/Graphite) & Pure Light (Ceramic/Lab White)
+   Inspired by Apple HIG, Material Design 3, and IBM Carbon
    ========================================================================== */
 
 :root,
 html[data-theme="dark"],
 .dark {
   /* Surfaces & Structural Layers */
-  --bg-page: #08090d;
-  --bg-card: #0f121a;
-  --bg-card-glass: rgba(15, 18, 26, 0.88);
-  --bg-sidebar: #0a0c13;
+  --bg-page: #090a0f;
+  --bg-card: #111319;
+  --bg-card-glass: rgba(17, 19, 25, 0.88);
+  --bg-sidebar: #0d0f15;
   --border-sidebar: rgba(255, 255, 255, 0.08);
-  --bg-header: rgba(10, 12, 19, 0.88);
-  --bg-inner: #131620;
+  --bg-header: rgba(13, 15, 21, 0.92);
+  --bg-inner: #171a23;
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(255, 255, 255, 0.09);
-  --bg-input: #0d0f17;
-  --viewport-bg: #08090d;
+  --bg-input: #0f1118;
+  --viewport-bg: #090a0f;
 
   /* Architectural Borders */
   --border-subtle: rgba(255, 255, 255, 0.08);
   --border-medium: rgba(255, 255, 255, 0.15);
-  --border-strong: rgba(255, 255, 255, 0.25);
-  --border-focus: #38bdf8;
+  --border-strong: rgba(255, 255, 255, 0.28);
+  --border-focus: #10b981;
 
-  /* Clean Typography Hierarchy */
+  /* Clean Scientific Typography Hierarchy */
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
@@ -40,26 +41,26 @@ html[data-theme="dark"],
   --text-inverse: #090a0f;
   --text-sidebar: #cbd5e1;
 
-  /* Primary Solid Button */
+  /* Primary Solid Button (Monochrome Precision) */
   --btn-primary-bg: #f8fafc;
   --btn-primary-text: #090a0f;
   --btn-primary-hover: #e2e8f0;
   --btn-primary-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 
   /* Secondary Button */
-  --btn-secondary-bg: #141722;
+  --btn-secondary-bg: #171a23;
   --btn-secondary-text: #e2e8f0;
   --btn-secondary-border: rgba(255, 255, 255, 0.12);
-  --btn-secondary-hover: #1c202e;
+  --btn-secondary-hover: #202431;
   --btn-secondary-hover-border: rgba(255, 255, 255, 0.22);
 
-  /* Accent Button */
-  --btn-accent-bg: rgba(56, 189, 248, 0.12);
-  --btn-accent-text: #38bdf8;
-  --btn-accent-border: rgba(56, 189, 248, 0.25);
-  --btn-accent-hover: rgba(56, 189, 248, 0.20);
+  /* Accent Button (Restrained Emerald Precision) */
+  --btn-accent-bg: rgba(16, 185, 129, 0.12);
+  --btn-accent-text: #10b981;
+  --btn-accent-border: rgba(16, 185, 129, 0.25);
+  --btn-accent-hover: rgba(16, 185, 129, 0.20);
 
-  /* Sidebar Active Navigation Item */
+  /* Sidebar Navigation */
   --sidebar-active-bg: #f8fafc;
   --sidebar-active-text: #090a0f;
   --sidebar-active-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -67,54 +68,54 @@ html[data-theme="dark"],
   --sidebar-hover-text: #ffffff;
 
   /* Telemetry & Badges */
-  --pill-bg: #131620;
+  --pill-bg: #171a23;
   --pill-border: rgba(255, 255, 255, 0.10);
   --pill-text: #94a3b8;
 
-  /* Scientific Accents (Controlled, non-neon) */
-  --mod-chemdraw-accent: #0284c7;
-  --mod-chemdraw-bg: rgba(2, 132, 199, 0.12);
-  --mod-rdkit-accent: #059669;
-  --mod-rdkit-bg: rgba(5, 150, 105, 0.12);
-  --mod-spectroscopy-accent: #d97706;
-  --mod-spectroscopy-bg: rgba(217, 119, 6, 0.12);
-  --mod-quantum-accent: #7c3aed;
-  --mod-quantum-bg: rgba(124, 58, 237, 0.12);
-  --mod-rxn-accent: #e11d48;
-  --mod-rxn-bg: rgba(225, 29, 72, 0.12);
-  --mod-periodic-accent: #0284c7;
-  --mod-periodic-bg: rgba(2, 132, 199, 0.12);
-  --mod-scientists-accent: #d97706;
+  /* Domain-Specific Scientific Accents (Non-Neon, Strict Semantic Alignment) */
+  --mod-chemdraw-accent: #94a3b8; /* Slate / Titanium 2D/3D CAD */
+  --mod-chemdraw-bg: rgba(148, 163, 184, 0.12);
+  --mod-rdkit-accent: #10b981; /* Emerald Molecular Validation */
+  --mod-rdkit-bg: rgba(16, 185, 129, 0.12);
+  --mod-spectroscopy-accent: #f59e0b; /* Amber Frequency & Resonance */
+  --mod-spectroscopy-bg: rgba(245, 158, 11, 0.12);
+  --mod-quantum-accent: #8b5cf6; /* Amethyst / Violet DFT Wavefunction */
+  --mod-quantum-bg: rgba(139, 92, 246, 0.12);
+  --mod-rxn-accent: #f43f5e; /* Rose / Crimson Thermodynamic Caution */
+  --mod-rxn-bg: rgba(244, 63, 94, 0.12);
+  --mod-periodic-accent: #34d399; /* Mint / Emerald Elemental System */
+  --mod-periodic-bg: rgba(52, 211, 153, 0.12);
+  --mod-scientists-accent: #d97706; /* Bronze / Gold Historical Archive */
   --mod-scientists-bg: rgba(217, 119, 6, 0.12);
 
   /* Clean Shadows without Neon Halos */
   --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
   --card-shadow-hover: 0 8px 30px -4px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
-  --ambient-bg: #08090d;
+  --ambient-bg: #090a0f;
 }
 
 html[data-theme="light"],
 .light {
   /* Surfaces & Structural Layers */
-  --bg-page: #f8f9fb;
+  --bg-page: #f6f8fa;
   --bg-card: #ffffff;
   --bg-card-glass: rgba(255, 255, 255, 0.92);
   --bg-sidebar: #ffffff;
-  --border-sidebar: rgba(0, 0, 0, 0.08);
+  --border-sidebar: rgba(15, 23, 42, 0.08);
   --bg-header: rgba(255, 255, 255, 0.92);
-  --bg-inner: #f1f3f7;
+  --bg-inner: #edf1f5;
   --bg-hover: #f1f5f9;
   --bg-active: #e2e8f0;
   --bg-input: #ffffff;
-  --viewport-bg: #f8f9fb;
+  --viewport-bg: #f6f8fa;
 
   /* Architectural Borders */
-  --border-subtle: rgba(0, 0, 0, 0.08);
-  --border-medium: rgba(0, 0, 0, 0.16);
-  --border-strong: rgba(0, 0, 0, 0.28);
-  --border-focus: #0284c7;
+  --border-subtle: rgba(15, 23, 42, 0.08);
+  --border-medium: rgba(15, 23, 42, 0.16);
+  --border-strong: rgba(15, 23, 42, 0.28);
+  --border-focus: #059669;
 
-  /* Clean Typography Hierarchy */
+  /* Clean Scientific Typography Hierarchy */
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-muted: #64748b;
@@ -131,15 +132,15 @@ html[data-theme="light"],
   /* Secondary Button */
   --btn-secondary-bg: #ffffff;
   --btn-secondary-text: #0f172a;
-  --btn-secondary-border: rgba(0, 0, 0, 0.12);
+  --btn-secondary-border: rgba(15, 23, 42, 0.12);
   --btn-secondary-hover: #f8fafc;
-  --btn-secondary-hover-border: rgba(0, 0, 0, 0.25);
+  --btn-secondary-hover-border: rgba(15, 23, 42, 0.25);
 
   /* Accent Button */
-  --btn-accent-bg: rgba(2, 132, 199, 0.08);
-  --btn-accent-text: #0284c7;
-  --btn-accent-border: rgba(2, 132, 199, 0.25);
-  --btn-accent-hover: rgba(2, 132, 199, 0.16);
+  --btn-accent-bg: rgba(5, 150, 105, 0.08);
+  --btn-accent-text: #059669;
+  --btn-accent-border: rgba(5, 150, 105, 0.25);
+  --btn-accent-hover: rgba(5, 150, 105, 0.16);
 
   /* Sidebar Active Navigation Item */
   --sidebar-active-bg: #0f172a;
@@ -150,12 +151,12 @@ html[data-theme="light"],
 
   /* Telemetry & Badges */
   --pill-bg: #f1f5f9;
-  --pill-border: rgba(0, 0, 0, 0.08);
+  --pill-border: rgba(15, 23, 42, 0.08);
   --pill-text: #475569;
 
   /* Module Specific Accents */
-  --mod-chemdraw-accent: #0284c7;
-  --mod-chemdraw-bg: rgba(2, 132, 199, 0.08);
+  --mod-chemdraw-accent: #64748b;
+  --mod-chemdraw-bg: rgba(100, 116, 139, 0.08);
   --mod-rdkit-accent: #059669;
   --mod-rdkit-bg: rgba(5, 150, 105, 0.08);
   --mod-spectroscopy-accent: #d97706;
@@ -164,15 +165,15 @@ html[data-theme="light"],
   --mod-quantum-bg: rgba(124, 58, 237, 0.08);
   --mod-rxn-accent: #e11d48;
   --mod-rxn-bg: rgba(225, 29, 72, 0.08);
-  --mod-periodic-accent: #0284c7;
-  --mod-periodic-bg: rgba(2, 132, 199, 0.08);
+  --mod-periodic-accent: #059669;
+  --mod-periodic-bg: rgba(5, 150, 105, 0.08);
   --mod-scientists-accent: #d97706;
   --mod-scientists-bg: rgba(217, 119, 6, 0.08);
 
   /* Clean Shadows */
-  --card-shadow: 0 4px 18px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.04);
-  --card-shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-  --ambient-bg: #f8f9fb;
+  --card-shadow: 0 4px 18px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
+  --card-shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --ambient-bg: #f6f8fa;
 }
 
 /* ==========================================================================
@@ -186,12 +187,24 @@ html[data-theme="light"],
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Inter Variable', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter Variable', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg-page);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+/* Reduced Motion Compliance */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Scrollbar styling */
@@ -221,7 +234,7 @@ body {
   scrollbar-width: none;
 }
 
-/* Touch target helper for mobile devices */
+/* Touch target helper for mobile accessibility */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
@@ -268,7 +281,7 @@ body {
 
 .input-control:focus {
   border-color: var(--border-focus);
-  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
 }
 
 /* Status Pill */

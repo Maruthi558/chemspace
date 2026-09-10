@@ -32,10 +32,10 @@ export default function PeriodicTable() {
   };
 
   const selectedTheme = CATEGORY_THEMES[selectedElement.category] || {
-    color: '#06b6d4',
-    bg: 'rgba(6, 182, 212, 0.14)',
-    border: 'rgba(6, 182, 212, 0.4)',
-    glow: 'rgba(6, 182, 212, 0.6)'
+    color: '#10b981',
+    bg: 'rgba(16, 185, 129, 0.14)',
+    border: 'rgba(16, 185, 129, 0.4)',
+    glow: 'rgba(16, 185, 129, 0.6)'
   };
 
   return (
@@ -80,7 +80,7 @@ export default function PeriodicTable() {
             <select
               value={trendOverlay}
               onChange={(e) => setTrendOverlay(e.target.value)}
-              className="px-2.5 py-1 bg-[#02040a] border border-white/20 rounded-xl text-xs font-mono text-white focus:border-cyan-400 focus:outline-none transition"
+              className="px-2.5 py-1 bg-[#02040a] border border-white/20 rounded-xl text-xs font-mono text-white focus:border-emerald-400 focus:outline-none transition"
             >
               <option value="none">Standard Category Colors</option>
               <option value="electronegativity">Electronegativity (Pauling)</option>
@@ -176,10 +176,10 @@ export default function PeriodicTable() {
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Solid
               </span>
               <span className="flex items-center gap-1 text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" /> Gas
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Gas
               </span>
               <span className="flex items-center gap-1 text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400" /> Liquid
+                <span className="w-1.5 h-1.5 rounded-full bg-teal-400" /> Liquid
               </span>
               <span className="flex items-center gap-1 text-slate-400">
                 <span className="w-1.5 h-1.5 rounded-full bg-rose-400" /> Synthetic
@@ -192,10 +192,10 @@ export default function PeriodicTable() {
             {filteredElements.map((el) => {
               const isSelected = selectedElement.number === el.number;
               const catTheme = CATEGORY_THEMES[el.category] || {
-                color: '#06b6d4',
-                bg: 'rgba(6, 182, 212, 0.14)',
-                border: 'rgba(6, 182, 212, 0.35)',
-                glow: 'rgba(6, 182, 212, 0.55)'
+                color: '#10b981',
+                bg: 'rgba(16, 185, 129, 0.14)',
+                border: 'rgba(16, 185, 129, 0.35)',
+                glow: 'rgba(16, 185, 129, 0.55)'
               };
 
               let trendColor = null;
@@ -350,7 +350,7 @@ export default function PeriodicTable() {
               </div>
               <div className="p-3 inner-box">
                 <span className="opacity-60 text-[10px] block font-sans">Atomic Radius</span>
-                <span className="text-cyan-400 font-bold text-sm font-mono">{selectedElement.radius} pm</span>
+                <span className="text-teal-400 font-bold text-sm font-mono">{selectedElement.radius} pm</span>
               </div>
               <div className="p-3 inner-box">
                 <span className="opacity-60 text-[10px] block font-sans">Ionization Energy</span>

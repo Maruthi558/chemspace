@@ -241,8 +241,14 @@ export default function Background3DCanvas() {
     // Calm Animation Loop (Subtle, non-distracting)
     let animationId;
     const clock = new THREE.Clock();
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const animate = () => {
+      if (prefersReducedMotion) {
+        renderer.render(scene, camera);
+        return;
+      }
+
       if (!document.hidden) {
         const t = clock.getElapsedTime();
 

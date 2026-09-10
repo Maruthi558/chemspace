@@ -69,14 +69,14 @@ export default function FinishSignUp() {
 
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 transition-colors select-none ${
-      isDark ? 'bg-[#06080d] text-slate-100' : 'bg-slate-50 text-slate-900'
+      isDark ? 'bg-[#090a0f] text-slate-100' : 'bg-[#f6f8fa] text-slate-900'
     }`}>
       <div className={`w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl border transition-all ${
-        isDark ? 'bg-[#0a0e17]/95 border-cyan-500/20' : 'bg-white border-slate-200'
+        isDark ? 'bg-[#111319]/95 border-white/10' : 'bg-white border-slate-200 shadow-xl'
       }`}>
         {/* Header */}
         <div className="text-center space-y-3 mb-6">
-          <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400">
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto text-emerald-400">
             <Atom className="w-7 h-7 animate-spin [animation-duration:12s]" />
           </div>
           <div>
@@ -90,8 +90,8 @@ export default function FinishSignUp() {
         {/* Loading State */}
         {loading && (
           <div className="py-8 text-center space-y-3">
-            <Loader2 className="w-8 h-8 text-cyan-500 animate-spin mx-auto" />
-            <p className="text-xs font-mono text-cyan-400">Securing your laboratory session...</p>
+            <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mx-auto" />
+            <p className="text-xs font-mono text-emerald-400">Securing your laboratory session...</p>
           </div>
         )}
 
@@ -132,8 +132,8 @@ export default function FinishSignUp() {
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
                   placeholder="scientist@institution.org"
-                  className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-cyan-400 transition ${
-                    isDark ? 'bg-black/50 border-slate-700 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
+                  className={`w-full pl-9 pr-3 py-2.5 rounded-xl text-xs font-mono border focus:outline-none focus:border-emerald-500 transition ${
+                    isDark ? 'bg-[#090a0f] border-white/10 text-white' : 'bg-slate-50 border-slate-300 text-slate-900'
                   }`}
                 />
               </div>
@@ -145,7 +145,7 @@ export default function FinishSignUp() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-bold text-xs transition flex items-center justify-center gap-2"
+              className="w-full py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs transition flex items-center justify-center gap-2"
             >
               <span>Complete Sign-In</span>
               <ArrowRight className="w-4 h-4" />

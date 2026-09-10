@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Bot, User, Terminal, Copy, Check, Info, FileText, Code } from 'lucide-react';
+import { Bot, User, Terminal, Copy, Check, Info, FileText, Code, Atom } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
 export default function ChatMessage({ message, isLast }) {
@@ -58,7 +58,7 @@ export default function ChatMessage({ message, isLast }) {
       const formattedLine = parts.map((part, j) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <strong key={j} className="text-cyan-400 font-bold">
+            <strong key={j} className="text-emerald-500 dark:text-emerald-400 font-bold">
               {part.slice(2, -2)}
             </strong>
           );
@@ -67,7 +67,7 @@ export default function ChatMessage({ message, isLast }) {
           return (
             <code
               key={j}
-              className="px-1.5 py-0.5 rounded bg-black/30 border border-white/10 text-cyan-300 font-mono text-[11px]"
+              className="px-1.5 py-0.5 rounded bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-emerald-600 dark:text-emerald-300 font-mono text-[11px]"
             >
               {part.slice(1, -1)}
             </code>
@@ -96,20 +96,20 @@ export default function ChatMessage({ message, isLast }) {
     const data = rows.slice(rows[1][0].includes('---') ? 2 : 1);
 
     return (
-      <div key={key} className="my-3 overflow-x-auto rounded-xl border border-white/10 bg-black/20">
+      <div key={key} className="my-3 overflow-x-auto rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-inner)]">
         <table className="w-full text-xs text-left border-collapse">
-          <thead className="bg-white/5 text-[var(--text-secondary)] font-bold uppercase tracking-wider">
+          <thead className="bg-[var(--bg-hover)] text-[var(--text-secondary)] font-bold uppercase tracking-wider">
             <tr>
               {header.map((cell, i) => (
-                <th key={i} className="px-3 py-2 border-b border-white/5">
+                <th key={i} className="px-3 py-2 border-b border-[var(--border-subtle)]">
                   {cell}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-white/5 font-mono">
+          <tbody className="divide-y divide-[var(--border-subtle)] font-mono">
             {data.map((row, i) => (
-              <tr key={i} className="hover:bg-white/5 transition-colors">
+              <tr key={i} className="hover:bg-[var(--bg-hover)] transition-colors">
                 {row.map((cell, j) => (
                   <td key={j} className="px-3 py-1.5 text-[var(--text-primary)]">
                     {cell}
@@ -126,34 +126,34 @@ export default function ChatMessage({ message, isLast }) {
   return (
     <div className={`flex gap-3 mb-4 ${isAI ? 'justify-start' : 'justify-end'} group`}>
       {isAI && (
-        <div className="w-8 h-8 rounded-2xl bg-gradient-to-br from-cyan-500 to-violet-600 flex items-center justify-center shrink-0 shadow-md">
-          <Bot className="w-4 h-4 text-white" />
+        <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0 shadow-sm text-emerald-400">
+          <Bot className="w-4 h-4" />
         </div>
       )}
 
       <div className={`max-w-[88%] space-y-2 ${isAI ? '' : 'flex flex-col items-end'}`}>
         {/* User Attached File Badge */}
         {!isAI && message.attachedFileName && (
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-white/10 text-cyan-300 text-xs font-mono mb-1">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-emerald-400 text-xs font-mono mb-1">
             <FileText className="w-3.5 h-3.5" />
             <span className="font-bold">{message.attachedFileName}</span>
           </div>
         )}
 
         <div
-          className={`relative p-4 rounded-3xl leading-relaxed text-xs ${
+          className={`relative p-4 rounded-2xl leading-relaxed text-xs ${
             isAI
-              ? 'inner-box border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-tl-none shadow-xl'
-              : 'bg-cyan-500 text-slate-950 font-bold rounded-tr-none shadow-md'
+              ? 'bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-tl-sm shadow-sm'
+              : 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] font-medium rounded-tr-sm shadow-sm'
           }`}
         >
           {isAI && (
             <button
               onClick={handleCopy}
-              className="absolute top-3 right-3 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-[var(--text-secondary)] hover:text-white transition-all opacity-0 group-hover:opacity-100"
+              className="absolute top-3 right-3 p-1.5 rounded-lg bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all opacity-0 group-hover:opacity-100"
               title="Copy Response"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
           )}
 
@@ -161,23 +161,23 @@ export default function ChatMessage({ message, isLast }) {
 
           {/* Generated Code Block */}
           {message.codeBlock && (
-            <div className="mt-3 rounded-2xl overflow-hidden border border-white/15 shadow-xl bg-[#04060b]">
-              <div className="bg-white/5 px-3.5 py-2 border-b border-white/10 flex items-center justify-between">
+            <div className="mt-3 rounded-xl overflow-hidden border border-[var(--border-medium)] shadow-md bg-[var(--bg-input)]">
+              <div className="bg-[var(--bg-inner)] px-3.5 py-2 border-b border-[var(--border-subtle)] flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="text-[10px] text-slate-400 font-mono font-bold uppercase tracking-widest">
+                  <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-[10px] text-[var(--text-muted)] font-mono font-bold uppercase tracking-widest">
                     Python RDKit Script
                   </span>
                 </div>
                 <button
                   onClick={handleCopyCode}
-                  className="telemetry-pill text-[10px] hover:bg-white/10"
+                  className="telemetry-pill text-[10px] hover:bg-[var(--bg-hover)] cursor-pointer"
                 >
-                  {codeCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  {codeCopied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                   <span>{codeCopied ? 'Copied' : 'Copy Code'}</span>
                 </button>
               </div>
-              <pre className="p-4 text-cyan-300 font-mono text-[11px] overflow-x-auto leading-relaxed">
+              <pre className="p-4 text-emerald-500 dark:text-emerald-300 font-mono text-[11px] overflow-x-auto leading-relaxed">
                 {message.codeBlock}
               </pre>
             </div>
@@ -188,17 +188,17 @@ export default function ChatMessage({ message, isLast }) {
         {isAI && message.thinkingSteps && message.thinkingSteps.length > 0 && (
           <div className="ml-1">
             <details className="group">
-              <summary className="text-[10px] text-[var(--text-muted)] cursor-pointer hover:text-cyan-400 transition-all list-none flex items-center gap-2 font-bold uppercase tracking-wider">
-                <div className="w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_8px_rgba(6,182,212,0.6)] animate-pulse" />
-                Scientific Logic Core
+              <summary className="text-[10px] text-[var(--text-muted)] cursor-pointer hover:text-emerald-400 transition-all list-none flex items-center gap-2 font-bold uppercase tracking-wider">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Scientific Reasoning Chain
                 <span className="opacity-0 group-open:opacity-100 transition-opacity ml-auto text-[9px] lowercase italic font-normal">
-                  reasoning validated
+                  validated
                 </span>
               </summary>
-              <div className="mt-2 pl-3 border-l-2 border-cyan-500/30 space-y-1.5 py-1 font-mono text-[10px] text-[var(--text-secondary)]">
+              <div className="mt-2 pl-3 border-l-2 border-emerald-500/30 space-y-1.5 py-1 font-mono text-[10px] text-[var(--text-secondary)]">
                 {message.thinkingSteps.map((step, i) => (
                   <div key={i} className="flex items-start gap-1.5">
-                    <Info className="w-3 h-3 text-cyan-400/50 shrink-0 mt-0.5" />
+                    <Info className="w-3 h-3 text-emerald-500/60 shrink-0 mt-0.5" />
                     <span>{step}</span>
                   </div>
                 ))}
@@ -209,7 +209,7 @@ export default function ChatMessage({ message, isLast }) {
       </div>
 
       {!isAI && (
-        <div className="w-8 h-8 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center shrink-0 text-[var(--text-primary)]">
+        <div className="w-8 h-8 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0 text-[var(--text-secondary)] shadow-sm">
           <User className="w-4 h-4" />
         </div>
       )}

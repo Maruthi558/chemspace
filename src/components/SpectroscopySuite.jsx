@@ -208,14 +208,14 @@ export default function SpectroscopySuite() {
       {/* 3. SCIENTIFIC METADATA & PROGRESS SUMMARY BAR */}
       <div className="p-3 px-4 rounded-xl inner-box text-xs font-sans flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-[11px] opacity-80">
-          <Info className="w-4 h-4 text-cyan-400 shrink-0" />
+          <Info className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>
             <strong>Computational Simulation:</strong> All spectral lines and assignments are predicted via quantum-chemical / empirical analytical algorithms.
           </span>
         </div>
         <div className="flex items-center gap-4 text-[11px] font-mono font-bold">
           <span>Formula: <strong className="text-emerald-400">{dossier.metadata.formula}</strong></span>
-          <span>MW: <strong className="text-cyan-400">{dossier.metadata.mw} g/mol</strong></span>
+          <span>MW: <strong className="text-emerald-400">{dossier.metadata.mw} g/mol</strong></span>
           <span>Exact Mass: <strong className="text-amber-400">{dossier.metadata.monoisotopicMass} u</strong></span>
         </div>
       </div>
@@ -279,7 +279,7 @@ export default function SpectroscopySuite() {
               : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
           }`}
         >
-          <BarChart2 className={`w-5 h-5 ${activeTechnique === 'ms' ? 'text-cyan-400 dark:text-cyan-600' : 'text-cyan-400'}`} />
+          <BarChart2 className={`w-5 h-5 ${activeTechnique === 'ms' ? 'text-amber-400 dark:text-amber-500' : 'text-amber-400'}`} />
           <div>
             <div className="font-bold text-xs">4. Mass Spectrometry</div>
             <div className="text-[10px] opacity-70">EI 70 eV • Isotope Cluster</div>
@@ -296,7 +296,7 @@ export default function SpectroscopySuite() {
               {activeTechnique === 'ir' && <Radio className="w-4 h-4 text-rose-400" />}
               {activeTechnique === 'uv' && <Sun className="w-4 h-4 text-amber-400" />}
               {activeTechnique === 'nmr' && <Eye className="w-4 h-4 text-violet-400" />}
-              {activeTechnique === 'ms' && <BarChart2 className="w-4 h-4 text-cyan-400" />}
+              {activeTechnique === 'ms' && <BarChart2 className="w-4 h-4 text-amber-400" />}
               {activeTechnique === 'ir' && `FT-IR Vibrational Spectrum — ${dossier.metadata.name}`}
               {activeTechnique === 'uv' && `UV-Visible Electronic Spectrum — ${dossier.metadata.name}`}
               {activeTechnique === 'nmr' && `${nmrSubTab === '1h' ? '¹H-NMR Proton' : '¹³C-NMR Carbon'} Spectrum — ${dossier.metadata.name}`}
@@ -707,7 +707,7 @@ export default function SpectroscopySuite() {
           <div className="p-4 inner-box rounded-xl space-y-2 text-xs">
             <div className="flex items-center justify-between font-bold border-b border-inherit pb-2">
               <span className="flex items-center gap-2">
-                <Atom className="w-4 h-4 text-cyan-400" />
+                <Atom className="w-4 h-4 text-amber-400" />
                 Natural Isotopic Cluster Pattern (M, M+1, M+2)
               </span>
               <span className="text-[10px] opacity-70 font-mono">
@@ -722,7 +722,7 @@ export default function SpectroscopySuite() {
                     <span className="font-bold font-mono">{iso.label}</span>
                     <span className="text-[10px] opacity-70 block font-mono">m/z {iso.mz}</span>
                   </div>
-                  <span className="text-cyan-400 font-black text-sm">{iso.relativeAbundance}%</span>
+                  <span className="text-amber-400 font-black text-sm">{iso.relativeAbundance}%</span>
                 </div>
               ))}
             </div>
@@ -733,7 +733,7 @@ export default function SpectroscopySuite() {
         <div className="space-y-3 pt-2">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-inherit pb-2">
             <div className="flex items-center gap-2">
-              <FileText className="w-4 h-4 text-cyan-400" />
+              <FileText className="w-4 h-4 text-emerald-400" />
               <h4 className="text-xs font-bold uppercase tracking-wider">
                 Detailed Peak Assignment & Structural Deconvolution Table
               </h4>
@@ -802,7 +802,7 @@ export default function SpectroscopySuite() {
                         <td className="py-2 px-3 opacity-70">{b.range}</td>
                         <td className="py-2 px-3">{b.intensity}</td>
                         <td className="py-2 px-3 font-sans">{b.assignment}</td>
-                        <td className="py-2 px-3 text-[10px] text-cyan-400">{b.zone}</td>
+                        <td className="py-2 px-3 text-[10px] text-amber-400">{b.zone}</td>
                       </tr>
                     ))}
 
@@ -813,7 +813,7 @@ export default function SpectroscopySuite() {
                       <tr key={idx} className="hover:bg-white/5 font-mono">
                         <td className="py-2 px-3 font-bold text-amber-400">{t.transition}</td>
                         <td className="py-2 px-3 font-bold">{t.lambda} nm</td>
-                        <td className="py-2 px-3 text-cyan-400">{t.energyEv} eV</td>
+                        <td className="py-2 px-3 text-emerald-400">{t.energyEv} eV</td>
                         <td className="py-2 px-3 opacity-70">{t.energyKcal} kcal/mol</td>
                         <td className="py-2 px-3">{t.intensity}</td>
                       </tr>
@@ -838,7 +838,7 @@ export default function SpectroscopySuite() {
                           <tr key={idx} className="hover:bg-white/5 font-mono">
                             <td className="py-2 px-3 font-bold text-emerald-400">δ {c.shift}</td>
                             <td className="py-2 px-3">{c.type}</td>
-                            <td className="py-2 px-3 text-cyan-400">{c.dept}</td>
+                            <td className="py-2 px-3 text-emerald-400">{c.dept}</td>
                             <td className="py-2 px-3 opacity-70">{c.ppm}</td>
                             <td className="py-2 px-3 font-sans">{c.assignment}</td>
                           </tr>
@@ -849,7 +849,7 @@ export default function SpectroscopySuite() {
                     .filter((p) => !searchFilter || p.label.toLowerCase().includes(searchFilter.toLowerCase()))
                     .map((p, idx) => (
                       <tr key={idx} className="hover:bg-white/5 font-mono">
-                        <td className="py-2 px-3 font-bold text-cyan-400">m/z {p.mz}</td>
+                        <td className="py-2 px-3 font-bold text-amber-400">m/z {p.mz}</td>
                         <td className="py-2 px-3 font-bold">{p.intensity}%</td>
                         <td className="py-2 px-3 font-sans">{p.label}</td>
                       </tr>

@@ -65,7 +65,7 @@ export default function PrivacyOverlay() {
       className="fixed inset-0 z-[9999] backdrop-blur-xl bg-black/75 flex flex-col items-center justify-center p-6 select-none cursor-pointer transition-all duration-300 animate-in fade-in"
     >
       <div className="max-w-md w-full p-8 rounded-3xl border border-neutral-800 bg-neutral-950/90 shadow-2xl text-center space-y-4">
-        <div className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 shadow-lg shadow-cyan-500/10">
+        <div className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 shadow-lg shadow-emerald-500/10">
           <EyeOff className="w-7 h-7 stroke-[1.75]" />
         </div>
 
