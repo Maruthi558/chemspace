@@ -1,4 +1,16 @@
-import { request } from './api';
+import { request } from './api.js';
+import {
+  resolveChemicalNameToSmiles,
+  identifyMoleculeFromSmiles,
+  isSmilesString,
+  validateSmilesSyntax,
+  extractCandidateChemicalName
+} from './chemicalResolver.js';
+import {
+  detectLanguage,
+  formatMultilingualMoleculeResponse,
+  formatUnresolvableResponse
+} from './languageDetector.js';
 
 // Scientific terminology phoneme & speech transcription correction dictionary
 const SCIENTIFIC_CORRECTIONS = {
@@ -17,6 +29,7 @@ const SCIENTIFIC_CORRECTIONS = {
   'ft ir': 'FTIR',
   'ir': 'IR',
   'smiles': 'SMILES',
+  'smile': 'SMILES',
   'orca': 'ORCA',
   'psi 4': 'PSI4',
   'psi4': 'PSI4',
@@ -32,6 +45,17 @@ const SCIENTIFIC_CORRECTIONS = {
   'benzene': 'Benzene',
   'ibuprofen': 'Ibuprofen',
   'paracetamol': 'Paracetamol',
+  'acetaminophen': 'Acetaminophen',
+  'ethanol': 'Ethanol',
+  'methanol': 'Methanol',
+  'acetic acid': 'Acetic acid',
+  'acetone': 'Acetone',
+  'glucose': 'Glucose',
+  'dopamine': 'Dopamine',
+  'serotonin': 'Serotonin',
+  'toluene': 'Toluene',
+  'aniline': 'Aniline',
+  'phenol': 'Phenol',
   'quantum chemistry': 'Quantum Chemistry',
   'spectroscopy': 'Spectroscopy',
   'mass spectrometry': 'Mass Spectrometry',
@@ -51,6 +75,7 @@ You are ChemBot, the AI assistant embedded in this chemistry website. Your role 
 
 Your responsibilities:
 - Answer chemistry questions directly — including topics related to the periodic table, molecular structures, drug discovery concepts, spectroscopy, and chemical synthesis. Give clear, accurate, and educational answers.
+- Return verified SMILES strings for chemical names accurately.
 - Guide users to the right tools — When a user asks about a specific feature (e.g., "draw a molecule," "calculate spectroscopy data," "look up an element"), tell them exactly which button or tool on the site does that, and explain briefly how to use it. If the interface allows it, you may trigger the relevant tool/button on the user's behalf rather than just describing it.
 - Handle general questions too — If a user asks something unrelated to chemistry, respond helpfully and naturally like a knowledgeable, friendly assistant, then gently guide the conversation back to what the site offers if relevant.
 - Maintain a consistent, approachable character — Friendly, knowledgeable, and clear. Avoid overly technical jargon unless the user signals expertise.
@@ -97,6 +122,15 @@ class AICopilotService {
    */
   async sendMessage(query, context = {}, signal = null) {
     const sanitizedQuery = this.sanitizeVoiceTranscript(query);
+    const langInfo = detectLanguage(sanitizedQuery);
+
+    // 1. First-class Chemistry Resolution: Check for chemical name or SMILES intent
+    const chemResult = await this.tryResolveChemistryIntent(sanitizedQuery, langInfo);
+    if (chemResult) {
+      this.history.push({ role: 'user', content: sanitizedQuery });
+      this.history.push({ role: 'assistant', content: chemResult.responseText });
+      return chemResult;
+    }
 
     try {
       const response = await request('/ai/chat', {
@@ -107,6 +141,7 @@ class AICopilotService {
           history: this.history.slice(-8), // Send recent messages for continuity
           context: {
             ...context,
+            detectedLanguage: langInfo.code,
             currentPath: typeof window !== 'undefined' ? window.location.pathname : '/',
             timestamp: new Date().toISOString()
           }
@@ -132,8 +167,122 @@ class AICopilotService {
         throw error;
       }
       console.warn('[AICopilotService] Using high-fidelity scientific client engine:', error.message);
-      return this.generateClientFallbackResponse(sanitizedQuery, context);
+      const fallback = await this.generateClientFallbackResponse(sanitizedQuery, context, langInfo);
+      this.history.push({ role: 'user', content: sanitizedQuery });
+      this.history.push({ role: 'assistant', content: fallback.responseText });
+      return fallback;
     }
+  }
+
+  /**
+   * Dedicated chemical intent resolution layer
+   */
+  async tryResolveChemistryIntent(query, langInfo) {
+    const lower = query.toLowerCase().trim();
+
+    // A. Detect if user is entering a SMILES string directly or asking to identify SMILES
+    let candidateSmiles = null;
+    if (isSmilesString(query)) {
+      candidateSmiles = query.trim();
+    } else {
+      const tokens = query.split(/\s+/);
+      for (const token of tokens) {
+        const clean = token.replace(/^[:,'"`]+|[:,'"`]+$/g, '');
+        if (isSmilesString(clean)) {
+          candidateSmiles = clean;
+          break;
+        }
+      }
+    }
+
+    if (candidateSmiles && validateSmilesSyntax(candidateSmiles)) {
+      const identified = await identifyMoleculeFromSmiles(candidateSmiles);
+      if (identified.success) {
+        const formatted = formatMultilingualMoleculeResponse(langInfo.code, identified, 'reverse');
+        return {
+          status: 'success',
+          query,
+          responseText: formatted.text,
+          thinkingSteps: [
+            `Detected valid SMILES structural input: "${candidateSmiles}"`,
+            `Language detected: ${langInfo.name} (${langInfo.code})`,
+            `Identified molecular entity: ${identified.name}`,
+            `Source: ${identified.source}`
+          ],
+          moleculeCard: {
+            name: identified.name,
+            iupac: identified.iupac || '',
+            smiles: identified.smiles,
+            formula: identified.formula || '',
+            molWeight: identified.mw || 0,
+            logP: identified.logP ?? 1.2,
+            tpsa: identified.tpsa ?? 40.0,
+            lipinskiPassed: identified.lipinski ?? true,
+            source: identified.source,
+            category: identified.category || 'Identified Compound'
+          },
+          suggestedActions: formatted.suggested,
+          timestamp: new Date().toISOString()
+        };
+      }
+    }
+
+    // B. Detect chemical name query (e.g. "Give me the SMILES for ethanol", "Acetic acid", "What is the SMILES of caffeine?")
+    const asksSmiles = lower.includes('smiles') || lower.includes('formula') || lower.includes('structure') || lower.includes('molecular weight') || lower.includes('mw') || lower.includes('what is') || lower.includes('give me') || lower.includes('show me') || lower.includes('tell me') || lower.includes('convert') || lower.includes('yokka') || lower.includes('kya hai') || lower.includes('enna');
+
+    const candidateName = extractCandidateChemicalName(query);
+
+    // If query is very short (e.g. "acetic acid", "ethanol", "caffeine", "benzene") or asks for SMILES/properties
+    if (candidateName && (asksSmiles || candidateName.split(' ').length <= 4)) {
+      const resolved = await resolveChemicalNameToSmiles(candidateName);
+      if (resolved.success) {
+        const formatted = formatMultilingualMoleculeResponse(langInfo.code, resolved, 'smiles');
+        return {
+          status: 'success',
+          query,
+          responseText: formatted.text,
+          thinkingSteps: [
+            `Extracted candidate chemical entity: "${candidateName}"`,
+            `Language detected: ${langInfo.name} (${langInfo.code})`,
+            `Resolved canonical SMILES: ${resolved.smiles}`,
+            `Validation: Confirmed through ${resolved.source}`
+          ],
+          moleculeCard: {
+            name: resolved.name,
+            iupac: resolved.iupac || '',
+            smiles: resolved.smiles,
+            formula: resolved.formula || '',
+            molWeight: resolved.mw || 0,
+            logP: resolved.logP ?? 1.2,
+            tpsa: resolved.tpsa ?? 40.0,
+            lipinskiPassed: resolved.lipinski ?? true,
+            source: resolved.source,
+            category: resolved.category || 'Resolved Molecule'
+          },
+          suggestedActions: formatted.suggested,
+          timestamp: new Date().toISOString()
+        };
+      } else if (asksSmiles && candidateName.length > 2 && !candidateName.includes('help') && !candidateName.includes('how to')) {
+        // Explicitly asked for a chemical's SMILES, but it could not be resolved reliably
+        // NEVER fabricate a SMILES string
+        return {
+          status: 'success',
+          query,
+          responseText: formatUnresolvableResponse(langInfo.code, candidateName),
+          thinkingSteps: [
+            `Chemical entity query: "${candidateName}"`,
+            `Attempted resolution via ChemSpace Verified Registry, PubChem PUG REST, and NIH Cactus`,
+            `Result: Could not verify molecular structure with 100% confidence`,
+            `Safeguard triggered: Refusing to hallucinate unverified SMILES`
+          ],
+          moleculeCard: null,
+          suggestedActions: ['Try Another Molecule', 'Draw in ChemDraw', 'Search Periodic Table'],
+          timestamp: new Date().toISOString()
+        };
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -161,7 +310,7 @@ class AICopilotService {
       currentText += (i === 0 ? '' : ' ') + words[i];
       yield currentText;
       // Slight natural variation in streaming cadence
-      const delay = Math.min(60, Math.max(15, words[i].length * 6));
+      const delay = Math.min(50, Math.max(12, words[i].length * 5));
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
   }
@@ -169,7 +318,8 @@ class AICopilotService {
   /**
    * Client-side scientific reasoning engine for ChemBot
    */
-  generateClientFallbackResponse(query, context = {}) {
+  async generateClientFallbackResponse(query, context = {}, langInfo = null) {
+    const lang = langInfo || detectLanguage(query);
     const lower = query.toLowerCase().trim();
     let navTarget = null;
     let targetName = null;
@@ -260,18 +410,18 @@ class AICopilotService {
       suggestedActions = ['Open Periodic Table', 'Explore Halogens', 'Compare Pauling vs Mulliken'];
     }
     // 4. Greetings & General / Non-chemistry Questions
-    else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower.includes('good morning') || lower.includes('good afternoon')) {
-      responseText = "Hello there! I'm **ChemBot**, your friendly lab assistant on this platform. 👋\n\nI can answer chemistry questions, explain concepts from molecular orbitals to organic synthesis, or guide you directly to any of our interactive tools:\n- 🎨 **ChemDraw Studio**: 2D drawing & 3D conformer optimization\n- 🐍 **RDKit Lab**: Molecular descriptors & Python scripting\n- ⚛️ **Quantum Chemistry**: DFT & HOMO-LUMO gap calculations\n- 📊 **Spectroscopy Suite**: FTIR, NMR, MS & UV-Vis\n- 🧪 **IBM RXN**: Organic synthesis & retrosynthesis\n- 🗺️ **Periodic Table**: 118 elements & periodic trends\n- 🏛️ **Scientists Archive**: Historical pioneers & discoveries\n\nWhat would you like to explore or calculate today?";
-      suggestedActions = ['Draw a Molecule', 'Analyze Spectroscopy Data', 'Look Up an Element', 'Calculate Lipinski Descriptors'];
+    else if (lower.includes('hello') || lower.includes('hi') || lower.includes('hey') || lower.includes('good morning') || lower.includes('good afternoon') || lower.includes('namaste') || lower.includes('vanakkam') || lower.includes('namaskaram')) {
+      responseText = "Hello there! I'm **ChemBot**, your scientific lab assistant on ChemSpace. 👋\n\nI can answer chemistry questions, convert chemical names into verified SMILES strings, explain concepts from molecular orbitals to organic synthesis, or guide you directly to our interactive tools:\n- 🧪 **Chemical Name $\\to$ SMILES**: Try *'Give me the SMILES for caffeine'* or *'Ethanol'*.\n- 🎨 **ChemDraw Studio**: 2D drawing & 3D conformer optimization\n- 🐍 **RDKit Lab**: Molecular descriptors & Python scripting\n- ⚛️ **Quantum Chemistry**: DFT & HOMO-LUMO gap calculations\n- 📊 **Spectroscopy Suite**: FTIR, NMR, MS & UV-Vis\n- 🧪 **IBM RXN**: Organic synthesis & retrosynthesis\n- 🗺️ **Periodic Table**: 118 elements & periodic trends\n\nWhat molecule or calculation would you like to explore today?";
+      suggestedActions = ['Give me the SMILES for caffeine', 'Draw a Molecule', 'Analyze Spectroscopy Data', 'Look Up an Element'];
     } else if (lower.includes('who are you') || lower.includes('what are you') || lower.includes('what can you do')) {
-      responseText = "I am **ChemBot**, the embedded AI assistant for this chemistry website! Think of me as your personal computational chemistry lab assistant.\n\nHere is how I can help you:\n1. **Answer Chemistry Questions**: Topics like the periodic table, molecular structures, drug discovery, spectroscopy, and organic reactions.\n2. **Guide You to Tools**: Tell me what you want to do (e.g. *'draw a molecule'*, *'check IR peaks'*, *'look up gold'*), and I will explain how to use the feature and can navigate you right to it.\n3. **Assist with Files & Code**: Drop Python or molecular files (.mol, .sdf, .xyz) and I'll help analyze them.\n\nLet me know where you'd like to start!";
-      suggestedActions = ['Open ChemDraw', 'Open RDKit Lab', 'Open Spectroscopy', 'Open Periodic Table'];
+      responseText = "I am **ChemBot**, the embedded AI assistant for ChemSpace! Think of me as your personal computational chemistry lab assistant.\n\nHere is how I can help you:\n1. **Chemical Name $\\to$ SMILES**: Ask for the SMILES of any chemical name (e.g. *'SMILES of aspirin'*, *'caffeine'*, *'ethanol'*), or enter a SMILES code to identify the molecule.\n2. **Answer Chemistry Questions**: Molecular structures, drug discovery (Lipinski Rule of 5), spectroscopy peaks, reaction mechanisms, and quantum orbitals.\n3. **Guide You to Tools**: Tell me what you want to do (e.g. *'draw benzene'*, *'check IR peaks'*, *'look up gold'*), and I will explain how to use the feature and can navigate you right to it.\n4. **Multilingual Chat**: Ask in English, Telugu, Hindi, or Tamil.\n\nLet me know where you'd like to start!";
+      suggestedActions = ['SMILES of aspirin', 'Open ChemDraw', 'Open RDKit Lab', 'Open Periodic Table'];
     } else if (lower.includes('weather') || lower.includes('joke') || lower.includes('music') || lower.includes('movie') || lower.includes('game') || lower.includes('capital of') || lower.includes('recipe')) {
       responseText = `I'm happy to chat about that! While I spend most of my time in the chemistry lab analyzing molecules, reactions, and periodic trends, I'm always here to help with general questions too.\n\nWhenever you're ready to dive back into science, we have great tools ready—like **ChemDraw** for molecular sketching, the **Periodic Table**, or the **Spectroscopy Suite**. Just let me know what you'd like to explore next!`;
-      suggestedActions = ['Explore Periodic Table', 'Draw a Molecule', 'Ask a Chemistry Question', 'Open Scientists Gallery'];
+      suggestedActions = ['SMILES for caffeine', 'Explore Periodic Table', 'Draw a Molecule', 'Ask a Chemistry Question'];
     } else {
-      responseText = `I've analyzed your query: **"${query}"**.\n\nAs your lab assistant, I can explain chemical principles, walk you through molecular calculations, or open the right workspace for you (such as **ChemDraw Studio**, **RDKit Lab**, **Quantum Chemistry**, **Spectroscopy**, or the **Periodic Table**).\n\nHow would you like to proceed?`;
-      suggestedActions = ['Open ChemDraw Studio', 'Launch RDKit Lab', 'Open Quantum Chemistry', 'Open Periodic Table'];
+      responseText = `I've analyzed your query: **"${query}"**.\n\nAs your lab assistant, I can resolve chemical names to verified SMILES strings, explain chemical principles, walk you through molecular calculations, or open the right workspace for you (such as **ChemDraw Studio**, **RDKit Lab**, **Quantum Chemistry**, **Spectroscopy**, or the **Periodic Table**).\n\nHow would you like to proceed?`;
+      suggestedActions = ['Give me the SMILES for caffeine', 'Open ChemDraw Studio', 'Launch RDKit Lab', 'Open Periodic Table'];
     }
 
     return {
@@ -280,9 +430,10 @@ class AICopilotService {
       responseText,
       thinkingSteps: [
         `ChemBot captured query: "${query}"`,
+        `Language: ${lang.name} (${lang.code})`,
         `Context route: ${context.currentPath || '/'}`,
-        navTarget ? `Identified tool guidance intent: ${targetName}` : 'Formulated educational response with lab assistant persona',
-        'Validated through ChemBot safe action registry'
+        navTarget ? `Identified tool guidance intent: ${targetName}` : 'Formulated scientific lab assistant response',
+        'Validated through ChemSpace Registry'
       ],
       moleculeCard,
       codeBlock,

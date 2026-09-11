@@ -44,12 +44,12 @@ export default function CopilotWindow({ onClose }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
-      content: "Hello! I am **ChemBot**, your AI lab assistant embedded in this chemistry website.\n\nI can answer chemistry questions directly (periodic table, molecular structures, drug discovery, spectroscopy, chemical synthesis) or guide you to any tool on the site (like **ChemDraw**, **RDKit Lab**, **Quantum Chemistry**, or **Spectroscopy**).\n\nHow can I help you today?",
+      content: "Hello! I am **ChemBot**, your scientific lab assistant on ChemSpace. 👋\n\nI can resolve chemical names to verified SMILES strings, calculate molecular formulas and weights, answer chemistry questions, or guide you to any interactive tool on the site:\n- 🧪 **Chemical Name $\\to$ SMILES**: Try *'Give me the SMILES for ethanol'* or *'Caffeine'*.\n- 🎨 **ChemDraw Studio**: 2D drawing & 3D conformer optimization\n- 🐍 **RDKit Lab**: Molecular descriptors & Python scripting\n- ⚛️ **Quantum Chemistry**: DFT & HOMO-LUMO calculations\n- 📊 **Spectroscopy Suite**: FTIR, NMR, MS & UV-Vis\n\nHow can I help your research today?",
       suggestedActions: [
-        'Draw a Molecule in ChemDraw',
-        'Calculate Lipinski Descriptors',
-        'Explain HOMO-LUMO Gap',
-        'Look Up an Element'
+        'Give me the SMILES for ethanol',
+        'SMILES of caffeine',
+        'Draw Benzene in ChemDraw',
+        'Calculate Lipinski Descriptors'
       ]
     }
   ]);
@@ -58,6 +58,7 @@ export default function CopilotWindow({ onClose }) {
   const [liveTranscript, setLiveTranscript] = useState('');
   const [ttsEnabled, setTtsEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [abortController, setAbortController] = useState(null);
@@ -72,7 +73,7 @@ export default function CopilotWindow({ onClose }) {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading, liveTranscript]);
+  }, [messages, isLoading, isThinking, liveTranscript]);
 
   useEffect(() => {
     // Theme switch listener dispatched from AI
@@ -116,6 +117,7 @@ export default function CopilotWindow({ onClose }) {
     }
 
     setIsLoading(true);
+    setIsThinking(true);
     setActionNotice(null);
     const controller = new AbortController();
     setAbortController(controller);
@@ -134,6 +136,9 @@ export default function CopilotWindow({ onClose }) {
       };
 
       const result = await aiCopilot.sendMessage(fullPrompt, contextPayload, controller.signal);
+
+      // Transition loading state smoothly when response begins streaming
+      setIsThinking(false);
 
       const aiMessage = {
         role: 'assistant',
@@ -181,12 +186,13 @@ export default function CopilotWindow({ onClose }) {
           ...prev,
           {
             role: 'assistant',
-            content: "I encountered an issue processing that scientific request. Please verify the input syntax or try another query."
+            content: "I encountered an issue processing that scientific request. Please verify the chemical name or input syntax and try again."
           }
         ]);
       }
     } finally {
       setIsLoading(false);
+      setIsThinking(false);
       setAbortController(null);
     }
   };
@@ -198,6 +204,7 @@ export default function CopilotWindow({ onClose }) {
     if (abortController) {
       abortController.abort();
       setIsLoading(false);
+      setIsThinking(false);
       setAbortController(null);
     }
     aiCopilot.stopSpeaking();
@@ -230,6 +237,8 @@ export default function CopilotWindow({ onClose }) {
         (error) => {
           console.warn('Voice recognition notice:', error);
           setMicState('idle');
+          setActionNotice(typeof error === 'string' ? error : 'Voice dictation unavailable in this browser. Please use text input.');
+          setTimeout(() => setActionNotice(null), 4000);
         },
         () => {
           if (micState === 'listening') setMicState('idle');
@@ -413,16 +422,16 @@ export default function CopilotWindow({ onClose }) {
             </div>
           )}
 
-          {/* Loading / Generating Indicator */}
-          {isLoading && (
-            <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] ml-1 py-1 animate-in fade-in duration-150">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shadow-sm">
+          {/* Loading / Generating Indicator — Molecular Orbital AI Processing Animation */}
+          {(isThinking || (isLoading && !messages[messages.length - 1]?.content)) && (
+            <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] ml-1 py-1.5 animate-in fade-in duration-150">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shadow-sm shrink-0">
                 <Atom className="w-4 h-4 animate-spin-slow" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-[var(--text-primary)]">ChemAI Molecular Engine</span>
+                <span className="font-bold text-[var(--text-primary)] text-xs">ChemAI Molecular Engine</span>
                 <span className="text-[10px] font-mono text-[var(--text-muted)] animate-pulse">
-                  Computing chemical properties &amp; molecular descriptors...
+                  Resolving structure &amp; computing chemical descriptors...
                 </span>
               </div>
             </div>
@@ -447,7 +456,7 @@ export default function CopilotWindow({ onClose }) {
         )}
 
         {/* 4. FOOTER & MULTI-MODAL PROMPT INPUT */}
-        <div className="p-4 border-t border-inherit bg-inherit shrink-0 space-y-2">
+        <div className="p-3 sm:p-4 border-t border-inherit bg-inherit shrink-0 space-y-2">
           <div className="relative flex items-center gap-2">
             {/* Hidden File Input */}
             <input
@@ -461,7 +470,7 @@ export default function CopilotWindow({ onClose }) {
             {/* Attach File Button */}
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-3 rounded-2xl bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400 transition cursor-pointer"
+              className="p-2.5 sm:p-3 rounded-2xl bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400 transition cursor-pointer shrink-0"
               title="Attach File (.py, .mol, .sdf, .xyz, .csv, .log)"
             >
               <Paperclip className="w-4 h-4" />
@@ -470,7 +479,7 @@ export default function CopilotWindow({ onClose }) {
             {/* Voice Dictation Button */}
             <button
               onClick={toggleMic}
-              className={`p-3 rounded-2xl border transition-all cursor-pointer ${
+              className={`p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer shrink-0 ${
                 micState === 'listening'
                   ? 'bg-rose-500 text-white border-rose-400 animate-pulse shadow-md'
                   : 'bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400'
@@ -492,8 +501,8 @@ export default function CopilotWindow({ onClose }) {
                   handleSend();
                 }
               }}
-              placeholder="Ask chemistry questions, request RDKit code, or say 'Open ChemDraw'..."
-              className="input-control flex-1 py-3 px-4 rounded-2xl text-xs font-mono text-[var(--text-primary)]"
+              placeholder="Ask chemistry questions, chemical name for SMILES, or say 'Open ChemDraw'..."
+              className="input-control flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-2xl text-xs font-mono text-[var(--text-primary)] min-w-0"
             />
 
             {/* Send / Stop Button */}

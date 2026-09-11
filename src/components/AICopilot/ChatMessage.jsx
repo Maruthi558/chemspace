@@ -1,13 +1,43 @@
 import React, { useState } from 'react';
-import { Bot, User, Terminal, Copy, Check, Info, FileText, Code, Atom } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
+import { Bot, User, Terminal, Copy, Check, Info, FileText, Atom } from 'lucide-react';
+import { isSmilesString } from '../../services/chemicalResolver';
+
+/**
+ * Inline code pill with 1-click copy support for SMILES and chemical tokens
+ */
+function InlineCodePill({ code }) {
+  const [copied, setCopied] = useState(false);
+  const isSmiles = isSmilesString(code) || (code.length >= 2 && /[=#\(\)1-9@]/.test(code));
+
+  const handleCopy = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <span className="inline-flex items-center gap-1 mx-0.5 align-middle">
+      <code className="px-1.5 py-0.5 rounded-md bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-emerald-600 dark:text-emerald-400 font-mono text-[11px] font-bold">
+        {code}
+      </code>
+      {isSmiles && (
+        <button
+          onClick={handleCopy}
+          className="p-0.5 rounded bg-[var(--bg-hover)] hover:bg-[var(--border-subtle)] text-[var(--text-muted)] hover:text-emerald-400 transition cursor-pointer"
+          title="Copy SMILES string"
+        >
+          {copied ? <Check className="w-2.5 h-2.5 text-emerald-500" /> : <Copy className="w-2.5 h-2.5" />}
+        </button>
+      )}
+    </span>
+  );
+}
 
 export default function ChatMessage({ message, isLast }) {
   const isAI = message.role === 'assistant';
   const [copied, setCopied] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
 
   const handleCopy = () => {
     if (!message.content) return;
@@ -53,34 +83,49 @@ export default function ChatMessage({ message, isLast }) {
         }
       }
 
-      // Inline formatting: Bold, Code
-      const parts = line.split(/(\*\*.*?\*\*|`.*?`)/g);
+      // Bullet points
+      const isBullet = line.trim().startsWith('•') || line.trim().startsWith('-');
+      const cleanLine = isBullet ? line.trim().replace(/^[•\-]\s*/, '') : line;
+
+      // Inline formatting: Bold, Code, Italic
+      const parts = cleanLine.split(/(\*\*.*?\*\*|`.*?`|\*.*?\*)/g);
       const formattedLine = parts.map((part, j) => {
         if (part.startsWith('**') && part.endsWith('**')) {
           return (
-            <strong key={j} className="text-emerald-500 dark:text-emerald-400 font-bold">
+            <strong key={j} className="text-[var(--text-primary)] font-bold">
               {part.slice(2, -2)}
             </strong>
           );
         }
         if (part.startsWith('`') && part.endsWith('`')) {
+          return <InlineCodePill key={j} code={part.slice(1, -1)} />;
+        }
+        if (part.startsWith('*') && part.endsWith('*') && !part.startsWith('**')) {
           return (
-            <code
-              key={j}
-              className="px-1.5 py-0.5 rounded bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-emerald-600 dark:text-emerald-300 font-mono text-[11px]"
-            >
+            <em key={j} className="text-[var(--text-secondary)] italic">
               {part.slice(1, -1)}
-            </code>
+            </em>
           );
         }
         return part;
       });
 
-      elements.push(
-        <p key={i} className="mb-2 leading-relaxed">
-          {formattedLine}
-        </p>
-      );
+      if (isBullet) {
+        elements.push(
+          <div key={i} className="flex items-start gap-2 mb-1.5 pl-1 leading-relaxed">
+            <span className="text-emerald-500 font-bold shrink-0 mt-0.5">•</span>
+            <div className="flex-1">{formattedLine}</div>
+          </div>
+        );
+      } else if (line.trim() === '') {
+        elements.push(<div key={i} className="h-2" />);
+      } else {
+        elements.push(
+          <p key={i} className="mb-2 leading-relaxed">
+            {formattedLine}
+          </p>
+        );
+      }
     }
 
     if (currentTable) {
@@ -124,14 +169,14 @@ export default function ChatMessage({ message, isLast }) {
   };
 
   return (
-    <div className={`flex gap-3 mb-4 ${isAI ? 'justify-start' : 'justify-end'} group`}>
+    <div className={`flex gap-2.5 sm:gap-3 mb-4 ${isAI ? 'justify-start' : 'justify-end'} group`}>
       {isAI && (
-        <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0 shadow-sm text-emerald-400">
-          <Bot className="w-4 h-4" />
+        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center shrink-0 shadow-sm text-emerald-400 mt-0.5">
+          <Bot className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </div>
       )}
 
-      <div className={`max-w-[88%] space-y-2 ${isAI ? '' : 'flex flex-col items-end'}`}>
+      <div className={`max-w-[88%] sm:max-w-[84%] space-y-2 ${isAI ? '' : 'flex flex-col items-end'}`}>
         {/* User Attached File Badge */}
         {!isAI && message.attachedFileName && (
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-emerald-400 text-xs font-mono mb-1">
@@ -141,7 +186,7 @@ export default function ChatMessage({ message, isLast }) {
         )}
 
         <div
-          className={`relative p-4 rounded-2xl leading-relaxed text-xs ${
+          className={`relative p-3.5 sm:p-4 rounded-2xl leading-relaxed text-xs sm:text-[13px] ${
             isAI
               ? 'bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-primary)] rounded-tl-sm shadow-sm'
               : 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] font-medium rounded-tr-sm shadow-sm'
@@ -150,8 +195,8 @@ export default function ChatMessage({ message, isLast }) {
           {isAI && (
             <button
               onClick={handleCopy}
-              className="absolute top-3 right-3 p-1.5 rounded-lg bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all opacity-0 group-hover:opacity-100"
-              title="Copy Response"
+              className="absolute top-2.5 right-2.5 p-1.5 rounded-lg bg-[var(--bg-hover)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+              title="Copy response"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
             </button>
@@ -171,13 +216,13 @@ export default function ChatMessage({ message, isLast }) {
                 </div>
                 <button
                   onClick={handleCopyCode}
-                  className="telemetry-pill text-[10px] hover:bg-[var(--bg-hover)] cursor-pointer"
+                  className="telemetry-pill text-[10px] hover:bg-[var(--bg-hover)] cursor-pointer flex items-center gap-1"
                 >
                   {codeCopied ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
                   <span>{codeCopied ? 'Copied' : 'Copy Code'}</span>
                 </button>
               </div>
-              <pre className="p-4 text-emerald-500 dark:text-emerald-300 font-mono text-[11px] overflow-x-auto leading-relaxed">
+              <pre className="p-3.5 sm:p-4 text-emerald-500 dark:text-emerald-300 font-mono text-[11px] overflow-x-auto leading-relaxed">
                 {message.codeBlock}
               </pre>
             </div>
@@ -188,7 +233,7 @@ export default function ChatMessage({ message, isLast }) {
         {isAI && message.thinkingSteps && message.thinkingSteps.length > 0 && (
           <div className="ml-1">
             <details className="group">
-              <summary className="text-[10px] text-[var(--text-muted)] cursor-pointer hover:text-emerald-400 transition-all list-none flex items-center gap-2 font-bold uppercase tracking-wider">
+              <summary className="text-[10px] text-[var(--text-muted)] cursor-pointer hover:text-emerald-400 transition-all list-none flex items-center gap-2 font-bold uppercase tracking-wider select-none">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                 Scientific Reasoning Chain
                 <span className="opacity-0 group-open:opacity-100 transition-opacity ml-auto text-[9px] lowercase italic font-normal">
@@ -209,8 +254,8 @@ export default function ChatMessage({ message, isLast }) {
       </div>
 
       {!isAI && (
-        <div className="w-8 h-8 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0 text-[var(--text-secondary)] shadow-sm">
-          <User className="w-4 h-4" />
+        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] flex items-center justify-center shrink-0 text-[var(--text-secondary)] shadow-sm mt-0.5">
+          <User className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </div>
       )}
     </div>

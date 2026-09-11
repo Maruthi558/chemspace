@@ -1494,31 +1494,85 @@ def ai_chat_assistant(data: AIChatInput):
     
     known_names = {
         "aspirin": "CC(=O)OC1=CC=CC=C1C(=O)O",
+        "acetylsalicylic acid": "CC(=O)OC1=CC=CC=C1C(=O)O",
         "benzene": "c1ccccc1",
         "caffeine": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
         "paracetamol": "CC(=O)NC1=CC=C(O)C=C1",
         "acetaminophen": "CC(=O)NC1=CC=C(O)C=C1",
         "ethanol": "CCO",
+        "methanol": "CO",
+        "acetic acid": "CC(=O)O",
+        "ethanoic acid": "CC(=O)O",
+        "acetone": "CC(=O)C",
         "water": "O",
         "methane": "C",
+        "ethane": "CC",
+        "propane": "CCC",
+        "butane": "CCCC",
+        "cyclohexane": "C1CCCCC1",
         "ibuprofen": "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O",
         "toluene": "Cc1ccccc1",
         "aniline": "Nc1ccccc1",
-        "phenol": "Oc1ccccc1"
+        "phenol": "Oc1ccccc1",
+        "glucose": "OC[C@@H](O)[C@@H](O)[C@H](O)[C@@H](O)C=O",
+        "dopamine": "NCCC1=CC(=C(O)C=C1)O",
+        "serotonin": "NCCC1=CNC2=C1C=C(O)C=C2",
+        "epinephrine": "CNC[C@H](O)C1=CC(=C(O)C=C1)O",
+        "adrenaline": "CNC[C@H](O)C1=CC(=C(O)C=C1)O",
+        "nicotine": "CN1CCC[C@H]1C1=CN=CC=C1",
+        "cholesterol": "CC(C)CCCC(C)C1CCC2C1(CCC3C2CC=C4C3(CCC(C4)O)C)C",
+        "urea": "NC(=O)N",
+        "chloroform": "ClC(Cl)Cl",
+        "dichloromethane": "ClCCl",
+        "dcm": "ClCCl",
+        "diethyl ether": "CCOCC",
+        "ether": "CCOCC",
+        "tetrahydrofuran": "C1CCOC1",
+        "thf": "C1CCOC1",
+        "acetonitrile": "CC#N",
+        "pyridine": "c1ccncc1",
+        "naphthalene": "c1ccc2ccccc2c1",
+        "citric acid": "OC(=O)CC(O)(CC(=O)O)C(=O)O",
+        "ascorbic acid": "C1=C(C(=O)O[C@@H]1[C@@H](CO)O)O",
+        "vitamin c": "C1=C(C(=O)O[C@@H]1[C@@H](CO)O)O",
+        "glycine": "NCC(=O)O",
+        "formaldehyde": "C=O",
+        "benzaldehyde": "O=Cc1ccccc1",
+        "vanillin": "COC1=C(C=CC(=C1)C=O)O"
     }
     
     lower_query = query.lower()
+    matched_name = None
     for name, s in known_names.items():
-        if name in lower_query:
+        if re.search(r'\b' + re.escape(name) + r'\b', lower_query):
             detected_smiles = s
+            matched_name = name.title()
             break
             
     if not detected_smiles:
         for word in words:
             clean_word = word.strip(".,;:!?()[]'\"")
-            if len(clean_word) >= 3 and any(c in clean_word for c in ['=', '#', '(', ')', '1', '2', '3', '@']):
+            if len(clean_word) >= 2 and any(c in clean_word for c in ['=', '#', '(', ')', '1', '2', '3', '@']) and not any(c in clean_word for c in [' ', '\t']):
                 detected_smiles = clean_word
                 break
+
+    # Attempt live PubChem resolution for unrecognized chemical name queries
+    if not detected_smiles and any(k in lower_query for k in ["smiles", "formula", "structure", "weight", "what is"]):
+        clean_name = re.sub(r'^(?:give me|show me|what is|find|tell me)?\s*(?:the)?\s*(?:smiles|structure)?\s*(?:of|for)?\s*', '', lower_query, flags=re.IGNORECASE).strip(" ?.!:")
+        if clean_name and len(clean_name) >= 3 and len(clean_name.split()) <= 4:
+            try:
+                pubchem_url = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/{urllib.parse.quote(clean_name)}/property/CanonicalSMILES,MolecularFormula,MolecularWeight,Title/JSON"
+                req = urllib.request.Request(pubchem_url, headers={'User-Agent': 'ChemSpace/3.1.0'})
+                with urllib.request.urlopen(req, timeout=3.0) as resp:
+                    if resp.status == 200:
+                        pdata = json.loads(resp.read().decode('utf-8'))
+                        props = pdata.get("PropertyTable", {}).get("Properties", [{}])[0]
+                        c_smiles = props.get("CanonicalSMILES")
+                        if c_smiles:
+                            detected_smiles = c_smiles
+                            matched_name = props.get("Title", clean_name.title())
+            except Exception:
+                pass
 
     mol_card = None
     if detected_smiles:

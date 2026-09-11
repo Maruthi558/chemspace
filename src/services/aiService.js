@@ -1,13 +1,7 @@
 import { request } from './api';
+import { KNOWN_CHEMICAL_DATABASE, validateSmilesSyntax, isSmilesString } from './chemicalResolver';
 
-const KNOWN_MOLECULES = {
-  aspirin: { smiles: 'CC(=O)OC1=CC=CC=C1C(=O)O', name: 'Aspirin (Acetylsalicylic Acid)', mw: 180.16, formula: 'C9H8O4', logP: 1.19, tpsa: 63.60, lipinski: true },
-  benzene: { smiles: 'c1ccccc1', name: 'Benzene', mw: 78.11, formula: 'C6H6', logP: 2.13, tpsa: 0.00, lipinski: true },
-  caffeine: { smiles: 'CN1C=NC2=C1C(=O)N(C(=O)N2C)C', name: 'Caffeine', mw: 194.19, formula: 'C8H10N4O2', logP: -0.07, tpsa: 58.44, lipinski: true },
-  paracetamol: { smiles: 'CC(=O)NC1=CC=C(O)C=C1', name: 'Paracetamol (Acetaminophen)', mw: 151.16, formula: 'C8H9NO2', logP: 0.46, tpsa: 49.33, lipinski: true },
-  ethanol: { smiles: 'CCO', name: 'Ethanol', mw: 46.07, formula: 'C2H6O', logP: -0.31, tpsa: 20.23, lipinski: true },
-  ibuprofen: { smiles: 'CC(C)CC1=CC=C(C=C1)C(C)C(=O)O', name: 'Ibuprofen', mw: 206.28, formula: 'C13H18O2', logP: 3.50, tpsa: 37.30, lipinski: true }
-};
+const KNOWN_MOLECULES = KNOWN_CHEMICAL_DATABASE;
 
 export function detectSmiles(text = '') {
   if (!text) return null;
