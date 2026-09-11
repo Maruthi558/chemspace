@@ -1,21 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <!-- ChemSpace Precision Scientific Atom Favicon -->
-  <rect width="64" height="64" rx="16" fill="#0f141c" />
-  
-  <!-- Outer Hexagonal Geometry -->
-  <polygon points="32,8 52,19.5 52,44.5 32,56 12,44.5 12,19.5" stroke="#334155" stroke-width="2" stroke-opacity="0.8" fill="none" />
-  
-  <!-- Orbital Rings -->
-  <ellipse cx="32" cy="32" rx="20" ry="7.5" stroke="#10b981" stroke-width="2" transform="rotate(-30 32 32)" stroke-opacity="0.9" />
-  <ellipse cx="32" cy="32" rx="20" ry="7.5" stroke="#94a3b8" stroke-width="1.8" transform="rotate(30 32 32)" stroke-opacity="0.85" />
-  <ellipse cx="32" cy="32" rx="20" ry="7.5" stroke="#10b981" stroke-width="1.8" transform="rotate(90 32 32)" stroke-opacity="0.85" />
-  
-  <!-- Central Nucleus -->
-  <circle cx="32" cy="32" r="5" fill="#10b981" />
-  <circle cx="32" cy="32" r="2.2" fill="#ffffff" />
-  
-  <!-- Electron nodes on orbital paths -->
-  <circle cx="46" cy="24" r="2.5" fill="#ffffff" stroke="#10b981" stroke-width="1.2" />
-  <circle cx="18" cy="40" r="2.5" fill="#ffffff" stroke="#94a3b8" stroke-width="1.2" />
-  <circle cx="32" cy="12" r="2.5" fill="#ffffff" stroke="#10b981" stroke-width="1.2" />
+  <!-- ChemSpace Precision Scientific Tab Favicon -->
+  <rect width="64" height="64" rx="16" fill="#0c0f17" />
+  <rect x="1" y="1" width="62" height="62" rx="15" stroke="#334155" stroke-width="2" stroke-opacity="0.6" />
+
+  <!-- High-Contrast Hexagonal Molecular Ring -->
+  <polygon
+    points="32,10 51,21 51,43 32,54 13,43 13,21"
+    stroke="#f8fafc"
+    stroke-width="4"
+    stroke-linejoin="round"
+  />
+
+  <!-- Subtle Orbital Trajectory Ring -->
+  <ellipse
+    cx="32"
+    cy="32"
+    rx="21"
+    ry="8.5"
+    transform="rotate(-28 32 32)"
+    stroke="#38bdf8"
+    stroke-width="3"
+    stroke-opacity="0.85"
+    stroke-dasharray="3 3"
+  />
+
+  <!-- Precision Nucleus Core -->
+  <circle cx="32" cy="32" r="6.5" fill="#10b981" />
+  <circle cx="32" cy="32" r="2.5" fill="#ffffff" />
+
+  <!-- Orbital Node Marker -->
+  <circle cx="49" cy="23" r="3.2" fill="#ffffff" stroke="#0c0f17" stroke-width="1.5" />
 </svg>

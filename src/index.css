@@ -72,21 +72,21 @@ html[data-theme="dark"],
   --pill-border: rgba(255, 255, 255, 0.10);
   --pill-text: #94a3b8;
 
-  /* Domain-Specific Scientific Accents (Non-Neon, Strict Semantic Alignment) */
+  /* Domain-Specific Scientific Accents (Refined, Cohesive Neutral Foundation) */
   --mod-chemdraw-accent: #94a3b8; /* Slate / Titanium 2D/3D CAD */
-  --mod-chemdraw-bg: rgba(148, 163, 184, 0.12);
-  --mod-rdkit-accent: #10b981; /* Emerald Molecular Validation */
-  --mod-rdkit-bg: rgba(16, 185, 129, 0.12);
-  --mod-spectroscopy-accent: #f59e0b; /* Amber Frequency & Resonance */
-  --mod-spectroscopy-bg: rgba(245, 158, 11, 0.12);
-  --mod-quantum-accent: #8b5cf6; /* Amethyst / Violet DFT Wavefunction */
-  --mod-quantum-bg: rgba(139, 92, 246, 0.12);
-  --mod-rxn-accent: #f43f5e; /* Rose / Crimson Thermodynamic Caution */
-  --mod-rxn-bg: rgba(244, 63, 94, 0.12);
-  --mod-periodic-accent: #34d399; /* Mint / Emerald Elemental System */
-  --mod-periodic-bg: rgba(52, 211, 153, 0.12);
-  --mod-scientists-accent: #d97706; /* Bronze / Gold Historical Archive */
-  --mod-scientists-bg: rgba(217, 119, 6, 0.12);
+  --mod-chemdraw-bg: rgba(148, 163, 184, 0.08);
+  --mod-rdkit-accent: #10b981; /* Restrained Emerald Precision */
+  --mod-rdkit-bg: rgba(16, 185, 129, 0.08);
+  --mod-spectroscopy-accent: #94a3b8;
+  --mod-spectroscopy-bg: rgba(148, 163, 184, 0.08);
+  --mod-quantum-accent: #94a3b8;
+  --mod-quantum-bg: rgba(148, 163, 184, 0.08);
+  --mod-rxn-accent: #94a3b8;
+  --mod-rxn-bg: rgba(148, 163, 184, 0.08);
+  --mod-periodic-accent: #94a3b8;
+  --mod-periodic-bg: rgba(148, 163, 184, 0.08);
+  --mod-scientists-accent: #94a3b8;
+  --mod-scientists-bg: rgba(148, 163, 184, 0.08);
 
   /* Clean Shadows without Neon Halos */
   --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -154,21 +154,21 @@ html[data-theme="light"],
   --pill-border: rgba(15, 23, 42, 0.08);
   --pill-text: #475569;
 
-  /* Module Specific Accents */
-  --mod-chemdraw-accent: #64748b;
-  --mod-chemdraw-bg: rgba(100, 116, 139, 0.08);
+  /* Module Specific Accents (Refined, Cohesive Neutral Foundation) */
+  --mod-chemdraw-accent: #475569;
+  --mod-chemdraw-bg: rgba(71, 85, 105, 0.06);
   --mod-rdkit-accent: #059669;
-  --mod-rdkit-bg: rgba(5, 150, 105, 0.08);
-  --mod-spectroscopy-accent: #d97706;
-  --mod-spectroscopy-bg: rgba(217, 119, 6, 0.08);
-  --mod-quantum-accent: #7c3aed;
-  --mod-quantum-bg: rgba(124, 58, 237, 0.08);
-  --mod-rxn-accent: #e11d48;
-  --mod-rxn-bg: rgba(225, 29, 72, 0.08);
-  --mod-periodic-accent: #059669;
-  --mod-periodic-bg: rgba(5, 150, 105, 0.08);
-  --mod-scientists-accent: #d97706;
-  --mod-scientists-bg: rgba(217, 119, 6, 0.08);
+  --mod-rdkit-bg: rgba(5, 150, 105, 0.06);
+  --mod-spectroscopy-accent: #475569;
+  --mod-spectroscopy-bg: rgba(71, 85, 105, 0.06);
+  --mod-quantum-accent: #475569;
+  --mod-quantum-bg: rgba(71, 85, 105, 0.06);
+  --mod-rxn-accent: #475569;
+  --mod-rxn-bg: rgba(71, 85, 105, 0.06);
+  --mod-periodic-accent: #475569;
+  --mod-periodic-bg: rgba(71, 85, 105, 0.06);
+  --mod-scientists-accent: #475569;
+  --mod-scientists-bg: rgba(71, 85, 105, 0.06);
 
   /* Clean Shadows */
   --card-shadow: 0 4px 18px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);

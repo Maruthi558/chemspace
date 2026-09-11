@@ -76,19 +76,19 @@ export default function LoadingScreen({ onFinish, duration = 1200 }) {
         {/* Brand & Subtitle */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-center gap-2">
-            <span className="text-base font-black tracking-widest uppercase">
-              CHEMNOVA
+            <span className="text-base font-bold tracking-widest uppercase">
+              CHEMSPACE
             </span>
             <span
-              className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ${
+              className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded tracking-wider ${
                 isDark ? 'bg-white text-black' : 'bg-black text-white'
               }`}
             >
-              SCIENTIFIC OS
+              MOLECULAR STUDIO
             </span>
           </div>
           <p className="text-xs text-slate-500 font-mono tracking-tight">
-            Initializing RDKit 2026 Kernel & WebGL 3D Workspaces...
+            Initializing Molecular Engine &amp; Laboratory Workspace...
           </p>
         </div>
 

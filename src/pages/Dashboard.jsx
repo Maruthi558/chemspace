@@ -64,16 +64,13 @@ export default function Dashboard() {
       {/* 1. WORKSPACE HEADER & TELEMETRY */}
       <div className="workspace-header">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
-            <Atom className="w-5 h-5 animate-spin-slow" />
+          <div className="p-2.5 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-[var(--text-primary)]">
+            <Atom className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-black tracking-wider text-[var(--text-primary)]">
-                CHEMNOVA RESEARCH DASHBOARD
-              </span>
-              <span className="telemetry-pill text-[9px] font-bold">
-                COMPUTATIONAL CORE v4.0
+              <span className="text-sm font-bold tracking-wider text-[var(--text-primary)]">
+                CHEMSPACE RESEARCH DASHBOARD
               </span>
             </div>
             <p className="text-[10px] text-[var(--text-secondary)] font-sans mt-0.5">
@@ -84,18 +81,8 @@ export default function Dashboard() {
 
         <div className="flex flex-wrap items-center gap-2">
           <div className="telemetry-pill text-[10px]">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                serverStatus.checking
-                  ? 'bg-amber-400 animate-pulse'
-                  : serverStatus.online
-                  ? 'bg-emerald-400'
-                  : 'bg-emerald-400/80'
-              }`}
-            />
-            <span className="font-bold">
-              {serverStatus.online ? `FASTAPI CORE: ONLINE (${serverStatus.latency}ms)` : 'FASTAPI: ACTIVE RUNTIME'}
-            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span className="font-semibold">Laboratory Engine Active</span>
           </div>
 
           <button
@@ -351,14 +338,14 @@ export default function Dashboard() {
                 logActivity('ChemDraw', 'Opened ChemDraw CAD Studio', 'Preloaded Aspirin molecular graph', 'sketch');
                 navigate('/chemdraw');
               }}
-              className="p-3.5 rounded-2xl inner-box hover:border-slate-500/50 transition flex items-center justify-between text-left group shadow-sm"
+              className="p-3.5 rounded-2xl inner-box hover:border-[var(--border-strong)] transition flex items-center justify-between text-left group shadow-sm cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-slate-500/10 text-slate-300 border border-slate-500/20 group-hover:scale-105 transition-transform">
+                <div className="p-2.5 rounded-xl bg-[var(--bg-inner)] text-[var(--text-primary)] border border-[var(--border-subtle)] group-hover:border-[var(--border-strong)] transition">
                   <PenTool className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-black group-hover:text-white transition text-[var(--text-primary)]">
+                  <div className="text-xs font-bold group-hover:text-emerald-500 transition text-[var(--text-primary)]">
                     ChemDraw 2D/3D CAD Studio
                   </div>
                   <div className="text-[10px] text-[var(--text-secondary)] font-sans">
@@ -367,10 +354,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-slate-500/15 text-slate-300 border border-slate-500/30">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-[var(--bg-inner)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                   CH₃-C(=O)OH
                 </span>
-                <ArrowRight className="w-4 h-4 text-slate-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-4 h-4 text-[var(--text-muted)] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition" />
               </div>
             </button>
 
@@ -380,14 +367,14 @@ export default function Dashboard() {
                 logActivity('RDKit Lab', 'Opened RDKit Python Sandbox', 'Loaded Lipinski descriptor workflow', 'rdkit');
                 navigate('/rdkit-lab');
               }}
-              className="p-3.5 rounded-2xl inner-box hover:border-emerald-400/50 transition flex items-center justify-between text-left group shadow-sm"
+              className="p-3.5 rounded-2xl inner-box hover:border-[var(--border-strong)] transition flex items-center justify-between text-left group shadow-sm cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 group-hover:scale-105 transition-transform">
+                <div className="p-2.5 rounded-xl bg-[var(--bg-inner)] text-[var(--text-primary)] border border-[var(--border-subtle)] group-hover:border-[var(--border-strong)] transition">
                   <Cpu className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-black group-hover:text-emerald-300 transition text-[var(--text-primary)]">
+                  <div className="text-xs font-bold group-hover:text-emerald-500 transition text-[var(--text-primary)]">
                     RDKit Python Lab
                   </div>
                   <div className="text-[10px] text-[var(--text-secondary)] font-sans">
@@ -396,10 +383,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-[var(--bg-inner)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                   C₉H₈O₄
                 </span>
-                <ArrowRight className="w-4 h-4 text-emerald-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-4 h-4 text-[var(--text-muted)] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition" />
               </div>
             </button>
 
@@ -409,14 +396,14 @@ export default function Dashboard() {
                 logActivity('Spectroscopy', 'Simulated Analytical Spectra', 'Inspected FT-IR / NMR / MS peaks', 'spectroscopy');
                 navigate('/spectroscopy');
               }}
-              className="p-3.5 rounded-2xl inner-box hover:border-violet-400/50 transition flex items-center justify-between text-left group shadow-sm"
+              className="p-3.5 rounded-2xl inner-box hover:border-[var(--border-strong)] transition flex items-center justify-between text-left group shadow-sm cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-violet-500/10 text-violet-400 border border-violet-500/20 group-hover:scale-105 transition-transform">
+                <div className="p-2.5 rounded-xl bg-[var(--bg-inner)] text-[var(--text-primary)] border border-[var(--border-subtle)] group-hover:border-[var(--border-strong)] transition">
                   <Radio className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-black group-hover:text-violet-300 transition text-[var(--text-primary)]">
+                  <div className="text-xs font-bold group-hover:text-emerald-500 transition text-[var(--text-primary)]">
                     Spectroscopy Analytics Suite
                   </div>
                   <div className="text-[10px] text-[var(--text-secondary)] font-sans">
@@ -425,10 +412,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-violet-500/15 text-violet-300 border border-violet-500/30">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-[var(--bg-inner)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                   C=O ~1715
                 </span>
-                <ArrowRight className="w-4 h-4 text-violet-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-4 h-4 text-[var(--text-muted)] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition" />
               </div>
             </button>
 
@@ -438,14 +425,14 @@ export default function Dashboard() {
                 logActivity('Periodic Table', 'Inspected 118 Elements', 'Filtered Mendeleev grid properties', 'general');
                 navigate('/periodic-table');
               }}
-              className="p-3.5 rounded-2xl inner-box hover:border-amber-400/50 transition flex items-center justify-between text-left group shadow-sm"
+              className="p-3.5 rounded-2xl inner-box hover:border-[var(--border-strong)] transition flex items-center justify-between text-left group shadow-sm cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform">
+                <div className="p-2.5 rounded-xl bg-[var(--bg-inner)] text-[var(--text-primary)] border border-[var(--border-subtle)] group-hover:border-[var(--border-strong)] transition">
                   <Grid className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-black group-hover:text-amber-300 transition text-[var(--text-primary)]">
+                  <div className="text-xs font-bold group-hover:text-emerald-500 transition text-[var(--text-primary)]">
                     Interactive Periodic Table
                   </div>
                   <div className="text-[10px] text-[var(--text-secondary)] font-sans">
@@ -454,10 +441,10 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-[var(--bg-inner)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                   H¹ → Og¹¹⁸
                 </span>
-                <ArrowRight className="w-4 h-4 text-amber-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-4 h-4 text-[var(--text-muted)] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition" />
               </div>
             </button>
 
@@ -467,14 +454,14 @@ export default function Dashboard() {
                 logActivity('Scientists', 'Explored Chemists Encyclopedia', 'Reviewed Nobel breakthroughs', 'general');
                 navigate('/scientists');
               }}
-              className="p-3.5 rounded-2xl inner-box hover:border-amber-400/50 transition flex items-center justify-between text-left group shadow-sm"
+              className="p-3.5 rounded-2xl inner-box hover:border-[var(--border-strong)] transition flex items-center justify-between text-left group shadow-sm cursor-pointer"
             >
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 group-hover:scale-105 transition-transform">
+                <div className="p-2.5 rounded-xl bg-[var(--bg-inner)] text-[var(--text-primary)] border border-[var(--border-subtle)] group-hover:border-[var(--border-strong)] transition">
                   <Award className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-black group-hover:text-amber-300 transition text-[var(--text-primary)]">
+                  <div className="text-xs font-bold group-hover:text-emerald-500 transition text-[var(--text-primary)]">
                     Scientists &amp; Discoveries Gallery
                   </div>
                   <div className="text-[10px] text-[var(--text-secondary)] font-sans">
@@ -483,17 +470,17 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <span className="text-[9px] font-mono px-2 py-0.5 rounded-lg bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-[var(--bg-inner)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
                   Nobel Archive
                 </span>
-                <ArrowRight className="w-4 h-4 text-amber-400 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition" />
+                <ArrowRight className="w-4 h-4 text-[var(--text-muted)] opacity-60 group-hover:opacity-100 group-hover:translate-x-1 transition" />
               </div>
             </button>
           </div>
 
-          <div className="pt-3 border-t border-inherit flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-            <span>Hardware Context: WebGL 2.0 GPU</span>
-            <span className="text-emerald-400 font-bold">60 FPS Cluster Active</span>
+          <div className="pt-3 border-t border-inherit flex items-center justify-between text-[10px] text-[var(--text-muted)] font-mono">
+            <span>Client Isolated Memory</span>
+            <span className="text-emerald-500 font-semibold">Laboratory Runtime Verified</span>
           </div>
         </div>
       </div>

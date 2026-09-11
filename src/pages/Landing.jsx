@@ -27,7 +27,7 @@ import {
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import Background3DCanvas from '../components/Background3DCanvas';
-import HeroScientificCanvas from '../components/HeroScientificCanvas';
+import ChemSpaceLogo from '../components/ChemSpaceLogo';
 
 const SCIENTIFIC_MODULES = [
   {
@@ -38,7 +38,6 @@ const SCIENTIFIC_MODULES = [
     path: '/chemdraw',
     icon: PenTool,
     tag: '2D/3D CAD',
-    accentClass: 'text-slate-400 border-slate-700/50 bg-slate-800/40',
     metrics: ['MMFF94 Engine', 'SMILES & Molfile', 'Valence Guard']
   },
   {
@@ -49,7 +48,6 @@ const SCIENTIFIC_MODULES = [
     path: '/rdkit-lab',
     icon: Cpu,
     tag: 'Python Descriptors',
-    accentClass: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
     metrics: ['Lipinski Ro5', 'TPSA & LogP', 'Graph Descriptors']
   },
   {
@@ -60,7 +58,6 @@ const SCIENTIFIC_MODULES = [
     path: '/spectroscopy',
     icon: Radio,
     tag: 'Spectra Analysis',
-    accentClass: 'text-amber-400 border-amber-500/30 bg-amber-500/10',
     metrics: ['FTIR Absorption', '¹H & ¹³C NMR', 'Deconvolution']
   },
   {
@@ -71,7 +68,6 @@ const SCIENTIFIC_MODULES = [
     path: '/quantum-library',
     icon: Zap,
     tag: 'DFT Solvers',
-    accentClass: 'text-violet-400 border-violet-500/30 bg-violet-500/10',
     metrics: ['HOMO-LUMO Gap', 'Slater Orbitals', 'Density Contours']
   },
   {
@@ -82,7 +78,6 @@ const SCIENTIFIC_MODULES = [
     path: '/ibm-rxn',
     icon: Activity,
     tag: 'Synthesis Planner',
-    accentClass: 'text-rose-400 border-rose-500/30 bg-rose-500/10',
     metrics: ['Retrosynthesis Tree', 'Commercial Feedstock', 'Reaction Rules']
   },
   {
@@ -93,7 +88,6 @@ const SCIENTIFIC_MODULES = [
     path: '/periodic-table',
     icon: Grid,
     tag: 'Elemental Data',
-    accentClass: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10',
     metrics: ['118 Elements', 'Isotope Library', 'Orbital Shells']
   }
 ];
@@ -175,7 +169,6 @@ export default function Landing() {
             {/* Left: Scientific Value Proposition */}
             <div className="space-y-4 max-w-2xl flex-1 flex flex-col justify-center">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono border border-[var(--border-subtle)] bg-[var(--bg-inner)] text-[var(--text-secondary)] shadow-sm self-start">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>ChemSpace Molecular Engine • Professional Chemistry Suite</span>
               </div>
 
@@ -215,21 +208,15 @@ export default function Landing() {
               </div>
             </div>
 
-            {/* Right: Restored 3D Molecular Simulation Hero Canvas */}
-            <div className="relative w-full lg:w-[460px] h-[300px] sm:h-[340px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] overflow-hidden shadow-lg flex items-center justify-center">
-              {/* Interactive 3D Canvas */}
-              <HeroScientificCanvas />
-
-              {/* Telemetry Overlay Badges */}
-              <div className="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-mono border border-[var(--border-subtle)] bg-[var(--bg-inner)]/80 backdrop-blur-md text-[var(--text-muted)] flex items-center gap-1.5">
-                <Atom className="w-3 h-3 text-emerald-400" />
-                <span>Real-Time 3D Orbital Trajectories</span>
-              </div>
-
-              <div className="absolute bottom-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-mono border border-[var(--border-subtle)] bg-[var(--bg-inner)]/80 backdrop-blur-md text-[var(--text-muted)] flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                <span>WebGL 2.0 • Hardware Accelerated</span>
-              </div>
+            {/* Right: Analytical Chemistry Laboratory Workstation */}
+            <div className="relative w-full lg:w-[460px] h-[300px] sm:h-[340px] rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] overflow-hidden shadow-lg flex items-center justify-center group">
+              <img
+                src="/assets/analytical_workbench.jpg"
+                alt="Analytical Chemistry Research Instrumentation Workstation"
+                className="w-full h-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-102"
+                loading="eager"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
             </div>
           </div>
 
@@ -390,18 +377,18 @@ export default function Landing() {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="w-10 h-10 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-primary)] group-hover:border-[var(--border-strong)] transition">
-                        <Icon className="w-5 h-5" />
+                        <Icon className="w-4.5 h-4.5 text-[var(--text-primary)]" />
                       </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-[var(--border-subtle)] text-[var(--text-muted)]">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-[var(--border-subtle)] bg-[var(--bg-inner)] text-[var(--text-muted)]">
                         {module.tag}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="text-base font-bold text-[var(--text-primary)] group-hover:text-emerald-400 transition">
+                      <h3 className="text-base font-bold text-[var(--text-primary)] group-hover:text-emerald-500 transition">
                         {module.title}
                       </h3>
-                      <p className="text-xs text-[var(--text-muted)] font-medium">
+                      <p className="text-xs text-[var(--text-muted)] font-medium mt-0.5">
                         {module.subtitle}
                       </p>
                     </div>
@@ -414,7 +401,7 @@ export default function Landing() {
                   <div className="pt-4 mt-4 border-t border-[var(--border-subtle)] flex items-center justify-between">
                     <div className="flex flex-wrap gap-1">
                       {module.metrics.slice(0, 2).map((m) => (
-                        <span key={m} className="text-[9px] font-mono text-[var(--text-muted)]">
+                        <span key={m} className="text-[9.5px] font-mono text-[var(--text-muted)]">
                           • {m}
                         </span>
                       ))}
@@ -732,15 +719,7 @@ export default function Landing() {
            ─────────────────────────────────────────────────────────────────────── */}
         <footer className="pt-10 pb-6 border-t border-[var(--border-subtle)] space-y-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center justify-center">
-                <Atom className="w-3.5 h-3.5" />
-              </div>
-              <span className="text-xs font-bold tracking-wider font-mono">CHEMSPACE PLATFORM</span>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-[var(--border-subtle)] text-[var(--text-muted)]">
-                v2.4 LTS
-              </span>
-            </div>
+            <ChemSpaceLogo size="sm" showText={true} />
 
             <div className="flex flex-wrap items-center gap-6 text-xs text-[var(--text-muted)] font-mono">
               <button onClick={() => navigate('/chemdraw')} className="hover:text-[var(--text-primary)] transition">ChemDraw</button>

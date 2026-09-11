@@ -35,6 +35,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { useGestures } from '../context/GestureContext';
 import GestureControlPanel from './Gestures/GestureControlPanel';
+import ChemSpaceLogo from './ChemSpaceLogo';
 import { getRecentActivities } from '../services/activityStore';
 import { logoutUser } from '../services/firebase';
 
@@ -212,19 +213,9 @@ export default function Layout() {
       }`}>
         <div
           onClick={() => navigate('/')}
-          className="flex items-center gap-2.5 cursor-pointer select-none touch-target"
+          className="flex items-center cursor-pointer select-none touch-target"
         >
-          <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center justify-center">
-            <Atom className="w-4 h-4" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-bold tracking-wider text-[var(--text-primary)]">
-              CHEMSPACE
-            </span>
-            <span className="text-[8.5px] font-mono text-[var(--text-muted)] tracking-wider uppercase">
-              STUDIO
-            </span>
-          </div>
+          <ChemSpaceLogo size="md" showText={true} />
         </div>
 
         <div className="flex items-center gap-2">
@@ -264,12 +255,7 @@ export default function Layout() {
             <div>
               {/* Header */}
               <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-subtle)]">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center justify-center">
-                    <Atom className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="text-xs font-bold tracking-wider">CHEMSPACE</span>
-                </div>
+                <ChemSpaceLogo size="sm" showText={true} />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-8 h-8 rounded-lg flex items-center justify-center opacity-70 hover:opacity-100 border border-[var(--border-subtle)]"
@@ -372,23 +358,10 @@ export default function Layout() {
           <div className={`flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} gap-2`}>
             <div
               onClick={() => navigate('/')}
-              className="flex items-center gap-2.5 cursor-pointer group overflow-hidden"
+              className="flex items-center cursor-pointer group overflow-hidden"
               title="ChemSpace Platform"
             >
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 flex items-center justify-center shrink-0">
-                <Atom className="w-4 h-4" />
-              </div>
-
-              {!sidebarCollapsed && (
-                <div className="flex flex-col truncate">
-                  <span className="text-xs font-bold tracking-wider text-[var(--text-primary)] truncate">
-                    CHEMSPACE
-                  </span>
-                  <span className="text-[8.5px] font-mono text-[var(--text-muted)] tracking-wider uppercase font-semibold">
-                    STUDIO
-                  </span>
-                </div>
-              )}
+              <ChemSpaceLogo size="md" showText={!sidebarCollapsed} />
             </div>
 
             {!sidebarCollapsed && (
