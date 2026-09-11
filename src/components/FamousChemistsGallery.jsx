@@ -91,11 +91,11 @@ function ChemistCard3D({ scientist, fc, isHovered, onSelect, onHoverChange, chil
       onMouseLeave={handleMouseLeave}
       className="group cursor-pointer rounded-3xl overflow-hidden relative flex flex-col transition-all duration-200"
       style={{
-        background: 'rgba(10, 14, 22, 0.9)',
-        border: `1px solid ${isHovered ? fc.accent + '80' : 'rgba(255, 255, 255, 0.08)'}`,
+        background: 'var(--bg-card)',
+        border: `1px solid ${isHovered ? 'var(--border-strong)' : 'var(--border-subtle)'}`,
         boxShadow: isHovered
-          ? `0 0 28px ${fc.accent}30, 0 16px 36px rgba(0,0,0,0.6)`
-          : '0 4px 20px rgba(0,0,0,0.3)',
+          ? 'var(--card-shadow-hover)'
+          : 'var(--card-shadow)',
         transform: isHovered
           ? `perspective(1000px) rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) translateY(-5px)`
           : 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0)',
@@ -106,7 +106,7 @@ function ChemistCard3D({ scientist, fc, isHovered, onSelect, onHoverChange, chil
         <div
           className="absolute inset-0 pointer-events-none z-30 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.1) 0%, transparent 65%)`
+            background: `radial-gradient(circle at ${tilt.glareX}% ${tilt.glareY}%, rgba(255,255,255,0.06) 0%, transparent 65%)`
           }}
         />
       )}
@@ -116,17 +116,11 @@ function ChemistCard3D({ scientist, fc, isHovered, onSelect, onHoverChange, chil
 }
 
 /* ─── Metric Badge Pill ──────────────────────────────────────────────── */
-function MetricPill({ label, count, color }) {
+function MetricPill({ label, count }) {
   return (
-    <span
-      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold"
-      style={{
-        background: `${color}18`,
-        border: `1px solid ${color}40`,
-        color
-      }}
-    >
-      {count} {label}
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-[var(--text-secondary)]">
+      <span className="text-[var(--text-primary)] font-black">{count}</span>
+      {label && <span>{label}</span>}
     </span>
   );
 }
@@ -221,19 +215,19 @@ export default function FamousChemistsGallery() {
         {/* ─── 1. ARCHIVE HEADER & TITLE ───────────────────────────────── */}
         <div className="workspace-header">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">
+            <div className="p-2.5 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-[var(--text-primary)]">
               <Award className="w-6 h-6 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-base font-black tracking-wider text-white">
+                <h1 className="text-base font-black tracking-wider text-[var(--text-primary)]">
                   Scientific Encyclopedia &amp; History Archive
                 </h1>
                 <span className="telemetry-pill text-[10px] font-bold">
                   {FAMOUS_CHEMISTS.length} PIONEERS CATALOGED
                 </span>
               </div>
-              <p className="text-[11px] text-slate-300 font-sans mt-0.5">
+              <p className="text-[11px] text-[var(--text-secondary)] font-sans mt-0.5">
                 Museum-grade scientific encyclopedia: authentic portraits, structured discoveries, reaction schemes, mathematical equations, and interactive simulations.
               </p>
             </div>
@@ -242,14 +236,14 @@ export default function FamousChemistsGallery() {
           {/* Portrait Mode Toggle & View Switcher */}
           <div className="flex flex-wrap items-center gap-2">
             {/* Real Archive vs AI Hologram Switch */}
-            <div className="flex items-center gap-1 bg-black/70 p-1 rounded-2xl border border-white/15 shadow-inner">
+            <div className="flex items-center gap-1 bg-[var(--bg-card)] p-1 rounded-2xl border border-[var(--border-subtle)] shadow-inner">
               <button
                 type="button"
                 onClick={() => setPortraitMode('real')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                   portraitMode === 'real'
-                    ? 'bg-white text-black shadow-md font-black'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm font-black'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
                 title="View Verified Historical Archival Photographs"
               >
@@ -262,8 +256,8 @@ export default function FamousChemistsGallery() {
                 onClick={() => setPortraitMode('animated')}
                 className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                   portraitMode === 'animated'
-                    ? 'bg-gradient-to-r from-cyan-400 to-purple-500 text-black shadow-lg font-black'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm font-black'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
                 title="View Futuristic Animated Quantum Hologram Avatars"
               >
@@ -273,7 +267,7 @@ export default function FamousChemistsGallery() {
             </div>
 
             {/* View Modes */}
-            <div className="flex items-center gap-1 bg-white/5 p-1 rounded-2xl border border-white/10 shadow-inner">
+            <div className="flex items-center gap-1 bg-[var(--bg-card)] p-1 rounded-2xl border border-[var(--border-subtle)] shadow-inner">
               {[
                 { id: 'grid', label: 'Museum Grid', icon: List },
                 { id: 'timeline', label: 'Global Timeline', icon: Clock },
@@ -286,8 +280,8 @@ export default function FamousChemistsGallery() {
                   onClick={() => setViewMode(id)}
                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
                     viewMode === id
-                      ? 'bg-cyan-500 text-black shadow-md font-black'
-                      : 'text-slate-300 hover:text-white'
+                      ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm font-black'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -303,53 +297,46 @@ export default function FamousChemistsGallery() {
           {[
             {
               icon: UserCheck,
-              color: '#06b6d4',
               label: 'Cataloged Pioneers',
               value: `${totalScientists} Icons`
             },
             {
               icon: Award,
-              color: '#f59e0b',
               label: 'Nobel Laureates',
               value: `${totalNobelLaureates} Laureates`
             },
             {
               icon: FlaskConical,
-              color: '#10b981',
               label: 'Milestone Discoveries',
               value: `${totalDiscoveries} Discoveries`
             },
             {
               icon: Atom,
-              color: '#8b5cf6',
               label: 'Theories & Models',
               value: `${totalEquations} Formulations`
             }
-          ].map(({ icon: Icon, color, label, value }) => (
+          ].map(({ icon: Icon, label, value }) => (
             <div
               key={label}
-              className="glass-panel p-3.5 rounded-2xl border border-white/10 flex items-center gap-3 shadow-lg"
+              className="glass-panel p-3.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] flex items-center gap-3 shadow-sm"
             >
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                style={{ background: `${color}18`, color }}
-              >
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-[var(--text-primary)]">
                 <Icon className="w-5 h-5" />
               </div>
               <div>
-                <div className="text-[10px] text-slate-400 uppercase font-mono font-bold tracking-wider">
+                <div className="text-[10px] text-[var(--text-muted)] uppercase font-mono font-bold tracking-wider">
                   {label}
                 </div>
-                <div className="text-sm font-black text-white">{value}</div>
+                <div className="text-sm font-black text-[var(--text-primary)]">{value}</div>
               </div>
             </div>
           ))}
         </div>
 
         {/* ─── 3. CURATED PRESET COLLECTIONS BAR ───────────────────────── */}
-        <div className="glass-panel p-3 rounded-2xl border border-white/10 flex items-center gap-2 overflow-x-auto custom-scrollbar shadow-lg">
-          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase shrink-0 px-2 flex items-center gap-1">
-            <Filter className="w-3 h-3 text-cyan-400" /> Presets:
+        <div className="glass-panel p-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-card)] flex items-center gap-2 overflow-x-auto custom-scrollbar shadow-sm">
+          <span className="text-[10px] font-mono font-bold text-[var(--text-muted)] uppercase shrink-0 px-2 flex items-center gap-1.5">
+            <Filter className="w-3 h-3 text-[var(--text-muted)]" /> Presets:
           </span>
           {CURATED_COLLECTIONS.map(col => (
             <button
@@ -358,8 +345,8 @@ export default function FamousChemistsGallery() {
               onClick={() => setSelectedCollection(col.id)}
               className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition flex items-center gap-1.5 shrink-0 ${
                 selectedCollection === col.id
-                  ? 'bg-cyan-500 text-black shadow-md font-black'
-                  : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                  ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm font-black'
+                  : 'bg-[var(--bg-inner)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span>{col.label}</span>
@@ -369,11 +356,11 @@ export default function FamousChemistsGallery() {
 
         {/* ─── 4. SEARCH & DISCIPLINE FILTERS (GRID ONLY) ──────────────── */}
         {viewMode === 'grid' && (
-          <div className="glass-panel p-4 rounded-3xl border border-white/10 space-y-3 shadow-xl">
+          <div className="glass-panel p-4 rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-card)] space-y-3 shadow-sm">
             <div className="flex flex-col md:flex-row items-center gap-3">
               {/* Search input */}
               <div className="flex-1 relative w-full">
-                <Search className="w-4 h-4 text-cyan-400 absolute left-3.5 top-3" />
+                <Search className="w-4 h-4 text-[var(--text-muted)] absolute left-3.5 top-3" />
                 <input
                   type="text"
                   value={searchQuery}
@@ -385,7 +372,7 @@ export default function FamousChemistsGallery() {
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
-                    className="absolute right-3.5 top-3 text-slate-400 hover:text-white text-xs font-bold"
+                    className="absolute right-3.5 top-3 text-[var(--text-muted)] hover:text-[var(--text-primary)] text-xs font-bold"
                   >
                     ✕
                   </button>
@@ -411,12 +398,12 @@ export default function FamousChemistsGallery() {
                   onClick={() => setNobelOnly(!nobelOnly)}
                   className={`px-3 py-2 rounded-2xl text-xs font-mono font-bold transition flex items-center gap-1.5 shrink-0 border ${
                     nobelOnly
-                      ? 'bg-amber-500 text-black border-amber-400 font-black shadow-md'
-                      : 'bg-white/5 text-slate-300 border-white/10 hover:bg-white/10'
+                      ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border-[var(--border-strong)] font-black shadow-sm'
+                      : 'bg-[var(--bg-inner)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--bg-hover)] hover:text-[var(--text-primary)]'
                   }`}
                   title="Filter to Nobel Laureates only"
                 >
-                  <Award className={`w-3.5 h-3.5 ${nobelOnly ? 'text-black' : 'text-amber-400'}`} />
+                  <Award className={`w-3.5 h-3.5 ${nobelOnly ? 'text-amber-500' : 'text-amber-400'}`} />
                   <span>Nobel Only</span>
                 </button>
               </div>
@@ -431,8 +418,8 @@ export default function FamousChemistsGallery() {
                   onClick={() => setSelectedField(field)}
                   className={`px-3 py-1.5 rounded-xl text-[11px] font-mono font-bold whitespace-nowrap transition ${
                     selectedField === field
-                      ? 'bg-white text-black shadow-md font-black'
-                      : 'bg-white/5 text-slate-300 hover:text-white hover:bg-white/10'
+                      ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm font-black'
+                      : 'bg-[var(--bg-inner)] text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]'
                   }`}
                 >
                   {field}
@@ -445,11 +432,11 @@ export default function FamousChemistsGallery() {
         {/* ─── 5. MAIN MUSEUM GRID VIEW ────────────────────────────────── */}
         {viewMode === 'grid' && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between text-xs text-slate-400 font-mono px-1">
+            <div className="flex items-center justify-between text-xs text-[var(--text-muted)] font-mono px-1">
               <span>
-                Displaying <strong className="text-white">{filteredScientists.length}</strong> verified scientific pioneers
+                Displaying <strong className="text-[var(--text-primary)]">{filteredScientists.length}</strong> verified scientific pioneers
               </span>
-              {nobelOnly && <span className="text-amber-400 font-bold">★ Nobel Laureates Filter Active</span>}
+              {nobelOnly && <span className="text-amber-500 font-bold">★ Nobel Laureates Filter Active</span>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -479,8 +466,8 @@ export default function FamousChemistsGallery() {
 
                       {/* Top Field Glow Line */}
                       <div
-                        className="absolute top-0 inset-x-0 h-1 rounded-t-3xl"
-                        style={{ background: `linear-gradient(90deg, transparent, ${fc.accent}, transparent)` }}
+                        className="absolute top-0 inset-x-0 h-0.5 rounded-t-3xl pointer-events-none"
+                        style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)' }}
                       />
 
                       {/* Nobel Star Badge */}
@@ -488,8 +475,8 @@ export default function FamousChemistsGallery() {
                         <div
                           className="absolute top-3 right-3 w-7 h-7 rounded-lg flex items-center justify-center shadow-lg"
                           style={{
-                            background: 'rgba(245,158,11,0.25)',
-                            border: '1px solid rgba(245,158,11,0.5)',
+                            background: 'rgba(0,0,0,0.7)',
+                            border: '1px solid rgba(245,158,11,0.45)',
                             backdropFilter: 'blur(8px)'
                           }}
                         >
@@ -499,11 +486,11 @@ export default function FamousChemistsGallery() {
 
                       {/* Lifetime Span */}
                       <div
-                        className="absolute bottom-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-black font-mono shadow"
+                        className="absolute bottom-3 left-3 px-2 py-0.5 rounded-lg text-[10px] font-bold font-mono shadow"
                         style={{
-                          background: 'rgba(5,10,20,0.85)',
-                          color: fc.accent,
-                          border: `1px solid ${fc.accent}40`,
+                          background: 'rgba(0,0,0,0.8)',
+                          color: '#f8fafc',
+                          border: '1px solid rgba(255,255,255,0.15)',
                           backdropFilter: 'blur(8px)'
                         }}
                       >
@@ -512,8 +499,8 @@ export default function FamousChemistsGallery() {
 
                       {/* Nationality */}
                       <div
-                        className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold text-slate-300 border border-white/10"
-                        style={{ background: 'rgba(5,10,20,0.8)', backdropFilter: 'blur(8px)' }}
+                        className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold text-slate-200 border border-white/10"
+                        style={{ background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)' }}
                       >
                         <Globe className="w-2.5 h-2.5" />
                         <span>{scientist.nationality.split('/')[0].trim()}</span>
@@ -523,33 +510,32 @@ export default function FamousChemistsGallery() {
                     {/* Card Content */}
                     <div className="flex flex-col flex-1 p-4 space-y-3 justify-between">
                       <div className="space-y-1.5">
-                        <h3 className="text-sm font-black text-white leading-tight group-hover:text-cyan-400 transition">
+                        <h3 className="text-sm font-black text-[var(--text-primary)] leading-tight group-hover:text-emerald-400 transition">
                           {scientist.name}
                         </h3>
 
                         <span
-                          className="text-[10px] font-bold font-mono inline-block px-1.5 py-0.5 rounded-md truncate max-w-full"
-                          style={{ background: fc.bg, color: fc.accent, border: `1px solid ${fc.border}` }}
+                          className="text-[10px] font-bold font-mono inline-block px-2 py-0.5 rounded-md truncate max-w-full bg-[var(--bg-inner)] text-[var(--text-secondary)] border border-[var(--border-subtle)]"
                         >
                           {scientist.field}
                         </span>
 
-                        <p className="text-[11px] text-slate-300 leading-relaxed font-sans line-clamp-2">
+                        <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed font-sans line-clamp-2">
                           {scientist.summary}
                         </p>
                       </div>
 
                       {/* Metrics Badges */}
-                      <div className="space-y-2 pt-2 border-t border-white/10">
+                      <div className="space-y-2 pt-2 border-t border-[var(--border-subtle)]">
                         <div className="flex flex-wrap items-center gap-1.5">
-                          <MetricPill count={discCount} label="Discoveries" color={fc.accent} />
-                          {eqCount > 0 && <MetricPill count={eqCount} label="Equations" color="#a855f7" />}
+                          <MetricPill count={discCount} label="Discoveries" />
+                          {eqCount > 0 && <MetricPill count={eqCount} label="Equations" />}
                           {scientist.molecule && (
-                            <MetricPill count={scientist.molecule.formula} label="" color="#10b981" />
+                            <MetricPill count={scientist.molecule.formula} label="" />
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between text-[10px] font-mono font-bold pt-1" style={{ color: fc.accent }}>
+                        <div className="flex items-center justify-between text-[10px] font-mono font-bold pt-1 text-[var(--text-muted)] group-hover:text-[var(--text-primary)] transition-colors">
                           <span>Inspect Full Dossier</span>
                           <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                         </div>

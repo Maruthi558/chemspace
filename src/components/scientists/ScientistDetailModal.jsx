@@ -94,7 +94,7 @@ export default function ScientistDetailModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto select-none"
-      style={{ background: 'rgba(0, 0, 0, 0.88)', backdropFilter: 'blur(20px)' }}
+      style={{ background: 'rgba(0, 0, 0, 0.85)', backdropFilter: 'blur(20px)' }}
       onClick={e => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -102,8 +102,8 @@ export default function ScientistDetailModal({
       <div
         className="relative max-w-5xl w-full rounded-[32px] overflow-hidden shadow-2xl flex flex-col my-auto border"
         style={{
-          background: 'rgba(9, 13, 20, 0.98)',
-          borderColor: `${fc.accent}45`,
+          background: 'var(--bg-card)',
+          borderColor: 'var(--border-medium)',
           maxHeight: '94vh'
         }}
       >
@@ -119,9 +119,9 @@ export default function ScientistDetailModal({
 
           {/* Top Chromatic Accent Strip */}
           <div
-            className="absolute top-0 inset-x-0 h-1.5 z-20"
+            className="absolute top-0 inset-x-0 h-1 z-20 pointer-events-none"
             style={{
-              background: `linear-gradient(90deg, transparent 0%, ${fc.accent} 40%, ${fc.accent} 60%, transparent 100%)`
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 40%, rgba(255,255,255,0.25) 60%, transparent 100%)'
             }}
           />
 
@@ -139,23 +139,17 @@ export default function ScientistDetailModal({
             <button
               type="button"
               onClick={() => setPortraitMode(portraitMode === 'real' ? 'animated' : 'real')}
-              className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 shadow-lg border"
-              style={{
-                background: 'rgba(0,0,0,0.75)',
-                borderColor: `${fc.accent}60`,
-                color: fc.accent,
-                backdropFilter: 'blur(8px)'
-              }}
+              className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold transition flex items-center gap-1.5 shadow-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
               title="Toggle between Historical Photo and AI Hologram"
             >
-              {portraitMode === 'real' ? <Cpu className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              {portraitMode === 'real' ? <Cpu className="w-3.5 h-3.5 text-slate-400" /> : <Eye className="w-3.5 h-3.5 text-slate-400" />}
               <span>{portraitMode === 'real' ? 'View AI Hologram' : 'View Archival Photo'}</span>
             </button>
 
             <button
               type="button"
               onClick={onClose}
-              className="w-9 h-9 rounded-xl flex items-center justify-center transition border border-white/20 bg-black/60 text-slate-300 hover:text-white hover:bg-red-500/30"
+              className="w-9 h-9 rounded-xl flex items-center justify-center transition border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
             >
               <X className="w-4 h-4" />
             </button>
@@ -166,8 +160,8 @@ export default function ScientistDetailModal({
             <div
               className="absolute top-4 left-4 z-20 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold shadow-lg"
               style={{
-                background: 'rgba(245,158,11,0.2)',
-                border: '1px solid rgba(245,158,11,0.5)',
+                background: 'rgba(0,0,0,0.75)',
+                border: '1px solid rgba(245,158,11,0.45)',
                 color: '#f59e0b',
                 backdropFilter: 'blur(8px)'
               }}
@@ -182,8 +176,7 @@ export default function ScientistDetailModal({
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span
-                  className="text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded-md"
-                  style={{ background: fc.bg, color: fc.accent, border: `1px solid ${fc.border}` }}
+                  className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[var(--bg-inner)] text-[var(--text-secondary)] border border-[var(--border-subtle)]"
                 >
                   {scientist.field}
                 </span>
@@ -196,11 +189,11 @@ export default function ScientistDetailModal({
               </h2>
               <div className="text-xs text-slate-300 font-mono mt-1 flex flex-wrap items-center gap-2">
                 <span>{scientist.years}</span>
-                <span style={{ color: fc.accent }}>•</span>
+                <span className="text-slate-500">•</span>
                 <span>{scientist.nationality}</span>
                 {scientist.birthPlace && (
                   <>
-                    <span style={{ color: fc.accent }}>•</span>
+                    <span className="text-slate-500">•</span>
                     <span className="text-slate-400 truncate max-w-xs">{scientist.birthPlace}</span>
                   </>
                 )}
@@ -210,34 +203,33 @@ export default function ScientistDetailModal({
             {/* Quick Metrics Chips */}
             <div className="flex items-center gap-2 shrink-0">
               <div
-                className="text-center px-3 py-1.5 rounded-xl bg-black/60 border"
-                style={{ borderColor: `${fc.accent}40` }}
+                className="text-center px-3 py-1.5 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]"
               >
-                <div className="text-lg font-mono font-black" style={{ color: fc.accent }}>
+                <div className="text-lg font-mono font-black text-[var(--text-primary)]">
                   {scientist.discoveries?.length || 0}
                 </div>
-                <div className="text-[9px] text-slate-400 uppercase font-mono font-bold">Discoveries</div>
+                <div className="text-[9px] text-[var(--text-muted)] uppercase font-mono font-bold">Discoveries</div>
               </div>
-              <div className="text-center px-3 py-1.5 rounded-xl bg-black/60 border border-purple-500/30">
-                <div className="text-lg font-mono font-black text-purple-400">
+              <div className="text-center px-3 py-1.5 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]">
+                <div className="text-lg font-mono font-black text-[var(--text-primary)]">
                   {scientist.equations?.length || 0}
                 </div>
-                <div className="text-[9px] text-slate-400 uppercase font-mono font-bold">Equations</div>
+                <div className="text-[9px] text-[var(--text-muted)] uppercase font-mono font-bold">Equations</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* ─── BIOGRAPHY EXCERPT & INSTITUTIONS ─────────────────────────── */}
-        <div className="px-6 py-3 border-b border-white/10 shrink-0 bg-black/30 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap items-center gap-1.5 text-xs text-slate-300 font-sans">
-            <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1">
-              <Building2 className="w-3 h-3 text-cyan-400" /> Institutions:
+        <div className="px-6 py-3 border-b border-[var(--border-subtle)] shrink-0 bg-[var(--bg-inner)] flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-[var(--text-secondary)] font-sans">
+            <span className="text-[10px] font-mono text-[var(--text-muted)] flex items-center gap-1">
+              <Building2 className="w-3 h-3 text-[var(--text-muted)]" /> Institutions:
             </span>
             {scientist.institutions?.map((inst, i) => (
               <span
                 key={i}
-                className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-white/5 border border-white/10 text-slate-200"
+                className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)]"
               >
                 {inst}
               </span>
@@ -253,26 +245,25 @@ export default function ScientistDetailModal({
                 })
               );
             }}
-            className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold transition flex items-center gap-1.5 text-cyan-300 bg-cyan-950/60 border border-cyan-500/30 hover:bg-cyan-900/50"
+            className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold transition flex items-center gap-1.5 text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-subtle)] hover:bg-[var(--bg-hover)]"
           >
-            <Bot className="w-3 h-3 animate-pulse" />
+            <Bot className="w-3 h-3 text-emerald-400" />
             <span>Consult ChemAI</span>
           </button>
         </div>
 
         {/* ─── TAB NAVIGATION BAR ───────────────────────────────────────── */}
-        <div className="flex items-center gap-1 px-6 py-2 border-b border-white/10 overflow-x-auto custom-scrollbar shrink-0 bg-black/40">
+        <div className="flex items-center gap-1.5 px-6 py-2 border-b border-[var(--border-subtle)] overflow-x-auto custom-scrollbar shrink-0 bg-[var(--bg-inner)]">
           {tabs.map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               type="button"
               onClick={() => setActiveTab(id)}
-              className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition flex items-center gap-1.5 shrink-0"
-              style={
+              className={`px-3 py-1.5 rounded-xl text-xs font-mono font-bold whitespace-nowrap transition flex items-center gap-1.5 shrink-0 ${
                 activeTab === id
-                  ? { background: fc.accent, color: '#03050a', fontWeight: 900 }
-                  : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.7)' }
-              }
+                  ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] shadow-sm font-black'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-subtle)] hover:bg-[var(--bg-hover)]'
+              }`}
             >
               <Icon className="w-3.5 h-3.5" />
               <span>{label}</span>
@@ -285,11 +276,11 @@ export default function ScientistDetailModal({
           {/* TAB 1: SCIENTIFIC CONTRIBUTIONS (STORY) */}
           {activeTab === 'story' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <h3 className="text-xs font-mono font-bold uppercase text-cyan-400 flex items-center gap-1.5">
-                  <Info className="w-4 h-4" /> Executive Summary &amp; Historical Impact
+              <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-2">
+                <h3 className="text-xs font-mono font-bold uppercase text-[var(--text-primary)] flex items-center gap-1.5">
+                  <Info className="w-4 h-4 text-[var(--text-muted)]" /> Executive Summary &amp; Historical Impact
                 </h3>
-                <p className="text-xs text-slate-200 font-sans leading-relaxed">
+                <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
                   {scientist.biography}
                 </p>
               </div>
@@ -297,23 +288,22 @@ export default function ScientistDetailModal({
               {scientist.story && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { key: 'who', label: '1. Who They Were', color: fc.accent },
-                    { key: 'problem', label: '2. The Fundamental Scientific Problem', color: '#f59e0b' },
-                    { key: 'discovery', label: '3. What Did They Discover?', color: '#10b981' },
-                    { key: 'how', label: '4. How Did They Discover It?', color: '#8b5cf6' },
-                    { key: 'why', label: '5. Why Was It Important?', color: '#3b82f6' },
-                    { key: 'scienceChanged', label: '6. How Did It Change Science?', color: '#ec4899' },
-                    { key: 'modernUse', label: '7. Modern Scientific Technologies Still Using This', color: '#06b6d4', span: true }
-                  ].map(({ key, label, color, span }) => (
+                    { key: 'who', label: '1. Who They Were' },
+                    { key: 'problem', label: '2. The Fundamental Scientific Problem' },
+                    { key: 'discovery', label: '3. What Did They Discover?' },
+                    { key: 'how', label: '4. How Did They Discover It?' },
+                    { key: 'why', label: '5. Why Was It Important?' },
+                    { key: 'scienceChanged', label: '6. How Did It Change Science?' },
+                    { key: 'modernUse', label: '7. Modern Scientific Technologies Still Using This', span: true }
+                  ].map(({ key, label, span }) => (
                     <div
                       key={key}
-                      className={`p-4 rounded-2xl space-y-1.5 border shadow-md ${span ? 'md:col-span-2' : ''}`}
-                      style={{ background: 'rgba(255,255,255,0.03)', borderColor: `${color}35` }}
+                      className={`p-4 rounded-2xl space-y-1.5 border border-[var(--border-subtle)] bg-[var(--bg-inner)] shadow-sm ${span ? 'md:col-span-2' : ''}`}
                     >
-                      <span className="text-[10px] font-mono font-black uppercase tracking-wider block" style={{ color }}>
+                      <span className="text-[10px] font-mono font-bold uppercase tracking-wider block text-[var(--text-muted)]">
                         {label}
                       </span>
-                      <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                      <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
                         {scientist.story[key]}
                       </p>
                     </div>
@@ -330,18 +320,17 @@ export default function ScientistDetailModal({
                 {scientist.discoveries?.map((disc, idx) => (
                   <div
                     key={idx}
-                    className="p-4 rounded-2xl border border-white/10 bg-white/5 space-y-2 shadow-md hover:border-cyan-500/40 transition"
+                    className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-inner)] space-y-2 shadow-sm hover:border-[var(--border-strong)] transition"
                   >
                     <div className="flex items-center gap-2">
                       <span
-                        className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold"
-                        style={{ background: fc.bg, color: fc.accent, border: `1px solid ${fc.border}` }}
+                        className="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]"
                       >
                         {disc.type}
                       </span>
-                      <strong className="text-sm font-mono text-white">{disc.title}</strong>
+                      <strong className="text-sm font-mono text-[var(--text-primary)]">{disc.title}</strong>
                     </div>
-                    <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                    <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
                       {disc.description}
                     </p>
                   </div>
@@ -349,15 +338,15 @@ export default function ScientistDetailModal({
               </div>
 
               {scientist.techniques && scientist.techniques.length > 0 && (
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                  <h4 className="text-xs font-mono font-bold text-cyan-400 uppercase">
+                <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-3">
+                  <h4 className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase">
                     Pioneered Laboratory &amp; Experimental Techniques:
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {scientist.techniques.map((tech, i) => (
-                      <div key={i} className="p-3 rounded-xl bg-black/40 border border-white/10 space-y-1">
-                        <div className="text-xs font-mono font-bold text-white">{tech.name}</div>
-                        <p className="text-[11px] text-slate-400 font-sans leading-relaxed">{tech.description}</p>
+                      <div key={i} className="p-3 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] space-y-1">
+                        <div className="text-xs font-mono font-bold text-[var(--text-primary)]">{tech.name}</div>
+                        <p className="text-[11px] text-[var(--text-secondary)] font-sans leading-relaxed">{tech.description}</p>
                       </div>
                     ))}
                   </div>
@@ -378,15 +367,15 @@ export default function ScientistDetailModal({
             <div className="space-y-6">
               {scientist.molecule && (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex flex-wrap items-center justify-between gap-4">
+                  <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <span className="text-[10px] font-mono uppercase text-cyan-400 font-bold block">
+                      <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] font-bold block">
                         Signature Chemical Entity:
                       </span>
-                      <h3 className="text-base font-mono font-black text-white">
+                      <h3 className="text-base font-mono font-black text-[var(--text-primary)]">
                         {scientist.molecule.name} ({scientist.molecule.formula})
                       </h3>
-                      <p className="text-xs text-slate-300 font-sans mt-0.5">
+                      <p className="text-xs text-[var(--text-secondary)] font-sans mt-0.5">
                         {scientist.molecule.description}
                       </p>
                     </div>
@@ -398,7 +387,7 @@ export default function ScientistDetailModal({
                           onClose();
                           navigate('/chemdraw');
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-cyan-500 hover:bg-cyan-400 text-black transition flex items-center gap-1.5 shadow-md"
+                        className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-[var(--btn-primary-bg)] hover:bg-[var(--btn-primary-hover)] text-[var(--btn-primary-text)] transition flex items-center gap-1.5 shadow-sm"
                         title="Edit in ChemDraw CAD Studio"
                       >
                         <FlaskConical className="w-3.5 h-3.5" />
@@ -411,7 +400,7 @@ export default function ScientistDetailModal({
                           onClose();
                           navigate('/quantum-library');
                         }}
-                        className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 transition flex items-center gap-1.5"
+                        className="px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-[var(--btn-secondary-bg)] hover:bg-[var(--btn-secondary-hover)] text-[var(--btn-secondary-text)] border border-[var(--btn-secondary-border)] transition flex items-center gap-1.5"
                         title="Compute Orbitals in Quantum Lab"
                       >
                         <Zap className="w-3.5 h-3.5" />
@@ -422,10 +411,10 @@ export default function ScientistDetailModal({
 
                   {/* 2D and 3D Viewers */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="h-[290px] rounded-2xl overflow-hidden border border-white/10 bg-black/60 flex flex-col">
-                      <div className="px-3 py-2 border-b border-white/10 text-[10px] font-mono text-slate-400 flex justify-between">
+                    <div className="h-[290px] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-inner)] flex flex-col">
+                      <div className="px-3 py-2 border-b border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)] flex justify-between">
                         <span>2D Graph Topology</span>
-                        <span className="text-cyan-400">{scientist.molecule.formula}</span>
+                        <span className="text-[var(--text-primary)] font-bold">{scientist.molecule.formula}</span>
                       </div>
                       <div className="flex-1 overflow-hidden">
                         {molecule2D && (
@@ -439,10 +428,10 @@ export default function ScientistDetailModal({
                       </div>
                     </div>
 
-                    <div className="h-[290px] rounded-2xl overflow-hidden border border-white/10 bg-black/60 flex flex-col">
-                      <div className="px-3 py-2 border-b border-white/10 text-[10px] font-mono text-slate-400 flex justify-between">
+                    <div className="h-[290px] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-inner)] flex flex-col">
+                      <div className="px-3 py-2 border-b border-[var(--border-subtle)] text-[10px] font-mono text-[var(--text-muted)] flex justify-between">
                         <span>3D WebGL Ball-and-Stick Conformer</span>
-                        <span className="text-emerald-400">Interactive Orbit Controls</span>
+                        <span className="text-emerald-400 font-bold">Interactive Orbit Controls</span>
                       </div>
                       <div className="flex-1 overflow-hidden">
                         {molecule3D && (
@@ -455,22 +444,22 @@ export default function ScientistDetailModal({
               )}
 
               {scientist.reactions && scientist.reactions.length > 0 && (
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-3">
-                  <h4 className="text-xs font-mono font-bold text-emerald-400 uppercase">
+                <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-3">
+                  <h4 className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase">
                     Signature Chemical Reaction Scheme:
                   </h4>
                   {scientist.reactions.map((rxn, i) => (
-                    <div key={i} className="p-3.5 rounded-xl bg-black/50 border border-white/10 space-y-2">
+                    <div key={i} className="p-3.5 rounded-xl bg-[var(--bg-card)] border border-[var(--border-subtle)] space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono font-bold text-white">{rxn.name}</span>
-                        <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        <span className="text-xs font-mono font-bold text-[var(--text-primary)]">{rxn.name}</span>
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded bg-[var(--bg-inner)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
                           {rxn.type}
                         </span>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-black/80 font-mono text-xs text-emerald-400 text-center border border-emerald-500/20 overflow-x-auto">
+                      <div className="p-2.5 rounded-lg bg-[var(--bg-inner)] font-mono text-xs text-[var(--text-primary)] text-center border border-[var(--border-subtle)] overflow-x-auto">
                         {rxn.scheme}
                       </div>
-                      <p className="text-[11px] text-slate-300 font-sans">{rxn.description}</p>
+                      <p className="text-[11px] text-[var(--text-secondary)] font-sans">{rxn.description}</p>
                     </div>
                   ))}
                 </div>
@@ -485,37 +474,37 @@ export default function ScientistDetailModal({
                 scientist.equations.map((eq, idx) => (
                   <div
                     key={idx}
-                    className="p-5 rounded-2xl border border-white/10 bg-white/5 space-y-3 shadow-md"
+                    className="p-5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-inner)] space-y-3 shadow-sm"
                   >
-                    <div className="text-xs font-mono font-bold" style={{ color: fc.accent }}>
+                    <div className="text-xs font-mono font-bold text-[var(--text-primary)]">
                       {eq.name}
                     </div>
                     <div
                       className="p-4 rounded-xl text-center font-mono font-bold text-sm sm:text-base shadow-inner overflow-x-auto"
                       style={{
-                        background: 'rgba(0,0,0,0.6)',
-                        border: `1px solid ${fc.accent}35`,
-                        color: fc.accent
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-subtle)',
+                        color: 'var(--text-primary)'
                       }}
                     >
                       {eq.formula}
                     </div>
-                    <p className="text-xs text-slate-300 font-sans leading-relaxed">
+                    <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
                       {eq.description}
                     </p>
 
                     {eq.variables && eq.variables.length > 0 && (
-                      <div className="pt-3 border-t border-white/10 space-y-1">
-                        <span className="text-[10px] font-mono uppercase text-slate-400 font-bold block">
+                      <div className="pt-3 border-t border-[var(--border-subtle)] space-y-1">
+                        <span className="text-[10px] font-mono uppercase text-[var(--text-muted)] font-bold block">
                           Variable Legend:
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {eq.variables.map((v, i) => (
-                            <div key={i} className="text-xs font-mono text-slate-300 flex items-center gap-2">
-                              <code className="px-1.5 py-0.5 rounded bg-black/50 text-cyan-300 font-bold border border-white/10">
+                            <div key={i} className="text-xs font-mono text-[var(--text-secondary)] flex items-center gap-2">
+                              <code className="px-1.5 py-0.5 rounded bg-[var(--bg-card)] text-[var(--text-primary)] font-bold border border-[var(--border-subtle)]">
                                 {v.symbol}
                               </code>
-                              <span className="text-[11px] text-slate-400 font-sans">{v.meaning}</span>
+                              <span className="text-[11px] text-[var(--text-muted)] font-sans">{v.meaning}</span>
                             </div>
                           ))}
                         </div>
@@ -524,7 +513,7 @@ export default function ScientistDetailModal({
                   </div>
                 ))
               ) : (
-                <div className="p-8 text-center text-slate-400 italic font-mono">
+                <div className="p-8 text-center text-[var(--text-muted)] italic font-mono">
                   No explicit mathematical equation cataloged for this profile.
                 </div>
               )}
@@ -533,25 +522,25 @@ export default function ScientistDetailModal({
 
           {/* TAB 6: TIMELINE */}
           {activeTab === 'timeline' && (
-            <div className="relative pl-6 space-y-4" style={{ borderLeft: `2px solid ${fc.accent}40` }}>
+            <div className="relative pl-6 space-y-4" style={{ borderLeft: '2px solid var(--border-medium)' }}>
               {scientist.timeline?.map((t, idx) => (
                 <div key={idx} className="relative group">
                   <div
                     className="absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full border-2 border-black shadow"
-                    style={{ background: fc.accent }}
+                    style={{ background: 'var(--text-primary)' }}
                   />
-                  <div className="p-3.5 rounded-xl bg-white/5 border border-white/10 space-y-1 hover:border-cyan-500/40 transition">
+                  <div className="p-3.5 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-1 hover:border-[var(--border-strong)] transition">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono font-bold" style={{ color: fc.accent }}>
+                      <span className="text-xs font-mono font-bold text-[var(--text-primary)]">
                         {t.year}
                       </span>
                       {t.category && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-white/10 text-slate-300">
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-[var(--bg-card)] text-[var(--text-secondary)] border border-[var(--border-subtle)]">
                           {t.category}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-300 font-sans">{t.event}</p>
+                    <p className="text-xs text-[var(--text-secondary)] font-sans">{t.event}</p>
                   </div>
                 </div>
               ))}
@@ -563,15 +552,15 @@ export default function ScientistDetailModal({
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Mentors */}
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="text-xs font-mono font-bold text-cyan-400 flex items-center gap-1.5 uppercase">
-                    <GraduationCap className="w-4 h-4" /> Academic Mentors &amp; Advisors:
+                <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-2">
+                  <div className="text-xs font-mono font-bold text-[var(--text-primary)] flex items-center gap-1.5 uppercase">
+                    <GraduationCap className="w-4 h-4 text-[var(--text-muted)]" /> Academic Mentors &amp; Advisors:
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {scientist.mentors?.map((m, i) => (
                       <span
                         key={i}
-                        className="px-2.5 py-1 rounded-xl text-xs font-mono bg-cyan-950/40 border border-cyan-500/30 text-cyan-200"
+                        className="px-2.5 py-1 rounded-xl text-xs font-mono bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)]"
                       >
                         {m}
                       </span>
@@ -580,15 +569,15 @@ export default function ScientistDetailModal({
                 </div>
 
                 {/* Students */}
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5 uppercase">
-                    <Users className="w-4 h-4" /> Notable Students &amp; Protégés:
+                <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-2">
+                  <div className="text-xs font-mono font-bold text-[var(--text-primary)] flex items-center gap-1.5 uppercase">
+                    <Users className="w-4 h-4 text-[var(--text-muted)]" /> Notable Students &amp; Protégés:
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {scientist.students?.map((s, i) => (
                       <span
                         key={i}
-                        className="px-2.5 py-1 rounded-xl text-xs font-mono bg-emerald-950/40 border border-emerald-500/30 text-emerald-200"
+                        className="px-2.5 py-1 rounded-xl text-xs font-mono bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)]"
                       >
                         {s}
                       </span>
@@ -599,15 +588,15 @@ export default function ScientistDetailModal({
 
               {/* Collaborators */}
               {scientist.collaborators && scientist.collaborators.length > 0 && (
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="text-xs font-mono font-bold text-purple-400 flex items-center gap-1.5 uppercase">
-                    <Users className="w-4 h-4" /> Key Scientific Collaborators:
+                <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-2">
+                  <div className="text-xs font-mono font-bold text-[var(--text-primary)] flex items-center gap-1.5 uppercase">
+                    <Users className="w-4 h-4 text-[var(--text-muted)]" /> Key Scientific Collaborators:
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {scientist.collaborators.map((c, i) => (
                       <span
                         key={i}
-                        className="px-2.5 py-1 rounded-xl text-xs font-mono bg-purple-950/40 border border-purple-500/30 text-purple-200"
+                        className="px-2.5 py-1 rounded-xl text-xs font-mono bg-[var(--bg-card)] border border-[var(--border-subtle)] text-[var(--text-secondary)]"
                       >
                         {c}
                       </span>
@@ -622,19 +611,19 @@ export default function ScientistDetailModal({
           {activeTab === 'awards' && (
             <div className="space-y-4">
               {/* Nobel Section */}
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1.5">
+              <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-amber-500/30 space-y-1.5">
                 <div className="text-xs font-mono font-black text-amber-400 uppercase flex items-center gap-1.5">
-                  <Award className="w-4 h-4" /> Nobel Prize Citation &amp; Highest Recognition:
+                  <Award className="w-4 h-4 text-amber-400" /> Nobel Prize Citation &amp; Highest Recognition:
                 </div>
-                <p className="text-xs text-slate-200 font-sans leading-relaxed">{scientist.nobel}</p>
+                <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">{scientist.nobel}</p>
               </div>
 
               {/* Awards List */}
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="text-xs font-mono font-bold text-cyan-400 uppercase">
+              <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-2">
+                <div className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase">
                   Major Medals &amp; Honors:
                 </div>
-                <ul className="list-disc pl-5 space-y-1 text-xs text-slate-300 font-sans">
+                <ul className="list-disc pl-5 space-y-1 text-xs text-[var(--text-secondary)] font-sans">
                   {scientist.awards?.map((a, i) => (
                     <li key={i}>{a}</li>
                   ))}
@@ -642,11 +631,11 @@ export default function ScientistDetailModal({
               </div>
 
               {/* Landmark Publications */}
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                <div className="text-xs font-mono font-bold text-purple-400 uppercase">
+              <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-2">
+                <div className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase">
                   Landmark Scientific Publications:
                 </div>
-                <ul className="list-disc pl-5 space-y-1 text-xs text-slate-300 font-sans">
+                <ul className="list-disc pl-5 space-y-1 text-xs text-[var(--text-secondary)] font-sans">
                   {scientist.publications?.map((p, i) => (
                     <li key={i}>
                       <em>{p}</em>
@@ -657,11 +646,11 @@ export default function ScientistDetailModal({
 
               {/* Historical Facts & Anecdotes */}
               {scientist.facts && scientist.facts.length > 0 && (
-                <div className="p-4 rounded-2xl bg-white/5 border border-white/10 space-y-2">
-                  <div className="text-xs font-mono font-bold text-emerald-400 uppercase">
+                <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-2">
+                  <div className="text-xs font-mono font-bold text-[var(--text-primary)] uppercase">
                     Curious Historical Facts &amp; Anecdotes:
                   </div>
-                  <ul className="list-disc pl-5 space-y-1 text-xs text-slate-300 font-sans">
+                  <ul className="list-disc pl-5 space-y-1 text-xs text-[var(--text-secondary)] font-sans">
                     {scientist.facts.map((fact, i) => (
                       <li key={i}>{fact}</li>
                     ))}
@@ -671,13 +660,13 @@ export default function ScientistDetailModal({
 
               {/* Sources */}
               {scientist.references && scientist.references.length > 0 && (
-                <div className="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-1.5">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase font-bold block">
+                <div className="p-4 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-1.5">
+                  <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase font-bold block">
                     Verified Archival References:
                   </span>
                   <div className="space-y-1">
                     {scientist.references.map((r, i) => (
-                      <div key={i} className="flex items-center gap-1.5 text-[11px] text-slate-400 font-mono">
+                      <div key={i} className="flex items-center gap-1.5 text-[11px] text-[var(--text-secondary)] font-mono">
                         <CheckCircle2 className="w-3 h-3 text-emerald-400 shrink-0" />
                         <span>{r}</span>
                       </div>
@@ -690,14 +679,14 @@ export default function ScientistDetailModal({
         </div>
 
         {/* ─── MODAL FOOTER ─────────────────────────────────────────────── */}
-        <div className="px-6 py-3 border-t border-white/10 flex items-center justify-between bg-black/50 shrink-0">
-          <span className="text-[10px] font-mono text-slate-400">
+        <div className="px-6 py-3 border-t border-[var(--border-subtle)] flex items-center justify-between bg-[var(--bg-inner)] shrink-0">
+          <span className="text-[10px] font-mono text-[var(--text-muted)]">
             ChemSpace Scientific Museum Archive • Profile ID: {scientist.id}
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl text-xs font-mono font-bold bg-white/10 hover:bg-white/15 text-slate-200 transition"
+            className="px-4 py-1.5 rounded-xl text-xs font-mono font-bold bg-[var(--btn-secondary-bg)] hover:bg-[var(--btn-secondary-hover)] text-[var(--btn-secondary-text)] border border-[var(--border-subtle)] transition"
           >
             Close Dossier
           </button>

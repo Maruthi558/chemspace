@@ -15,14 +15,14 @@ export default function ScientistCompareView({ onSelectScientist }) {
 
   return (
     <div className="space-y-6 select-none">
-      <div className="glass-panel p-6 rounded-3xl border border-white/10 space-y-2">
-        <div className="flex items-center gap-2 text-cyan-400">
-          <GitCompare className="w-5 h-5" />
-          <h2 className="text-base font-black text-white font-mono">
+      <div className="glass-panel p-6 rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-card)] space-y-2 shadow-sm">
+        <div className="flex items-center gap-2 text-[var(--text-primary)]">
+          <GitCompare className="w-5 h-5 text-[var(--text-muted)]" />
+          <h2 className="text-base font-black text-[var(--text-primary)] font-mono">
             Side-by-Side Pioneer Comparative Matrix
           </h2>
         </div>
-        <p className="text-xs text-slate-300 font-sans leading-relaxed">
+        <p className="text-xs text-[var(--text-secondary)] font-sans leading-relaxed">
           Compare scientific paradigms, major discoveries, mathematical models, signature chemical compounds, and historical impact between any two scientists.
         </p>
       </div>
@@ -46,8 +46,8 @@ export default function ScientistCompareView({ onSelectScientist }) {
         ].map(({ scientist, selectedId, setId, fc, label }) => (
           <div
             key={label}
-            className="glass-panel rounded-3xl overflow-hidden border space-y-4 shadow-2xl flex flex-col justify-between"
-            style={{ borderColor: `${fc.accent}40`, background: 'rgba(10, 14, 22, 0.95)' }}
+            className="glass-panel rounded-3xl overflow-hidden border space-y-4 shadow-sm flex flex-col justify-between"
+            style={{ borderColor: 'var(--border-subtle)', background: 'var(--bg-card)' }}
           >
             {/* Header Hero Portrait */}
             <div className="relative h-52 w-full">
@@ -57,8 +57,8 @@ export default function ScientistCompareView({ onSelectScientist }) {
                 size="compare"
               />
               <div
-                className="absolute top-0 inset-x-0 h-1"
-                style={{ background: `linear-gradient(90deg, transparent, ${fc.accent}, transparent)` }}
+                className="absolute top-0 inset-x-0 h-0.5 pointer-events-none"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)' }}
               />
               <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
                 <div>
@@ -72,8 +72,7 @@ export default function ScientistCompareView({ onSelectScientist }) {
                 <button
                   type="button"
                   onClick={() => onSelectScientist(scientist)}
-                  className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold transition flex items-center gap-1 shadow"
-                  style={{ background: fc.accent, color: '#03050a' }}
+                  className="px-3 py-1 rounded-xl text-[10px] font-mono font-bold transition flex items-center gap-1 shadow-sm bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] hover:bg-[var(--btn-primary-hover)]"
                 >
                   <span>Dossier</span>
                   <ArrowRight className="w-3 h-3" />
@@ -83,7 +82,7 @@ export default function ScientistCompareView({ onSelectScientist }) {
 
             {/* Selector Dropdown */}
             <div className="px-5">
-              <span className="text-[10px] font-mono font-bold uppercase text-slate-400 block mb-1">
+              <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-muted)] block mb-1">
                 Choose {label}:
               </span>
               <select
@@ -102,63 +101,63 @@ export default function ScientistCompareView({ onSelectScientist }) {
             {/* Structured Comparative Data */}
             <div className="px-5 pb-5 space-y-3.5 flex-1">
               {/* Field & Era */}
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                <span className="text-[10px] font-mono font-bold uppercase" style={{ color: fc.accent }}>
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-muted)]">
                   Discipline &amp; Historical Era:
                 </span>
-                <div className="text-xs font-mono text-white font-bold">{scientist.field}</div>
-                <div className="text-[11px] font-sans text-slate-400">{scientist.era}</div>
+                <div className="text-xs font-mono text-[var(--text-primary)] font-bold">{scientist.field}</div>
+                <div className="text-[11px] font-sans text-[var(--text-secondary)]">{scientist.era}</div>
               </div>
 
               {/* Major Discoveries */}
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1.5">
-                <span className="text-[10px] font-mono font-bold uppercase flex items-center gap-1" style={{ color: fc.accent }}>
-                  <FlaskConical className="w-3 h-3" /> Breakthrough Discoveries:
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-1.5">
+                <span className="text-[10px] font-mono font-bold uppercase flex items-center gap-1 text-[var(--text-muted)]">
+                  <FlaskConical className="w-3 h-3 text-[var(--text-muted)]" /> Breakthrough Discoveries:
                 </span>
                 <ul className="space-y-1.5">
                   {scientist.discoveries?.slice(0, 3).map((d, i) => (
-                    <li key={i} className="text-xs font-sans text-slate-300">
-                      <strong className="text-white font-mono">{d.title}:</strong> {d.description}
+                    <li key={i} className="text-xs font-sans text-[var(--text-secondary)]">
+                      <strong className="text-[var(--text-primary)] font-mono">{d.title}:</strong> {d.description}
                     </li>
                   ))}
                 </ul>
               </div>
 
               {/* Mathematical Equation / Model */}
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                <span className="text-[10px] font-mono font-bold uppercase" style={{ color: fc.accent }}>
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-[var(--text-muted)]">
                   Key Mathematical Formulation:
                 </span>
-                <div className="text-xs font-bold text-white font-mono">
+                <div className="text-xs font-bold text-[var(--text-primary)] font-mono">
                   {scientist.equations?.[0]?.name || 'N/A'}
                 </div>
                 <div
                   className="p-2.5 rounded-xl font-mono text-xs font-bold text-center overflow-x-auto shadow-inner"
-                  style={{ background: 'rgba(0,0,0,0.6)', color: fc.accent, border: `1px solid ${fc.accent}30` }}
+                  style={{ background: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border-subtle)' }}
                 >
                   {scientist.equations?.[0]?.formula || 'No formula recorded'}
                 </div>
               </div>
 
               {/* Signature Molecule */}
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                <span className="text-[10px] font-mono font-bold uppercase flex items-center gap-1" style={{ color: fc.accent }}>
-                  <Atom className="w-3 h-3" /> Signature Chemical Entity:
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase flex items-center gap-1 text-[var(--text-muted)]">
+                  <Atom className="w-3 h-3 text-[var(--text-muted)]" /> Signature Chemical Entity:
                 </span>
-                <div className="text-xs font-mono font-bold text-white">
+                <div className="text-xs font-mono font-bold text-[var(--text-primary)]">
                   {scientist.molecule?.name} ({scientist.molecule?.formula})
                 </div>
-                <div className="text-[11px] font-sans text-slate-400">
+                <div className="text-[11px] font-sans text-[var(--text-secondary)]">
                   {scientist.molecule?.description}
                 </div>
               </div>
 
               {/* Nobel & Honors */}
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 space-y-1">
-                <span className="text-[10px] font-mono font-bold uppercase text-amber-400 flex items-center gap-1">
-                  <Award className="w-3 h-3" /> Honors &amp; Awards:
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] space-y-1">
+                <span className="text-[10px] font-mono font-bold uppercase text-amber-500 flex items-center gap-1">
+                  <Award className="w-3 h-3 text-amber-400" /> Honors &amp; Awards:
                 </span>
-                <p className="text-xs font-sans text-slate-300">
+                <p className="text-xs font-sans text-[var(--text-secondary)]">
                   {scientist.nobel}
                 </p>
               </div>
