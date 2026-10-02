@@ -1,0 +1,390 @@
+{
+  "training_summary": {
+    "initial_vocab_size": 540,
+    "final_vocab_size": 4096,
+    "merges_count": 3556,
+    "target_vocab_size": 4096
+  },
+  "round_trip_tests": {
+    "total_tested": 21,
+    "passed": 21,
+    "failed": 0,
+    "details": [
+      {
+        "original": "H2O",
+        "tokens": [
+          "H",
+          "2",
+          "O"
+        ],
+        "token_ids": [
+          56,
+          34,
+          63
+        ],
+        "decoded": "H2O",
+        "exact_match": true
+      },
+      {
+        "original": "C6H6",
+        "tokens": [
+          "C",
+          "6",
+          "H",
+          "6"
+        ],
+        "token_ids": [
+          51,
+          38,
+          56,
+          38
+        ],
+        "decoded": "C6H6",
+        "exact_match": true
+      },
+      {
+        "original": "CH3COOH",
+        "tokens": [
+          "CH",
+          "3",
+          "COOH"
+        ],
+        "token_ids": [
+          938,
+          35,
+          361
+        ],
+        "decoded": "CH3COOH",
+        "exact_match": true
+      },
+      {
+        "original": "NaCl",
+        "tokens": [
+          "NaCl"
+        ],
+        "token_ids": [
+          355
+        ],
+        "decoded": "NaCl",
+        "exact_match": true
+      },
+      {
+        "original": "CCO",
+        "tokens": [
+          "CCO"
+        ],
+        "token_ids": [
+          2618
+        ],
+        "decoded": "CCO",
+        "exact_match": true
+      },
+      {
+        "original": "CC(=O)O",
+        "tokens": [
+          "CC",
+          "(",
+          "=",
+          "O",
+          ")",
+          "O"
+        ],
+        "token_ids": [
+          1207,
+          24,
+          45,
+          63,
+          25,
+          63
+        ],
+        "decoded": "CC(=O)O",
+        "exact_match": true
+      },
+      {
+        "original": "c1ccccc1",
+        "tokens": [
+          "c",
+          "1",
+          "ccccc",
+          "1"
+        ],
+        "token_ids": [
+          83,
+          33,
+          1617,
+          33
+        ],
+        "decoded": "c1ccccc1",
+        "exact_match": true
+      },
+      {
+        "original": "C=C",
+        "tokens": [
+          "C",
+          "=",
+          "C"
+        ],
+        "token_ids": [
+          51,
+          45,
+          51
+        ],
+        "decoded": "C=C",
+        "exact_match": true
+      },
+      {
+        "original": "C#N",
+        "tokens": [
+          "C",
+          "#",
+          "N"
+        ],
+        "token_ids": [
+          51,
+          19,
+          62
+        ],
+        "decoded": "C#N",
+        "exact_match": true
+      },
+      {
+        "original": "C(=O)O",
+        "tokens": [
+          "C",
+          "(",
+          "=",
+          "O",
+          ")",
+          "O"
+        ],
+        "token_ids": [
+          51,
+          24,
+          45,
+          63,
+          25,
+          63
+        ],
+        "decoded": "C(=O)O",
+        "exact_match": true
+      },
+      {
+        "original": "[Na+]",
+        "tokens": [
+          "[Na+]"
+        ],
+        "token_ids": [
+          3731
+        ],
+        "decoded": "[Na+]",
+        "exact_match": true
+      },
+      {
+        "original": "[OH-]",
+        "tokens": [
+          "[OH",
+          "-]"
+        ],
+        "token_ids": [
+          3636,
+          1403
+        ],
+        "decoded": "[OH-]",
+        "exact_match": true
+      },
+      {
+        "original": "\u0394G = \u0394H - T\u0394S",
+        "tokens": [
+          "\u0394",
+          "G",
+          " ",
+          "=",
+          " ",
+          "\u0394",
+          "H",
+          " ",
+          "-",
+          " ",
+          "T",
+          "\u0394",
+          "S"
+        ],
+        "token_ids": [
+          141,
+          55,
+          16,
+          45,
+          16,
+          141,
+          56,
+          16,
+          29,
+          16,
+          68,
+          141,
+          67
+        ],
+        "decoded": "\u0394G = \u0394H - T\u0394S",
+        "exact_match": true
+      },
+      {
+        "original": "1H NMR",
+        "tokens": [
+          "1",
+          "H",
+          " ",
+          "NMR"
+        ],
+        "token_ids": [
+          33,
+          56,
+          16,
+          477
+        ],
+        "decoded": "1H NMR",
+        "exact_match": true
+      },
+      {
+        "original": "13C NMR",
+        "tokens": [
+          "13",
+          "C",
+          " ",
+          "NMR"
+        ],
+        "token_ids": [
+          1193,
+          51,
+          16,
+          477
+        ],
+        "decoded": "13C NMR",
+        "exact_match": true
+      },
+      {
+        "original": "m/z",
+        "tokens": [
+          "m",
+          "/",
+          "z"
+        ],
+        "token_ids": [
+          93,
+          31,
+          106
+        ],
+        "decoded": "m/z",
+        "exact_match": true
+      },
+      {
+        "original": "kJ/mol",
+        "tokens": [
+          "kJ/mol"
+        ],
+        "token_ids": [
+          316
+        ],
+        "decoded": "kJ/mol",
+        "exact_match": true
+      },
+      {
+        "original": "mol/L",
+        "tokens": [
+          "mol/L"
+        ],
+        "token_ids": [
+          315
+        ],
+        "decoded": "mol/L",
+        "exact_match": true
+      },
+      {
+        "original": "A + B -> C",
+        "tokens": [
+          "A",
+          " ",
+          "+",
+          " ",
+          "B",
+          " ",
+          "-",
+          ">",
+          " ",
+          "C"
+        ],
+        "token_ids": [
+          49,
+          16,
+          27,
+          16,
+          50,
+          16,
+          29,
+          46,
+          16,
+          51
+        ],
+        "decoded": "A + B -> C",
+        "exact_match": true
+      },
+      {
+        "original": "6.022 \u00d7 10\u00b2\u00b3",
+        "tokens": [
+          "6.022",
+          " ",
+          "\u00d7",
+          " ",
+          "10",
+          "\u00b2",
+          "\u00b3"
+        ],
+        "token_ids": [
+          2427,
+          16,
+          164,
+          16,
+          916,
+          189,
+          190
+        ],
+        "decoded": "6.022 \u00d7 10\u00b2\u00b3",
+        "exact_match": true
+      },
+      {
+        "original": "1.75 \u00d7 10\u207b\u2075",
+        "tokens": [
+          "1.7",
+          "5",
+          " ",
+          "\u00d7",
+          " ",
+          "10",
+          "\u207b",
+          "\u2075"
+        ],
+        "token_ids": [
+          2568,
+          37,
+          16,
+          164,
+          16,
+          916,
+          199,
+          192
+        ],
+        "decoded": "1.75 \u00d7 10\u207b\u2075",
+        "exact_match": true
+      }
+    ]
+  },
+  "vocabulary_statistics": {
+    "vocabulary_size": 4096,
+    "merges_count": 3556,
+    "total_corpus_tokens": 145867,
+    "unique_tokens_used": 3333,
+    "vocabulary_utilization_rate": 81.37,
+    "unknown_tokens_count": 53,
+    "unknown_token_frequency_percent": 0.0363,
+    "average_tokens_per_sample": 107.89
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "curr_2026_cof_water_splitting",
+  "headline": "Overall Pure Water Splitting Using Covalent Organic Frameworks (COFs)",
+  "information": "Fully conjugated crystalline sp2 carbon-linked COF photocatalyst achieving overall water splitting without sacrificial reagents under visible light.",
+  "domain": "Materials Chemistry",
+  "subdomain": "photocatalysis",
+  "source": "Nature Energy",
+  "source_url": "https://doi.org/10.1038/s41560-025-01420-x",
+  "publication_date": "2025-2026",
+  "retrieval_date": "2026-10-01T09:43:59.967021+00:00",
+  "verification_status": "peer_reviewed",
+  "doi": null,
+  "chemical_entities": [
+    "COF",
+    "H2O",
+    "H2",
+    "O2"
+  ],
+  "tags": [
+    "photocatalysis",
+    "green_hydrogen",
+    "framework_materials"
+  ]
+}

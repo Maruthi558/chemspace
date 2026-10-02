@@ -1,0 +1,98 @@
+{
+  "entries": [
+    {
+      "id": "curr_2026_room_temp_sc",
+      "headline": "Nitrogen-Doped Lutetium Hydride Under Review",
+      "information": "Extensive independent laboratory replications evaluate high-pressure hydride phase diagrams and superconducting magnetic susceptibility thresholds.",
+      "domain": "Materials Chemistry",
+      "subdomain": "superconductivity",
+      "source": "Nature & Physical Review B Peer Reviews",
+      "source_url": "https://doi.org/10.1038/s41586-023-05742-0",
+      "publication_date": "2024-2026",
+      "retrieval_date": "2026-10-01T09:43:59.961629+00:00",
+      "verification_status": "peer_reviewed",
+      "doi": null,
+      "chemical_entities": [
+        "LuH3",
+        "Lu-N-H"
+      ],
+      "tags": [
+        "superconductivity",
+        "high-pressure",
+        "materials"
+      ]
+    },
+    {
+      "id": "curr_2026_co2_electrocatalysis",
+      "headline": "Direct Electrochemical CO2 Reduction to C2+ Products via Bimetallic Cu-Ag Interfaces",
+      "information": "Nanostructured tandem catalyst achieving >85% Faradaic efficiency toward ethylene and ethanol using zero-gap membrane electrode assemblies.",
+      "domain": "Physical Chemistry",
+      "subdomain": "electrocatalysis",
+      "source": "Journal of the American Chemical Society (JACS)",
+      "source_url": "https://doi.org/10.1021/jacs.c2co2reduction",
+      "publication_date": "2025-2026",
+      "retrieval_date": "2026-10-01T09:43:59.965423+00:00",
+      "verification_status": "peer_reviewed",
+      "doi": null,
+      "chemical_entities": [
+        "CO2",
+        "C2H4",
+        "C2H5OH",
+        "Cu-Ag"
+      ],
+      "tags": [
+        "electrocatalysis",
+        "green_chemistry",
+        "carbon_capture"
+      ]
+    },
+    {
+      "id": "curr_2026_cof_water_splitting",
+      "headline": "Overall Pure Water Splitting Using Covalent Organic Frameworks (COFs)",
+      "information": "Fully conjugated crystalline sp2 carbon-linked COF photocatalyst achieving overall water splitting without sacrificial reagents under visible light.",
+      "domain": "Materials Chemistry",
+      "subdomain": "photocatalysis",
+      "source": "Nature Energy",
+      "source_url": "https://doi.org/10.1038/s41560-025-01420-x",
+      "publication_date": "2025-2026",
+      "retrieval_date": "2026-10-01T09:43:59.967021+00:00",
+      "verification_status": "peer_reviewed",
+      "doi": null,
+      "chemical_entities": [
+        "COF",
+        "H2O",
+        "H2",
+        "O2"
+      ],
+      "tags": [
+        "photocatalysis",
+        "green_hydrogen",
+        "framework_materials"
+      ]
+    },
+    {
+      "id": "curr_2026_mof_water_harvesting",
+      "headline": "Autonomous Atmospheric Water Harvesting in Arid Climates Using Aluminum MOF-303",
+      "information": "Field deployment of customized metal-organic framework MOF-303 yielding >1.3 liters of pure drinking water per kilogram MOF daily at <20% relative humidity.",
+      "domain": "Materials Chemistry",
+      "subdomain": "porous_materials",
+      "source": "Science",
+      "source_url": "https://doi.org/10.1126/science.abf0832",
+      "publication_date": "2024-2026",
+      "retrieval_date": "2026-10-01T09:43:59.968486+00:00",
+      "verification_status": "peer_reviewed",
+      "doi": null,
+      "chemical_entities": [
+        "MOF-303",
+        "Al(OH)(PZDC)",
+        "H2O"
+      ],
+      "tags": [
+        "water_harvesting",
+        "mof",
+        "sustainability"
+      ]
+    }
+  ],
+  "last_updated": "2026-10-01T09:43:59.968672+00:00"
+}

@@ -10,9 +10,11 @@ import {
   AlertTriangle,
   Layers,
   CheckCircle2,
-  Info
+  Info,
+  ArrowRight
 } from 'lucide-react';
 import { quantumService } from '../../services/quantumService';
+import ButtonSpinner from '../common/ButtonSpinner';
 
 export default function QuantumConfigurator({
   config,
@@ -271,10 +273,11 @@ export default function QuantumConfigurator({
         <button
           onClick={onRun}
           disabled={isRunning}
-          className="btn-primary py-3.5 text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
+          className="btn-horizontal btn-orange py-3.5 text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center justify-center gap-2 shadow-lg group"
         >
-          {isRunning ? <Activity className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
-          {isRunning ? 'Solving Hamiltonian...' : 'Submit to Compute Engine'}
+          {isRunning ? <ButtonSpinner className="text-white" /> : <Zap className="w-4 h-4" />}
+          <span>{isRunning ? 'Solving Hamiltonian...' : 'Submit to Compute Engine'}</span>
+          {!isRunning && <ArrowRight className="w-3.5 h-3.5 arrow-micro text-white/80" />}
         </button>
       </div>
     </div>

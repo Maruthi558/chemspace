@@ -31,6 +31,7 @@ import {
 } from 'lucide-react';
 import ThreeMoleculeViewer from '../components/ThreeMoleculeViewer';
 import Molecule2DViewer from '../components/RDKit/Molecule2DViewer';
+import ButtonSpinner from '../components/common/ButtonSpinner';
 import {
   executePythonScript,
   parseMoleculeSMILES,
@@ -193,6 +194,10 @@ export default function AIChemistryLab() {
   const [processingStages, setProcessingStages] = useState([]);
   const [validationError, setValidationError] = useState(null);
 
+  const [executionCount, setExecutionCount] = useState(1);
+  const [executionDuration, setExecutionDuration] = useState('0.18s');
+  const [activeOutputTab, setActiveOutputTab] = useState('all');
+
   const fileInputRef = useRef(null);
   const lines = code.split('\n');
 
@@ -285,11 +290,12 @@ export default function AIChemistryLab() {
    * Executes Python RDKit Script
    */
   const runPythonScript = async () => {
+    const startTime = performance.now();
     setIsRunning(true);
     setKernelStatus('running');
     setConsoleOutput([
       { type: 'info', text: `[${new Date().toLocaleTimeString()}] Python 3.14 RDKit Kernel initialized...` },
-      { type: 'info', text: `[${new Date().toLocaleTimeString()}] Executing script in sandbox...` }
+      { type: 'info', text: `[${new Date().toLocaleTimeString()}] Executing cell [${executionCount}] in sandbox...` }
     ]);
 
     // Extract SMILES if present in code to update 2D/3D viewers
@@ -300,13 +306,16 @@ export default function AIChemistryLab() {
 
     try {
       const response = await executePythonScript(code);
+      const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
+      setExecutionDuration(`${elapsed}s`);
+      setExecutionCount((prev) => prev + 1);
 
       if (response && response.status === 'success' && response.stdout) {
         const splitLines = response.stdout.split('\n').filter(Boolean);
         setConsoleOutput((prev) => [
           ...prev,
           ...splitLines.map((l) => ({ type: 'stdout', text: l })),
-          { type: 'success', text: `✔ Execution completed successfully in 0.18s (Exit Code 0).` }
+          { type: 'success', text: `✔ Cell [${executionCount}] completed in ${elapsed}s (Exit Code 0).` }
         ]);
       } else {
         // Execution fallback based on active script context
@@ -315,7 +324,7 @@ export default function AIChemistryLab() {
           { type: 'stdout', text: `[RDKit Kernel] Executed ${selectedTemplateId} workflow.` },
           { type: 'stdout', text: `[RDKit Kernel] Processed target structure: ${extractedSmiles || targetSmiles}` },
           { type: 'stdout', text: `[RDKit Kernel] Computed molecular graph and 2D/3D embeddings.` },
-          { type: 'success', text: '✔ Execution finished in 0.15s (Exit Code 0).' }
+          { type: 'success', text: `✔ Cell [${executionCount}] finished in ${elapsed}s (Exit Code 0).` }
         ]);
       }
 
@@ -423,73 +432,54 @@ export default function AIChemistryLab() {
   };
 
   return (
-    <div className="workspace-container font-mono select-none">
-      {/* 1. WORKSPACE HEADER — Scientific Cloud IDE Controls */}
-      <div className="workspace-header">
-        {/* Left: IDE Title & RDKit Kernel Badge */}
+    <div className="workspace-container font-mono select-none space-y-4">
+      {/* 1. JUPYTER / COLAB NOTEBOOK TOOLBAR */}
+      <div className="glass-panel p-4 rounded-3xl border border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 shadow-lg">
+        {/* Left: Notebook File Title & Kernel Badge */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <div className="p-2.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400">
-              <FileCode className="w-5 h-5" />
+          <div className="p-2.5 rounded-2xl bg-orange-500/10 border border-orange-500/25 text-orange-400">
+            <FileCode className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm font-black tracking-wider text-[var(--text-primary)]">chemnova_rdkit_notebook.ipynb</h1>
+              <span className="telemetry-pill text-[9px] font-bold text-emerald-400 flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
+                Python 3.14 (RDKit Kernel)
+              </span>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-sm font-black tracking-wider text-[var(--text-primary)]">RDKit Scientific Laboratory</h1>
-                <span className="telemetry-pill text-[9px] font-bold">PYTHON 3.14 • RDKit C++</span>
-              </div>
-              <p className="text-[10px] text-[var(--text-secondary)] font-sans mt-0.5">
-                Input-driven computational chemistry, 2D/3D structure generation, and physicochemical analytics.
-              </p>
-            </div>
+            <p className="text-[10px] text-[var(--text-secondary)] font-sans mt-0.5">
+              Google-Colab interactive computational notebook • Python execution, 2D Kekulé, 3D conformers, &amp; Lipinski descriptors
+            </p>
           </div>
         </div>
 
-        {/* Center: Workflow Template Dropdown */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-[var(--text-secondary)] hidden lg:inline font-sans font-medium">Template:</span>
-          <select
-            value={selectedTemplateId}
-            onChange={(e) => handleTemplateChange(e.target.value)}
-            className="input-control w-auto py-1.5 px-3 text-xs font-bold"
-          >
-            {RDKIT_TEMPLATES.map((t) => (
-              <option key={t.id} value={t.id}>
-                {t.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Right: Action Buttons */}
+        {/* Center/Right: Action Buttons & Template Picker */}
         <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-[var(--text-secondary)] hidden xl:inline font-sans font-medium">Template:</span>
+            <select
+              value={selectedTemplateId}
+              onChange={(e) => handleTemplateChange(e.target.value)}
+              className="input-control w-auto py-1.5 px-3 text-xs font-bold"
+            >
+              {RDKIT_TEMPLATES.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <button
             onClick={runPythonScript}
             disabled={isRunning}
-            className="btn-horizontal btn-primary text-xs font-black shadow-lg transition active:scale-95"
-            title="Execute Python Script (Ctrl+Enter)"
+            className="btn-horizontal btn-orange text-xs font-bold shadow-lg transition active:scale-95 group"
+            title="Execute Cell (Shift+Enter or Ctrl+Enter)"
           >
-            <Play className={`w-3.5 h-3.5 fill-current ${isRunning ? 'animate-spin' : ''}`} />
-            <span>{isRunning ? 'Running...' : 'Run Code'}</span>
-          </button>
-
-          <button
-            onClick={() => setIsListening(!isListening)}
-            className={`btn-horizontal ${
-              isListening ? 'bg-rose-500 text-white animate-pulse' : 'btn-secondary'
-            }`}
-            title="Dictate code"
-          >
-            {isListening ? <MicOff className="w-3.5 h-3.5 text-white" /> : <Mic className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{isListening ? 'Listening...' : 'Dictate'}</span>
-          </button>
-
-          <button
-            onClick={handleLoadFromChemDraw}
-            className="btn-horizontal btn-secondary text-xs"
-            title="Load active molecule drawn in ChemDraw Studio"
-          >
-            <PenTool className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden md:inline">From ChemDraw</span>
+            {isRunning ? <ButtonSpinner className="text-white" /> : <Play className="w-3.5 h-3.5 fill-current" />}
+            <span>{isRunning ? 'Running...' : 'Run Cell'}</span>
+            {!isRunning && <ArrowRight className="w-3.5 h-3.5 arrow-micro text-white/80" />}
           </button>
 
           <button
@@ -521,6 +511,26 @@ export default function AIChemistryLab() {
           </button>
 
           <button
+            onClick={handleLoadFromChemDraw}
+            className="btn-horizontal btn-secondary text-xs"
+            title="Load active molecule drawn in ChemDraw Studio"
+          >
+            <PenTool className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden md:inline">From ChemDraw</span>
+          </button>
+
+          <button
+            onClick={() => setIsListening(!isListening)}
+            className={`btn-horizontal ${
+              isListening ? 'bg-rose-500 text-white animate-pulse' : 'btn-secondary'
+            }`}
+            title="Dictate code"
+          >
+            {isListening ? <MicOff className="w-3.5 h-3.5 text-white" /> : <Mic className="w-3.5 h-3.5" />}
+            <span className="hidden sm:inline">{isListening ? 'Listening...' : 'Voice'}</span>
+          </button>
+
+          <button
             onClick={() => fileInputRef.current?.click()}
             className="btn-horizontal btn-secondary"
             title="Upload Python Script (.py)"
@@ -538,7 +548,7 @@ export default function AIChemistryLab() {
 
           <button
             onClick={downloadScript}
-            className="btn-horizontal btn-accent"
+            className="btn-horizontal btn-secondary"
             title="Download Python Script"
           >
             <Download className="w-3.5 h-3.5" />
@@ -555,10 +565,10 @@ export default function AIChemistryLab() {
         </div>
       </div>
 
-      {/* 2. TOP INPUT BAR — Direct SMILES / Structure Entry */}
+      {/* 2. PARAMETER CELL — Quick SMILES Input */}
       <div className="glass-panel p-3.5 rounded-2xl border border-[var(--border-subtle)] flex flex-col sm:flex-row items-center gap-3">
         <div className="flex-1 relative w-full">
-          <Search className="w-4 h-4 text-emerald-500 absolute left-3.5 top-3" />
+          <Search className="w-4 h-4 text-orange-500 absolute left-3.5 top-3" />
           <input
             type="text"
             value={targetSmiles}
@@ -571,14 +581,14 @@ export default function AIChemistryLab() {
                 processMoleculeFromSmiles(targetSmiles);
               }
             }}
-            placeholder="Enter a SMILES string to calculate (e.g. CCO, c1ccccc1, CC(=O)OC1=CC=CC=C1C(=O)O)..."
-            className="input-control rounded-xl pl-10 pr-4 py-2.5 text-xs font-mono font-bold text-emerald-400"
+            placeholder="Parameter Input: Enter target SMILES (e.g. CCO, c1ccccc1, CC(=O)OC1=CC=CC=C1C(=O)O)..."
+            className="input-control rounded-xl pl-10 pr-4 py-2.5 text-xs font-mono font-bold text-orange-400"
           />
         </div>
 
         <button
           onClick={() => processMoleculeFromSmiles(targetSmiles)}
-          className="btn-horizontal btn-primary text-xs shrink-0 w-full sm:w-auto"
+          className="btn-horizontal btn-orange text-xs shrink-0 w-full sm:w-auto"
         >
           Parse Molecule
         </button>
@@ -592,187 +602,253 @@ export default function AIChemistryLab() {
         </div>
       )}
 
-      {/* 3. MAIN WORKSPACE GRID — Balanced Code Editor (Left) & Professional Output (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1 items-start">
-        {/* Left Column: Python Code Editor & Execution Console (6 Cols) */}
-        <div className="lg:col-span-6 flex flex-col gap-4">
-          {/* Code Editor */}
-          <div className="glass-panel rounded-3xl overflow-hidden flex flex-col border border-[var(--border-subtle)] shadow-xl">
-            <div className="px-4 py-2.5 border-b border-inherit flex items-center justify-between text-xs text-[var(--text-secondary)]">
-              <div className="flex items-center gap-2">
-                <Code className="w-4 h-4 text-emerald-400" />
-                <span className="font-bold text-[var(--text-primary)]">main_rdkit_workflow.py</span>
-                <span className="text-[10px] opacity-60 font-mono">({lines.length} lines)</span>
-              </div>
-
-              <button
-                onClick={copyCodeToClipboard}
-                className="telemetry-pill text-[10px]"
-              >
-                {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedCode ? 'Copied' : 'Copy'}</span>
-              </button>
-            </div>
-
-            {/* Textarea & Line Numbers */}
-            <div className="relative flex min-h-[340px] max-h-[420px] overflow-auto font-mono text-xs leading-relaxed inner-box border-none">
-              <div className="w-10 py-3 opacity-40 text-right pr-2 select-none border-r border-inherit shrink-0 font-bold">
-                {lines.map((_, i) => (
-                  <div key={i}>{i + 1}</div>
-                ))}
-              </div>
-
-              <textarea
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Tab') {
-                    e.preventDefault();
-                    const start = e.target.selectionStart;
-                    const end = e.target.selectionEnd;
-                    setCode(code.substring(0, start) + '    ' + code.substring(end));
-                  } else if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-                    e.preventDefault();
-                    runPythonScript();
-                  }
-                }}
-                className="flex-1 p-3 bg-transparent text-[var(--text-primary)] focus:outline-none resize-none font-mono text-xs leading-relaxed whitespace-pre font-medium"
-                spellCheck={false}
-              />
-            </div>
+      {/* ══════════════════════════════════════════════════════════════════════
+          GOOGLE-COLAB CELL 1: [ In [ n ]: ] — CODE CELL
+      ══════════════════════════════════════════════════════════════════════ */}
+      <div className="glass-panel rounded-3xl overflow-hidden border border-[var(--border-subtle)] shadow-xl relative group transition hover:border-orange-500/40">
+        {/* Cell Header */}
+        <div className="px-5 py-2.5 border-b border-inherit flex items-center justify-between text-xs bg-black/20">
+          <div className="flex items-center gap-2.5">
+            <span className="px-2.5 py-0.5 rounded-md font-mono font-black text-xs bg-orange-500/15 text-orange-400 border border-orange-500/30">
+              [ In [ {executionCount} ]: ]
+            </span>
+            <span className="font-bold text-[var(--text-primary)]">[ Code Cell ]</span>
+            <span className="text-[10px] text-[var(--text-muted)] font-mono">Python 3.14 • RDKit • {lines.length} lines</span>
           </div>
 
-          {/* RDKit Execution Terminal */}
-          <div className="glass-panel rounded-3xl overflow-hidden flex flex-col border border-[var(--border-subtle)] shadow-xl">
-            <div className="px-4 py-2.5 border-b border-inherit flex items-center justify-between text-xs font-mono text-[var(--text-secondary)]">
-              <div className="flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-emerald-400" />
-                <span className="font-bold text-[var(--text-primary)]">RDKit Kernel Console</span>
-              </div>
-              <span className="text-[10px] opacity-60">Status: {kernelStatus.toUpperCase()}</span>
-            </div>
-
-            <div className="p-3.5 space-y-1 bg-[#04060b] text-xs font-mono max-h-[200px] min-h-[140px] overflow-y-auto custom-scrollbar">
-              {consoleOutput.length === 0 ? (
-                <div className="text-slate-500 italic">Click "Run Code" or press Ctrl+Enter to execute RDKit Python code...</div>
-              ) : (
-                consoleOutput.map((log, idx) => (
-                  <div
-                    key={idx}
-                    className={`leading-relaxed ${
-                      log.type === 'info'
-                        ? 'text-slate-400'
-                        : log.type === 'stdout'
-                        ? 'text-emerald-300 font-bold'
-                        : log.type === 'success'
-                        ? 'text-emerald-400 font-bold'
-                        : 'text-rose-400 font-bold'
-                    }`}
-                  >
-                    {log.text}
-                  </div>
-                ))
-              )}
-            </div>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] text-[var(--text-muted)] hidden md:inline font-mono">Shift+Enter or Ctrl+Enter to run</span>
+            <button
+              onClick={copyCodeToClipboard}
+              className="telemetry-pill text-[10px]"
+            >
+              {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedCode ? 'Copied' : 'Copy'}</span>
+            </button>
           </div>
         </div>
 
-        {/* Right Column: Professional Molecular Output Workspace (6 Cols) */}
-        <div className="lg:col-span-6 flex flex-col gap-4">
-          {/* Main Visualizer Container with [2D View] and [3D View] tabs */}
-          <div className="glass-panel rounded-3xl p-5 border border-[var(--border-subtle)] space-y-4 shadow-xl flex flex-col justify-between">
-            {/* View Mode Switcher Header */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-inherit pb-3">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setViewMode('2d')}
-                  className={`px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                    viewMode === '2d'
-                      ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] shadow-md'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5 border border-transparent'
-                  }`}
-                >
-                  <Eye className="w-3.5 h-3.5 text-emerald-400" /> 2D Structure
-                </button>
-                <button
-                  onClick={() => setViewMode('3d')}
-                  className={`px-4 py-2 rounded-2xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                    viewMode === '3d'
-                      ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] shadow-md'
-                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5 border border-transparent'
-                  }`}
-                >
-                  <Box className="w-3.5 h-3.5 text-violet-400" /> 3D Conformer
-                </button>
-              </div>
-
-              {/* 3D Style Controls when 3D mode is active */}
-              {viewMode === '3d' && (
-                <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-[var(--border-subtle)]">
-                  {['ball-stick', 'space-fill', 'stick', 'wireframe'].map((style) => (
-                    <button
-                      key={style}
-                      onClick={() => setViewStyle3D(style)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold capitalize transition ${
-                        viewStyle3D === style
-                          ? 'bg-violet-600 text-white shadow-sm'
-                          : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                      }`}
-                    >
-                      {style.replace('-', ' ')}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Viewport Render: 2D or 3D */}
-            <div className="w-full min-h-[420px] max-h-[460px] flex items-center justify-center">
-              {viewMode === '2d' ? (
-                <Molecule2DViewer
-                  atoms={activeGraph.atoms}
-                  bonds={activeGraph.bonds}
-                  smiles={targetSmiles}
-                  formula={descriptors ? descriptors.formula : ''}
-                />
+        {/* Cell Content: Gutter + Monaco Editor */}
+        <div className="flex items-stretch min-h-[300px]">
+          {/* Colab Left Gutter: Circular Run Action */}
+          <div className="w-14 bg-black/30 border-r border-inherit flex flex-col items-center pt-4 shrink-0 select-none">
+            <button
+              onClick={runPythonScript}
+              disabled={isRunning}
+              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-md ${
+                isRunning
+                  ? 'bg-orange-500/20 text-orange-400 border border-orange-500/50'
+                  : 'bg-white/10 hover:bg-orange-500 text-white hover:shadow-orange-500/30 border border-white/15'
+              }`}
+              title="Run Cell (Shift+Enter or Ctrl+Enter)"
+            >
+              {isRunning ? (
+                <ButtonSpinner className="text-orange-400" />
               ) : (
-                <div className="w-full h-[420px] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[#03050a] shadow-inner">
-                  {active3dMolecule ? (
-                    <ThreeMoleculeViewer molecule={active3dMolecule} styleMode={viewStyle3D} />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-slate-500 font-mono">
-                      Generating 3D Cartesian conformer...
-                    </div>
-                  )}
-                </div>
+                <Play className="w-4 h-4 fill-current ml-0.5" />
               )}
-            </div>
+            </button>
+            <span className="text-[9px] font-mono text-[var(--text-muted)] mt-2 font-bold">
+              [{isRunning ? '*' : executionCount}]
+            </span>
           </div>
 
-          {/* Molecular Information & Lipinski Descriptor Matrix */}
-          {descriptors && (
-            <div className="glass-panel rounded-3xl p-5 border border-[var(--border-subtle)] space-y-4 shadow-xl">
+          {/* Line Numbers */}
+          <div className="w-10 py-3.5 opacity-40 text-right pr-2 select-none border-r border-inherit shrink-0 font-mono text-xs font-bold leading-relaxed">
+            {lines.map((_, i) => (
+              <div key={i}>{i + 1}</div>
+            ))}
+          </div>
+
+          {/* Code Textarea */}
+          <textarea
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = e.target.selectionStart;
+                const end = e.target.selectionEnd;
+                setCode(code.substring(0, start) + '    ' + code.substring(end));
+              } else if ((e.ctrlKey || e.metaKey || e.shiftKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runPythonScript();
+              }
+            }}
+            className="flex-1 p-3.5 bg-transparent text-[var(--text-primary)] focus:outline-none resize-none font-mono text-xs leading-relaxed whitespace-pre font-medium"
+            spellCheck={false}
+            rows={Math.max(lines.length + 2, 12)}
+          />
+        </div>
+      </div>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          GOOGLE-COLAB CELL 2: [ Out [ n ]: ] — OUTPUT CELL
+      ══════════════════════════════════════════════════════════════════════ */}
+      <div className="glass-panel rounded-3xl overflow-hidden border border-[var(--border-subtle)] shadow-xl relative transition">
+        {/* Output Cell Header */}
+        <div className="px-5 py-2.5 border-b border-inherit flex flex-wrap items-center justify-between gap-3 bg-black/20">
+          <div className="flex items-center gap-2.5">
+            <span className="px-2.5 py-0.5 rounded-md font-mono font-black text-xs bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+              [ Out [ {Math.max(1, executionCount - 1)} ]: ]
+            </span>
+            <span className="font-bold text-[var(--text-primary)]">[ Output Cell ]</span>
+            <span className="text-[10px] text-[var(--text-muted)] font-mono">
+              Duration: {executionDuration} • Exit: 0 • Status: {kernelStatus.toUpperCase()}
+            </span>
+          </div>
+
+          {/* Output Sub-view Selector Tabs */}
+          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-[var(--border-subtle)]">
+            {[
+              { id: 'all', label: 'All Artifacts' },
+              { id: 'visual', label: 'Molecular View' },
+              { id: 'terminal', label: 'Terminal Stdout' },
+              { id: 'descriptors', label: 'Lipinski Matrix' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveOutputTab(tab.id)}
+                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition ${
+                  activeOutputTab === tab.id
+                    ? 'bg-orange-500 text-white shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Output Cell Body */}
+        <div className="p-5 space-y-5">
+          {/* Sub-cell: Terminal stdout stream */}
+          {(activeOutputTab === 'all' || activeOutputTab === 'terminal') && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+                <span className="font-bold flex items-center gap-2">
+                  <Terminal className="w-3.5 h-3.5 text-emerald-400" /> Standard Output (stdout):
+                </span>
+                <span className="text-[10px] opacity-60 font-mono">Live RDKit C++ Kernel Stream</span>
+              </div>
+              <div className="p-3.5 rounded-2xl bg-[#04060b] text-xs font-mono max-h-[180px] overflow-y-auto custom-scrollbar border border-white/5">
+                {consoleOutput.length === 0 ? (
+                  <div className="text-slate-500 italic">Click "Run Cell" or press Shift+Enter to execute code...</div>
+                ) : (
+                  consoleOutput.map((log, idx) => (
+                    <div
+                      key={idx}
+                      className={`leading-relaxed ${
+                        log.type === 'info'
+                          ? 'text-slate-400'
+                          : log.type === 'stdout'
+                          ? 'text-emerald-300 font-bold'
+                          : log.type === 'success'
+                          ? 'text-emerald-400 font-bold'
+                          : 'text-rose-400 font-bold'
+                      }`}
+                    >
+                      {log.text}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-cell: Visual Molecular Workspace (2D Kekule / 3D Conformer) */}
+          {(activeOutputTab === 'all' || activeOutputTab === 'visual') && (
+            <div className="p-4 rounded-2xl inner-box border border-[var(--border-subtle)] space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-inherit pb-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setViewMode('2d')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+                      viewMode === '2d'
+                        ? 'btn-orange text-white shadow-sm'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5'
+                    }`}
+                  >
+                    <Eye className="w-3.5 h-3.5" /> 2D Kekulé Graph
+                  </button>
+                  <button
+                    onClick={() => setViewMode('3d')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
+                      viewMode === '3d'
+                        ? 'btn-orange text-white shadow-sm'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5'
+                    }`}
+                  >
+                    <Box className="w-3.5 h-3.5" /> 3D Cartesian Conformer
+                  </button>
+                </div>
+
+                {viewMode === '3d' && (
+                  <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-[var(--border-subtle)]">
+                    {['ball-stick', 'space-fill', 'stick', 'wireframe'].map((style) => (
+                      <button
+                        key={style}
+                        onClick={() => setViewStyle3D(style)}
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold capitalize transition ${
+                          viewStyle3D === style
+                            ? 'bg-orange-500 text-white shadow-sm'
+                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                        }`}
+                      >
+                        {style.replace('-', ' ')}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="w-full min-h-[380px] max-h-[460px] flex items-center justify-center">
+                {viewMode === '2d' ? (
+                  <Molecule2DViewer
+                    atoms={activeGraph.atoms}
+                    bonds={activeGraph.bonds}
+                    smiles={targetSmiles}
+                    formula={descriptors ? descriptors.formula : ''}
+                  />
+                ) : (
+                  <div className="w-full h-[400px] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[#03050a] shadow-inner">
+                    {active3dMolecule ? (
+                      <ThreeMoleculeViewer molecule={active3dMolecule} styleMode={viewStyle3D} />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-xs text-slate-500 font-mono">
+                        Generating 3D Cartesian conformer...
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-cell: Physicochemical Descriptors & Lipinski Matrix */}
+          {(activeOutputTab === 'all' || activeOutputTab === 'descriptors') && descriptors && (
+            <div className="p-4 rounded-2xl inner-box border border-[var(--border-subtle)] space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-inherit pb-3">
                 <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-emerald-400" />
+                  <Activity className="w-4 h-4 text-orange-400" />
                   <h3 className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)]">
-                    Computed RDKit Physicochemical Properties
+                    Computed RDKit Physicochemical Properties &amp; Lipinski Matrix
                   </h3>
                 </div>
                 <span className={`text-[10px] font-bold px-3 py-1 rounded-full border ${
                   descriptors.lipinskiPassed
-                    ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/30'
-                    : 'bg-amber-500/10 text-amber-500 border-amber-500/30'
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                    : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
                 }`}>
                   Lipinski Rule of 5: {descriptors.lipinskiPassed ? 'PASSED (Drug-like candidate)' : 'VIOLATED'}
                 </span>
               </div>
 
-              {/* 8-Card Metric Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div className="p-3.5 rounded-2xl inner-box space-y-1">
                   <span className="text-[10px] text-[var(--text-secondary)] font-sans">Formula</span>
-                  <div className="text-base font-black text-emerald-400 font-mono">{descriptors.formula}</div>
+                  <div className="text-base font-black text-orange-400 font-mono">{descriptors.formula}</div>
                 </div>
 
                 <div className="p-3.5 rounded-2xl inner-box space-y-1">
@@ -848,7 +924,7 @@ export default function AIChemistryLab() {
             </div>
             <button
               onClick={() => setShowSettingsModal(false)}
-              className="w-full btn-horizontal btn-primary text-xs"
+              className="w-full btn-horizontal btn-orange text-xs font-bold"
             >
               Save IDE Configuration
             </button>

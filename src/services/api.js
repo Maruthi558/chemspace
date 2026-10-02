@@ -4,6 +4,7 @@ import {
   computePhysicochemicalDescriptors,
   parseSmilesTo2D
 } from './chemicalGraph.js';
+import { loadingManager } from './loadingManager.js';
 
 const API_BASE = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) || '';
 const API_URL = API_BASE ? `${API_BASE}/api` : '/api';
@@ -23,6 +24,7 @@ export async function request(path, options = {}) {
     headers.Authorization = `Bearer ${token}`;
   }
 
+  loadingManager.start();
   try {
     const response = await fetch(`${API_URL}${path}`, {
       ...options,
@@ -36,6 +38,8 @@ export async function request(path, options = {}) {
   } catch (err) {
     console.warn(`[ChemSpace API] Notice: ${path} using high-fidelity local engine (${err.message}).`);
     return { status: 'fallback', message: err.message };
+  } finally {
+    loadingManager.finish();
   }
 }
 

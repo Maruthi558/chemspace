@@ -1,0 +1,15 @@
+{
+  "experiment_name": "chemnova_foundation_v1",
+  "batch_size": 4,
+  "learning_rate": 0.0003,
+  "weight_decay": 0.01,
+  "epochs": 10,
+  "warmup_steps": 100,
+  "grad_clip": 1.0,
+  "eval_interval": 50,
+  "save_interval": 200,
+  "dataset_config": {
+    "max_seq_len": 512,
+    "stride": 256
+  }
+}

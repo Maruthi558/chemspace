@@ -1,0 +1,23 @@
+{
+  "id": "curr_2026_mof_water_harvesting",
+  "headline": "Autonomous Atmospheric Water Harvesting in Arid Climates Using Aluminum MOF-303",
+  "information": "Field deployment of customized metal-organic framework MOF-303 yielding >1.3 liters of pure drinking water per kilogram MOF daily at <20% relative humidity.",
+  "domain": "Materials Chemistry",
+  "subdomain": "porous_materials",
+  "source": "Science",
+  "source_url": "https://doi.org/10.1126/science.abf0832",
+  "publication_date": "2024-2026",
+  "retrieval_date": "2026-10-01T09:43:59.968486+00:00",
+  "verification_status": "peer_reviewed",
+  "doi": null,
+  "chemical_entities": [
+    "MOF-303",
+    "Al(OH)(PZDC)",
+    "H2O"
+  ],
+  "tags": [
+    "water_harvesting",
+    "mof",
+    "sustainability"
+  ]
+}

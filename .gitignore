@@ -52,3 +52,25 @@ Thumbs.db
 # Temporary / OS
 tmp/
 temp/
+
+# Self-Hosted Chemistry LLM Weights & Checkpoints (Prevent accidental commit)
+*.pt
+*.bin
+*.pth
+*.safetensors
+*.gguf
+chemistry_llm/models/base/*
+!chemistry_llm/models/base/.gitkeep
+chemistry_llm/models/checkpoints/*
+!chemistry_llm/models/checkpoints/.gitkeep
+chemistry_llm/models/adapters/*
+!chemistry_llm/models/adapters/.gitkeep
+chemistry_llm/data/raw/*
+!chemistry_llm/data/raw/.gitkeep
+chemistry_llm/data/cleaned/*
+!chemistry_llm/data/cleaned/.gitkeep
+chemistry_llm/data/processed/*
+!chemistry_llm/data/processed/.gitkeep
+chemistry_llm/data/evaluation/*
+!chemistry_llm/data/evaluation/.gitkeep
+

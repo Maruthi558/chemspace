@@ -1,0 +1,38 @@
+# Model weights, tensors, and checkpoints
+models/base/*
+!models/base/.gitkeep
+models/checkpoints/*
+!models/checkpoints/.gitkeep
+models/adapters/*
+!models/adapters/.gitkeep
+
+*.bin
+*.pt
+*.pth
+*.safetensors
+*.gguf
+*.onnx
+
+# Data files
+data/raw/*
+!data/raw/.gitkeep
+data/cleaned/*
+!data/cleaned/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/evaluation/*
+!data/evaluation/.gitkeep
+
+*.parquet
+*.jsonl
+*.csv
+*.arrow
+
+# Environment & local secrets
+.env
+.env.local
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/

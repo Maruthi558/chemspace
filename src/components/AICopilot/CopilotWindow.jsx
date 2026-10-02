@@ -4,252 +4,266 @@ import {
   Send,
   Mic,
   MicOff,
-  Bot,
-  Terminal,
-  Activity,
-  History,
-  Trash2,
+  Sparkles,
+  Minus,
   Maximize2,
   Minimize2,
-  RotateCcw,
-  StopCircle,
-  Paperclip,
+  Trash2,
+  Square,
+  Sliders,
   Volume2,
   VolumeX,
-  FileText,
-  CheckCircle2,
-  ArrowRight,
-  Code,
-  Compass,
-  Zap,
-  Play,
-  Atom
+  Radio,
+  Paperclip,
+  FileText
 } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
 import { aiCopilot } from '../../services/aiCopilotService';
 import { useTheme } from '../../context/ThemeContext';
 import ChatMessage from './ChatMessage';
 import VoiceVisualizer from './VoiceVisualizer';
-import ChemistryCard from './ChemistryCard';
-import SuggestedActions from './SuggestedActions';
-import { getUserPreferences } from '../../services/userPreferences';
+import CircularVoiceButton from './CircularVoiceButton';
+import AILoader from '../loading/AILoader';
 
-export default function CopilotWindow({ onClose }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { theme, setTheme } = useTheme();
+const INITIAL_WELCOME_MESSAGE = {
+  role: 'assistant',
+  content: "Hello! I am **ChemSpace AI**, your chemistry and science assistant. I'm here to answer chemical concepts, solve calculations, explain mechanisms, analyze spectra, or explore scientific topics with you.\n\nHow can I help you today?",
+  timestamp: new Date().toISOString()
+};
+
+export default function CopilotWindow({ isOpen = true, onClose, onOpen }) {
+  const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState([
-    {
-      role: 'assistant',
-      content: "Hello! I am **ChemBot**, your scientific lab assistant on ChemSpace. 👋\n\nI can resolve chemical names to verified SMILES strings, calculate molecular formulas and weights, answer chemistry questions, or guide you to any interactive tool on the site:\n- 🧪 **Chemical Name $\\to$ SMILES**: Try *'Give me the SMILES for ethanol'* or *'Caffeine'*.\n- 🎨 **ChemDraw Studio**: 2D drawing & 3D conformer optimization\n- 🐍 **RDKit Lab**: Molecular descriptors & Python scripting\n- ⚛️ **Quantum Chemistry**: DFT & HOMO-LUMO calculations\n- 📊 **Spectroscopy Suite**: FTIR, NMR, MS & UV-Vis\n\nHow can I help your research today?",
-      suggestedActions: [
-        'Give me the SMILES for ethanol',
-        'SMILES of caffeine',
-        'Draw Benzene in ChemDraw',
-        'Calculate Lipinski Descriptors'
-      ]
-    }
-  ]);
+  const [messages, setMessages] = useState([INITIAL_WELCOME_MESSAGE]);
+  const [selectedLanguage, setSelectedLanguage] = useState('auto');
 
-  const [micState, setMicState] = useState('idle'); // 'idle' | 'listening' | 'processing' | 'speaking'
-  const [liveTranscript, setLiveTranscript] = useState('');
-  const [ttsEnabled, setTtsEnabled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isThinking, setIsThinking] = useState(false);
+  // Window Display States
   const [isMinimized, setIsMinimized] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
+
+  // Execution States
+  const [isLoading, setIsLoading] = useState(false);
   const [abortController, setAbortController] = useState(null);
   const [attachedFile, setAttachedFile] = useState(null);
-  const [actionNotice, setActionNotice] = useState(null);
+
+  // Voice States
+  const [voiceConfig, setVoiceConfig] = useState(aiCopilot.getVoiceSettings());
+  const [showVoiceSettings, setShowVoiceSettings] = useState(false);
+  const [availableVoices, setAvailableVoices] = useState([]);
+  const [micState, setMicState] = useState('idle'); // 'idle' | 'listening' | 'processing' | 'speaking'
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [liveTranscript, setLiveTranscript] = useState('');
 
   const scrollRef = useRef(null);
+  const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
-  const textInputRef = useRef(null);
+  const recordingTimerRef = useRef(null);
 
+  // Scroll to bottom on new messages or stream chunks
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, isLoading, isThinking, liveTranscript]);
+  }, [messages, isLoading, liveTranscript]);
 
+  // Load available speech voices
   useEffect(() => {
-    // Theme switch listener dispatched from AI
-    const handleThemeSwitch = (e) => {
-      if (e.detail && e.detail.theme) {
-        setTheme(e.detail.theme);
-      }
+    const loadVoices = () => {
+      setAvailableVoices(aiCopilot.getAvailableVoices());
     };
-    window.addEventListener('chemspace-theme-switch', handleThemeSwitch);
-    return () => window.removeEventListener('chemspace-theme-switch', handleThemeSwitch);
-  }, [setTheme]);
-
-  /**
-   * Handle sending a query to the AI Copilot
-   */
-  const handleSend = async (textOverride = null, isRegenerate = false) => {
-    const text = (textOverride || query).trim();
-    if (!text && !attachedFile && !isRegenerate) return;
-
-    let fullPrompt = text;
-    let currentAttached = attachedFile;
-
-    if (currentAttached) {
-      fullPrompt = `[Attached File: ${currentAttached.name} (${currentAttached.type})]\n${currentAttached.content}\n\nUser Request: ${text || 'Please inspect this scientific file, identify the molecular data or script, and suggest next steps.'}`;
+    loadVoices();
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = loadVoices;
     }
+    return () => {
+      aiCopilot.interruptAll();
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+    };
+  }, []);
 
-    if (!isRegenerate) {
-      setQuery('');
-      setAttachedFile(null);
-      setLiveTranscript('');
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'user',
-          content: text || `Uploaded file: ${currentAttached?.name}`,
-          attachedFileName: currentAttached?.name
-        }
-      ]);
-    } else {
-      setMessages((prev) => prev.slice(0, -1));
-    }
-
-    setIsLoading(true);
-    setIsThinking(true);
-    setActionNotice(null);
-    const controller = new AbortController();
-    setAbortController(controller);
-
-    try {
-      const prefs = getUserPreferences();
-      const activeMolecule = localStorage.getItem('chemspace_active_molecule') || null;
-      const activeScientist = localStorage.getItem('chemspace_selected_scientist') || null;
-
-      const contextPayload = {
-        currentPath: location.pathname,
-        activeMolecule,
-        activeScientist,
-        preferredLanguage: prefs.language,
-        responseMode: prefs.aiResponseMode
-      };
-
-      const result = await aiCopilot.sendMessage(fullPrompt, contextPayload, controller.signal);
-
-      // Transition loading state smoothly when response begins streaming
-      setIsThinking(false);
-
-      const aiMessage = {
-        role: 'assistant',
-        content: '',
-        thinkingSteps: result.thinkingSteps || [],
-        moleculeCard: result.moleculeCard,
-        codeBlock: result.codeBlock,
-        suggestedActions: result.suggestedActions || []
-      };
-
-      setMessages((prev) => [...prev, aiMessage]);
-
-      // Stream response chunks smoothly
-      for await (const chunk of aiCopilot.streamResponse(result.responseText, controller.signal)) {
-        if (controller.signal.aborted) break;
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          newMessages[newMessages.length - 1].content = chunk;
-          return newMessages;
-        });
-      }
-
-      // Handle Safe Navigation Action
-      if (result.navigationTarget) {
-        setActionNotice(`Navigating to ${result.targetName || result.navigationTarget}...`);
-        setTimeout(() => {
-          if (!controller.signal.aborted) {
-            navigate(result.navigationTarget);
-            setActionNotice(null);
-          }
-        }, 1500);
-      }
-
-      // If TTS enabled, voice was used, or autoRead preference is on, speak the response
-      if (ttsEnabled || micState === 'processing' || prefs.autoRead) {
-        aiCopilot.speak(result.responseText);
-        setMicState('speaking');
-        setTimeout(() => {
-          setMicState('idle');
-        }, Math.min(10000, result.responseText.length * 70));
-      }
-    } catch (error) {
-      if (error.name !== 'AbortError') {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: 'assistant',
-            content: "I encountered an issue processing that scientific request. Please verify the chemical name or input syntax and try again."
-          }
-        ]);
-      }
-    } finally {
-      setIsLoading(false);
-      setIsThinking(false);
-      setAbortController(null);
-    }
+  const updateVoiceSetting = (key, value) => {
+    let updated;
+    if (key === 'voiceGender') updated = aiCopilot.setVoiceGender(value);
+    else if (key === 'speechSpeed') updated = aiCopilot.setSpeechSpeed(value);
+    else if (key === 'voiceOutput') updated = aiCopilot.setVoiceOutput(value);
+    else if (key === 'selectedVoiceURI') updated = aiCopilot.setSelectedVoiceURI(value);
+    else if (key === 'conversationalMode') updated = aiCopilot.setConversationalMode(value);
+    setVoiceConfig({ ...updated });
   };
 
   /**
-   * Stops current generation & TTS
+   * CANCEL / STOP: Mandatory control to immediately cancel generation, voice playback, or recording
    */
   const handleStop = () => {
     if (abortController) {
       abortController.abort();
-      setIsLoading(false);
-      setIsThinking(false);
       setAbortController(null);
     }
-    aiCopilot.stopSpeaking();
-    aiCopilot.stopListening();
+    aiCopilot.interruptAll();
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+    setIsLoading(false);
     setMicState('idle');
+    setRecordingSeconds(0);
+    setLiveTranscript('');
   };
 
   /**
-   * Toggles Voice Dictation
+   * SEND ACTION: Streams response from backend or uses fallback
    */
+  const handleSend = async (textOverride = null) => {
+    const text = (textOverride || query).trim();
+    if (!text && !attachedFile) return;
+
+    // Interrupt any active voice playback before new query
+    aiCopilot.stopSpeaking();
+
+    const currentAttached = attachedFile;
+    let fullPrompt = text;
+    if (currentAttached) {
+      fullPrompt = `[Attached File: ${currentAttached.name}]\n${currentAttached.content}\n\n${text || 'Please inspect this scientific file.'}`;
+    }
+
+    setQuery('');
+    setAttachedFile(null);
+    setLiveTranscript('');
+
+    const userMessage = {
+      role: 'user',
+      content: text || `Attached: ${currentAttached?.name}`,
+      attachedFileName: currentAttached?.name,
+      timestamp: new Date().toISOString()
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
+    setIsLoading(true);
+
+    const controller = new AbortController();
+    setAbortController(controller);
+
+    // Initial placeholder AI message
+    const aiMessage = {
+      role: 'assistant',
+      content: '',
+      timestamp: new Date().toISOString()
+    };
+    setMessages((prev) => [...prev, aiMessage]);
+
+    try {
+      let accumulatedText = '';
+      for await (const chunk of aiCopilot.streamResponse(fullPrompt, { preferredLanguage: selectedLanguage }, controller.signal)) {
+        if (controller.signal.aborted) break;
+        accumulatedText = chunk.text;
+        setMessages((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = {
+            ...next[next.length - 1],
+            content: accumulatedText,
+            citations: chunk.citations?.length ? chunk.citations : next[next.length - 1].citations,
+            metadata: chunk.metadata && Object.keys(chunk.metadata).length ? chunk.metadata : next[next.length - 1].metadata,
+            tools: chunk.tools?.length ? chunk.tools : next[next.length - 1].tools,
+            tool_used: chunk.tool_used !== undefined ? chunk.tool_used : next[next.length - 1].tool_used,
+          };
+          return next;
+        });
+      }
+
+      // Voice output: Speak AI answer if voiceOutput is enabled or in conversational mode
+      if (accumulatedText && (voiceConfig.voiceOutput || voiceConfig.conversationalMode) && !controller.signal.aborted) {
+        setMicState('speaking');
+        aiCopilot.speak(
+          accumulatedText,
+          () => setMicState('speaking'),
+          () => {
+            setMicState('idle');
+            // If conversational hands-free loop active, listen for follow up
+            if (voiceConfig.conversationalMode && !controller.signal.aborted) {
+              setTimeout(() => {
+                startListeningSession();
+              }, 500);
+            }
+          },
+          () => setMicState('idle'),
+          selectedLanguage
+        );
+      } else {
+        setMicState('idle');
+      }
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        setMessages((prev) => {
+          const next = [...prev];
+          next[next.length - 1] = {
+            ...next[next.length - 1],
+            content: "I'm sorry, an unexpected error occurred while processing that request. Please try again."
+          };
+          return next;
+        });
+      }
+    } finally {
+      setIsLoading(false);
+      setAbortController(null);
+    }
+  };
+
+  /**
+   * VOICE RECOGNITION: Start speech-to-text
+   */
+  const startListeningSession = () => {
+    aiCopilot.stopSpeaking();
+    setMicState('listening');
+    setRecordingSeconds(0);
+    setLiveTranscript('');
+
+    if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+    recordingTimerRef.current = setInterval(() => {
+      setRecordingSeconds((prev) => prev + 1);
+    }, 1000);
+
+    aiCopilot.startListening(
+      (interim) => {
+        setLiveTranscript(interim);
+        setQuery(interim);
+      },
+      (final) => {
+        setLiveTranscript(final);
+        setQuery(final);
+        if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+
+        if (voiceConfig.conversationalMode && final.trim().length > 1) {
+          setMicState('processing');
+          handleSend(final);
+        } else {
+          setMicState('idle');
+        }
+      },
+      () => {
+        if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+        setMicState('idle');
+      },
+      () => {
+        if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
+        if (micState === 'listening') setMicState('idle');
+      },
+      selectedLanguage
+    );
+  };
+
   const toggleMic = () => {
     if (micState === 'listening') {
       aiCopilot.stopListening();
+      if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
       setMicState('idle');
-      if (liveTranscript.trim()) {
-        handleSend(liveTranscript);
-      }
     } else {
-      setMicState('listening');
-      setLiveTranscript('');
-      aiCopilot.startListening(
-        (interim) => {
-          setLiveTranscript(interim);
-        },
-        (final) => {
-          setLiveTranscript(final);
-          setMicState('processing');
-          handleSend(final);
-        },
-        (error) => {
-          console.warn('Voice recognition notice:', error);
-          setMicState('idle');
-          setActionNotice(typeof error === 'string' ? error : 'Voice dictation unavailable in this browser. Please use text input.');
-          setTimeout(() => setActionNotice(null), 4000);
-        },
-        () => {
-          if (micState === 'listening') setMicState('idle');
-        }
-      );
+      startListeningSession();
     }
   };
 
-  /**
-   * Handles local file attachment (.py, .mol, .sdf, .xyz, .csv, .txt, .json, .log)
-   */
+  const handleClearHistory = () => {
+    aiCopilot.clearHistory();
+    setMessages([INITIAL_WELCOME_MESSAGE]);
+  };
+
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -258,273 +272,362 @@ export default function CopilotWindow({ onClose }) {
     reader.onload = (evt) => {
       setAttachedFile({
         name: file.name,
-        size: `${(file.size / 1024).toFixed(1)} KB`,
-        type: file.name.split('.').pop().toUpperCase(),
         content: evt.target?.result || ''
       });
-      textInputRef.current?.focus();
+      textareaRef.current?.focus();
     };
     reader.readAsText(file);
   };
 
-  const handleClearHistory = () => {
-    aiCopilot.clearHistory();
-    setMessages([
-      {
-        role: 'assistant',
-        content: "Conversation history cleared. Ready for your next research task.",
-        suggestedActions: ["Analyze Aspirin", "Write RDKit Script", "Open Quantum Chemistry"]
-      }
-    ]);
-  };
-
-  const handleActionClick = (action) => {
-    handleSend(action);
-  };
-
-  const handleDeepAnalyzeCard = (cardData) => {
-    if (cardData?.smiles) {
-      try {
-        localStorage.setItem('chemspace_active_mol', JSON.stringify({ smiles: cardData.smiles, name: cardData.name }));
-      } catch (e) {}
-      navigate('/rdkit-lab');
-      onClose();
-    }
-  };
-
-  if (isMinimized) {
+  // =========================================================================
+  // 1. DEFAULT COLLAPSED / MINIMIZED STATE: Small Round AI Launcher Button
+  // =========================================================================
+  if (!isOpen || isMinimized) {
     return (
-      <div
-        onClick={() => setIsMinimized(false)}
-        className="fixed bottom-6 right-6 z-50 py-2.5 px-4 rounded-2xl bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] border border-[var(--border-subtle)] shadow-2xl cursor-pointer hover:opacity-95 transition flex items-center gap-2.5 font-mono text-xs font-bold"
-      >
-        <Bot className="w-4 h-4 text-emerald-500 animate-pulse" />
-        <span>ChemAI Copilot</span>
-        <Maximize2 className="w-3.5 h-3.5 opacity-60" />
-      </div>
+      <aside aria-label="ChemSpace AI Launcher" className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={() => {
+            setIsMinimized(false);
+            if (onOpen) onOpen();
+          }}
+          className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 via-amber-500 to-orange-400 text-white shadow-[0_4px_24px_rgba(249,115,22,0.4)] hover:shadow-[0_6px_30px_rgba(249,115,22,0.6)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border border-orange-300/40 group"
+          title="ChemSpace AI (Click to Open)"
+          aria-label="Open ChemSpace AI"
+        >
+          {/* Subtle Rotating Orbital Ring around the Launcher */}
+          <span className="absolute -inset-1 rounded-full border border-orange-400/30 animate-spin [animation-duration:8s] pointer-events-none" />
+          <Sparkles className="w-5 h-5 text-white transition-transform duration-200 group-hover:rotate-12" />
+        </button>
+      </aside>
     );
   }
 
+  // =========================================================================
+  // 2. EXPANDED FLOATING AI PANEL (Desktop & Mobile Responsive)
+  // =========================================================================
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-5 select-none font-mono">
-      <div
-        className={`glass-panel rounded-[32px] border border-[var(--border-subtle)] shadow-2xl flex flex-col overflow-hidden transition-all duration-200 ${
-          isMaximized ? 'w-full h-full max-w-[1280px] max-h-[92vh]' : 'w-full max-w-2xl h-[680px] max-h-[88vh]'
-        }`}
-      >
-        {/* 1. COPILOT HEADER */}
-        <div className="px-5 py-3.5 border-b border-inherit flex items-center justify-between bg-inherit shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 flex items-center justify-center shadow-sm">
-              <Bot className="w-5 h-5" />
-            </div>
+    <div
+      role="dialog"
+      aria-label="ChemSpace AI Assistant"
+      className={`fixed z-50 glass-panel rounded-2xl border border-[var(--border-subtle)] shadow-2xl flex flex-col overflow-hidden transition-all duration-200 font-sans ${
+        isMaximized
+          ? 'w-[calc(100vw-32px)] max-w-4xl h-[86vh] bottom-4 right-4 sm:bottom-6 sm:right-6'
+          : 'w-[440px] max-w-[calc(100vw-32px)] h-[620px] max-h-[calc(100vh-80px)] bottom-4 right-4 sm:bottom-6 sm:right-6'
+      }`}
+    >
+      {/* ── HEADER: Clean ChemSpace AI branding + Controls ──────────────── */}
+      <div className="px-4 py-3 border-b border-inherit flex items-center justify-between bg-[var(--bg-card)] shrink-0 select-none">
+        {/* Left: ChemSpace AI only */}
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <Sparkles className="w-4 h-4" />
+          </div>
+          <div className="flex items-center gap-2">
+            <h2 className="text-xs font-bold text-[var(--text-primary)]">ChemSpace AI</h2>
+            <span className="w-2 h-2 rounded-full bg-emerald-500" title="Online" />
+          </div>
+        </div>
+
+        {/* Right: Action Controls */}
+        <div className="flex items-center gap-1 text-[var(--text-secondary)]">
+          {/* Language Selector */}
+          <select
+            value={selectedLanguage}
+            onChange={(e) => {
+              setSelectedLanguage(e.target.value);
+              aiCopilot.setLanguage(e.target.value);
+            }}
+            className="px-2 py-1 rounded-lg text-[10px] bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] focus:outline-none cursor-pointer"
+            title="Language"
+          >
+            <option value="auto">Auto</option>
+            <option value="en">English</option>
+            <option value="te">తెలుగు</option>
+            <option value="hi">हिन्दी</option>
+          </select>
+
+          {/* Voice Settings Popover Toggle */}
+          <button
+            onClick={() => setShowVoiceSettings(!showVoiceSettings)}
+            className={`p-1.5 rounded-lg transition cursor-pointer ${
+              showVoiceSettings || voiceConfig.voiceOutput
+                ? 'bg-emerald-500/20 text-emerald-400'
+                : 'hover:bg-white/5'
+            }`}
+            title="Voice settings"
+          >
+            <Sliders className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Clear Conversation */}
+          <button
+            onClick={handleClearHistory}
+            className="p-1.5 rounded-lg hover:bg-white/5 transition cursor-pointer"
+            title="Clear chat"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Maximize / Restore */}
+          <button
+            onClick={() => setIsMaximized(!isMaximized)}
+            className="p-1.5 rounded-lg hover:bg-white/5 transition hidden sm:inline-flex cursor-pointer"
+            title={isMaximized ? 'Restore' : 'Maximize'}
+          >
+            {isMaximized ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+          </button>
+
+          {/* Mandatory Minimize Button: Collapses window, preserves conversation */}
+          <button
+            onClick={() => setIsMinimized(true)}
+            className="p-1.5 rounded-lg hover:bg-white/5 transition cursor-pointer"
+            title="Minimize"
+          >
+            <Minus className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Mandatory Close Button: Closes window, preserves state */}
+          <button
+            onClick={onClose}
+            className="p-1.5 rounded-lg hover:bg-rose-500/20 hover:text-rose-400 transition cursor-pointer"
+            title="Close"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {/* ── VOICE SETTINGS PANEL (Popover) ─────────────────────────────── */}
+      {showVoiceSettings && (
+        <div className="px-4 py-3 bg-[var(--bg-inner)] border-b border-inherit space-y-3 shrink-0 text-xs animate-in fade-in duration-150">
+          <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-1.5">
+            <span className="font-bold text-[var(--text-primary)]">Voice &amp; Audio Settings</span>
+            <button
+              onClick={() => setShowVoiceSettings(false)}
+              className="text-[var(--text-muted)] hover:text-[var(--text-primary)] font-medium text-xs cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {/* Voice Style / Gender */}
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-[var(--text-primary)]">ChemBot AI Assistant</h2>
-                <span className="telemetry-pill text-[9px]">LAB COPILOT</span>
+              <label className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold block mb-1">
+                Voice Tone
+              </label>
+              <div className="flex rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-0.5">
+                {['female', 'male', 'neutral'].map((g) => (
+                  <button
+                    key={g}
+                    onClick={() => updateVoiceSetting('voiceGender', g)}
+                    className={`flex-1 py-1 text-[10px] rounded-md font-semibold capitalize transition ${
+                      voiceConfig.voiceGender === g
+                        ? 'bg-emerald-500 text-white shadow-sm'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {g}
+                  </button>
+                ))}
               </div>
-              <p className="text-[10px] text-[var(--text-secondary)] font-mono">
-                Active Context: <strong className="text-emerald-500">{location.pathname}</strong>
-              </p>
+            </div>
+
+            {/* Speech Speed */}
+            <div>
+              <label className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider font-semibold block mb-1">
+                Speed
+              </label>
+              <div className="flex rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-0.5">
+                {[
+                  { id: 'slow', label: '0.85x' },
+                  { id: 'normal', label: '1.0x' },
+                  { id: 'fast', label: '1.2x' }
+                ].map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => updateVoiceSetting('speechSpeed', s.id)}
+                    className={`flex-1 py-1 text-[10px] rounded-md font-semibold transition ${
+                      voiceConfig.speechSpeed === s.id
+                        ? 'bg-emerald-500 text-white shadow-sm'
+                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 text-[var(--text-secondary)]">
-            {/* Audio Voice Toggle */}
+          {/* Voice Output Toggle & Hands-free Mode */}
+          <div className="flex items-center justify-between pt-1">
             <button
               onClick={() => {
-                setTtsEnabled(!ttsEnabled);
-                if (ttsEnabled) aiCopilot.stopSpeaking();
+                const next = !voiceConfig.voiceOutput;
+                updateVoiceSetting('voiceOutput', next);
+                if (!next) aiCopilot.stopSpeaking();
               }}
-              className={`p-2 rounded-xl transition ${
-                ttsEnabled ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30' : 'hover:bg-white/5'
+              className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
+                voiceConfig.voiceOutput
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : 'bg-[var(--bg-card)] border-[var(--border-subtle)] text-[var(--text-secondary)]'
               }`}
-              title={ttsEnabled ? 'Mute AI Voice Output' : 'Enable AI Voice Output'}
             >
-              {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              {voiceConfig.voiceOutput ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+              <span>Voice Readout: {voiceConfig.voiceOutput ? 'ON' : 'OFF'}</span>
             </button>
 
-            {/* Clear History */}
             <button
-              onClick={handleClearHistory}
-              className="p-2 rounded-xl hover:bg-white/5 transition"
-              title="Clear Conversation"
+              onClick={() => updateVoiceSetting('conversationalMode', !voiceConfig.conversationalMode)}
+              className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer ${
+                voiceConfig.conversationalMode
+                  ? 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30'
+                  : 'bg-[var(--bg-card)] border-[var(--border-subtle)] text-[var(--text-secondary)]'
+              }`}
+              title="Continuous conversational voice mode with automatic turn taking"
             >
-              <Trash2 className="w-4 h-4" />
-            </button>
-
-            {/* Maximize / Restore */}
-            <button
-              onClick={() => setIsMaximized(!isMaximized)}
-              className="p-2 rounded-xl hover:bg-white/5 transition hidden sm:inline-flex"
-              title={isMaximized ? 'Restore Size' : 'Maximize Window'}
-            >
-              {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-            </button>
-
-            {/* Minimize */}
-            <button
-              onClick={() => setIsMinimized(true)}
-              className="p-2 rounded-xl hover:bg-white/5 transition"
-              title="Minimize Copilot"
-            >
-              <span className="text-base leading-none font-bold">_</span>
-            </button>
-
-            {/* Close */}
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl hover:bg-rose-500/20 hover:text-rose-400 transition"
-              title="Close Copilot"
-            >
-              <X className="w-4 h-4" />
+              <Radio className={`w-3.5 h-3.5 ${voiceConfig.conversationalMode ? 'animate-pulse text-cyan-400' : ''}`} />
+              <span>Hands-Free Loop</span>
             </button>
           </div>
         </div>
+      )}
 
-        {/* Action Notice Bar (when AI executes safe platform action) */}
-        {actionNotice && (
-          <div className="px-5 py-2 bg-emerald-500/10 border-b border-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center gap-2 animate-pulse">
-            <Bot className="w-3.5 h-3.5" />
-            <span>{actionNotice}</span>
-          </div>
-        )}
+      {/* ── CONVERSATION STREAM ────────────────────────────────────────── */}
+      <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto space-y-3 bg-[var(--bg-main)]">
+        {messages.map((msg, idx) => (
+          <ChatMessage
+            key={idx}
+            message={msg}
+            isLast={idx === messages.length - 1}
+            onRegenerate={() => handleSend(messages[idx - 1]?.content)}
+          />
+        ))}
 
-        {/* 2. CONVERSATION MESSAGE STREAM */}
-        <div ref={scrollRef} className="flex-1 p-5 overflow-y-auto space-y-4 custom-scrollbar">
-          {messages.map((msg, idx) => (
-            <div key={idx}>
-              <ChatMessage message={msg} isLast={idx === messages.length - 1} />
-              {msg.moleculeCard && (
-                <div className="max-w-[85%] ml-11">
-                  <ChemistryCard data={msg.moleculeCard} onAnalyze={handleDeepAnalyzeCard} />
-                </div>
-              )}
-              {msg.suggestedActions && msg.suggestedActions.length > 0 && idx === messages.length - 1 && (
-                <div className="ml-11">
-                  <SuggestedActions actions={msg.suggestedActions} onAction={handleActionClick} />
-                </div>
-              )}
+        {/* Live Listening Waveform */}
+        {micState === 'listening' && (
+          <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 space-y-2 animate-in fade-in duration-150">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-cyan-400 flex items-center gap-1.5">
+                <Mic className="w-3.5 h-3.5 animate-pulse" />
+                Listening...
+              </span>
+              <VoiceVisualizer
+                state="listening"
+                durationSeconds={recordingSeconds}
+                onCancel={handleStop}
+              />
             </div>
-          ))}
-
-          {/* Live Voice Speech-to-Text Preview */}
-          {micState === 'listening' && (
-            <div className="p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs flex items-center justify-between gap-3 animate-pulse">
-              <div className="flex items-center gap-2">
-                <Mic className="w-4 h-4 text-cyan-400 animate-bounce" />
-                <span className="font-bold">Listening:</span>
-                <span className="italic text-[var(--text-primary)]">
-                  {liveTranscript || 'Speak your scientific question or command...'}
-                </span>
+            {liveTranscript && (
+              <div className="text-xs text-[var(--text-primary)] italic bg-[var(--bg-card)] p-2 rounded-xl border border-cyan-500/20">
+                "{liveTranscript}"
               </div>
-              <VoiceVisualizer state={micState} />
-            </div>
-          )}
-
-          {/* Loading / Generating Indicator — Molecular Orbital AI Processing Animation */}
-          {(isThinking || (isLoading && !messages[messages.length - 1]?.content)) && (
-            <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)] ml-1 py-1.5 animate-in fade-in duration-150">
-              <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400 shadow-sm shrink-0">
-                <Atom className="w-4 h-4 animate-spin-slow" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-[var(--text-primary)] text-xs">ChemAI Molecular Engine</span>
-                <span className="text-[10px] font-mono text-[var(--text-muted)] animate-pulse">
-                  Resolving structure &amp; computing chemical descriptors...
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 3. ATTACHED FILE BADGE */}
-        {attachedFile && (
-          <div className="px-5 py-2 border-t border-inherit bg-[var(--bg-inner)] flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 text-emerald-500">
-              <FileText className="w-4 h-4" />
-              <span className="font-bold">{attachedFile.name}</span>
-              <span className="text-[10px] opacity-60 font-mono">({attachedFile.size})</span>
-            </div>
-            <button
-              onClick={() => setAttachedFile(null)}
-              className="text-rose-400 hover:text-rose-300 text-xs font-bold"
-            >
-              Remove
-            </button>
-          </div>
-        )}
-
-        {/* 4. FOOTER & MULTI-MODAL PROMPT INPUT */}
-        <div className="p-3 sm:p-4 border-t border-inherit bg-inherit shrink-0 space-y-2">
-          <div className="relative flex items-center gap-2">
-            {/* Hidden File Input */}
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept=".py,.mol,.sdf,.xyz,.csv,.txt,.json,.log,.out"
-              className="hidden"
-            />
-
-            {/* Attach File Button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="p-2.5 sm:p-3 rounded-2xl bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400 transition cursor-pointer shrink-0"
-              title="Attach File (.py, .mol, .sdf, .xyz, .csv, .log)"
-            >
-              <Paperclip className="w-4 h-4" />
-            </button>
-
-            {/* Voice Dictation Button */}
-            <button
-              onClick={toggleMic}
-              className={`p-2.5 sm:p-3 rounded-2xl border transition-all cursor-pointer shrink-0 ${
-                micState === 'listening'
-                  ? 'bg-rose-500 text-white border-rose-400 animate-pulse shadow-md'
-                  : 'bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400'
-              }`}
-              title={micState === 'listening' ? 'Stop Listening & Send' : 'Speak Voice Command'}
-            >
-              {micState === 'listening' ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </button>
-
-            {/* Query Text Input */}
-            <input
-              ref={textInputRef}
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Ask chemistry questions, chemical name for SMILES, or say 'Open ChemDraw'..."
-              className="input-control flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-2xl text-xs font-mono text-[var(--text-primary)] min-w-0"
-            />
-
-            {/* Send / Stop Button */}
-            {isLoading ? (
-              <button
-                onClick={handleStop}
-                className="p-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white transition shadow-md"
-                title="Stop Response Generation"
-              >
-                <StopCircle className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={() => handleSend()}
-                disabled={!query.trim() && !attachedFile}
-                className="p-3 rounded-2xl btn-primary transition shadow-lg disabled:opacity-30"
-                title="Send Prompt (Enter)"
-              >
-                <Send className="w-4 h-4" />
-              </button>
             )}
           </div>
+        )}
+
+        {/* Speaking Waveform */}
+        {micState === 'speaking' && (
+          <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-between gap-3 text-xs">
+            <span className="text-emerald-400 font-semibold flex items-center gap-1.5">
+              <Volume2 className="w-3.5 h-3.5 animate-pulse" />
+              ChemSpace AI is speaking
+            </span>
+            <VoiceVisualizer state="speaking" onCancel={handleStop} />
+          </div>
+        )}
+
+        {/* Thinking Indicator */}
+        {isLoading && !messages[messages.length - 1]?.content && (
+          <div className="py-1">
+            <AILoader onCancel={handleStop} />
+          </div>
+        )}
+      </div>
+
+      {/* ── ATTACHED FILE BADGE ────────────────────────────────────────── */}
+      {attachedFile && (
+        <div className="px-4 py-1.5 border-t border-inherit bg-[var(--bg-inner)] flex items-center justify-between text-xs shrink-0">
+          <div className="flex items-center gap-1.5 text-emerald-400">
+            <FileText className="w-3.5 h-3.5" />
+            <span className="font-semibold truncate max-w-[280px]">{attachedFile.name}</span>
+          </div>
+          <button
+            onClick={() => setAttachedFile(null)}
+            className="text-rose-400 hover:text-rose-300 text-xs font-semibold cursor-pointer"
+          >
+            Remove
+          </button>
+        </div>
+      )}
+
+      {/* ── INPUT BAR ─────────────────────────────────────────────────── */}
+      <div className="p-3 border-t border-inherit bg-[var(--bg-card)] shrink-0">
+        <div className="relative flex items-center gap-1.5">
+          {/* File Input (Hidden) */}
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept=".py,.mol,.sdf,.xyz,.csv,.txt,.json,.log"
+            className="hidden"
+          />
+
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="p-2.5 rounded-xl bg-[var(--bg-inner)] hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-emerald-400 transition cursor-pointer shrink-0"
+            title="Attach file"
+          >
+            <Paperclip className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Premium Circular Voice Action Button */}
+          <CircularVoiceButton
+            state={micState}
+            onClick={toggleMic}
+            size="sm"
+            title={micState === 'listening' ? 'Stop listening' : 'Voice input (Listen)'}
+          />
+
+          {/* Auto-expanding Input Area */}
+          <textarea
+            ref={textareaRef}
+            rows={1}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+            placeholder="Ask a question or request a calculation..."
+            className="input-control flex-1 py-2 px-3 rounded-xl text-xs text-[var(--text-primary)] min-w-0 resize-none max-h-28 overflow-y-auto leading-relaxed"
+          />
+
+          {/* Send / Stop Action Button with arrow/icon micro-interaction */}
+          {isLoading || micState === 'speaking' ? (
+            <button
+              type="button"
+              onClick={handleStop}
+              className="p-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white transition shrink-0 cursor-pointer shadow-sm active:scale-95"
+              title="Stop"
+            >
+              <Square className="w-3.5 h-3.5 fill-current" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleSend()}
+              disabled={!query.trim() && !attachedFile}
+              className="group p-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white transition disabled:opacity-30 disabled:pointer-events-none shrink-0 cursor-pointer shadow-[0_2px_12px_rgba(249,115,22,0.3)] hover:shadow-[0_4px_18px_rgba(249,115,22,0.45)] active:scale-95 border border-orange-400/30"
+              title="Send"
+            >
+              <Send className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
+            </button>
+          )}
         </div>
       </div>
     </div>

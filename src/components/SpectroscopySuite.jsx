@@ -18,10 +18,12 @@ import {
   Atom,
   CheckCircle2,
   Sliders,
-  ChevronRight
+  ChevronRight,
+  ArrowRight
 } from 'lucide-react';
 import { calculateFullSpectroscopyDossier } from '../services/spectroscopyEngine';
 import { logActivity } from '../services/activityStore';
+import ButtonSpinner from './common/ButtonSpinner';
 
 export default function SpectroscopySuite() {
   // Input & Simulation State
@@ -57,7 +59,7 @@ export default function SpectroscopySuite() {
     }
 
     setIsCalculating(true);
-    setTimeout(() => {
+    try {
       const result = calculateFullSpectroscopyDossier(query);
       if (!result.valid) {
         setIsCalculating(false);
@@ -66,7 +68,6 @@ export default function SpectroscopySuite() {
       }
 
       setDossier(result);
-      setIsCalculating(false);
       setZoomLevel(1.0);
 
       logActivity(
@@ -75,7 +76,11 @@ export default function SpectroscopySuite() {
         `Calculated FT-IR, UV-Vis, 1H/13C NMR & EI-MS for ${result.metadata.formula}`,
         'spectroscopy'
       );
-    }, 300);
+    } catch (e) {
+      showErrorModal('Computation error', 'Failed to compute spectroscopy dossier.');
+    } finally {
+      setIsCalculating(false);
+    }
   }
 
   function showErrorModal(title, reason) {
@@ -197,10 +202,11 @@ export default function SpectroscopySuite() {
           <button
             onClick={() => handleAnalyze()}
             disabled={isCalculating}
-            className="btn-horizontal btn-primary text-xs shrink-0"
+            className="btn-horizontal btn-orange text-xs shrink-0 group shadow-lg font-bold"
           >
-            <Activity className={`w-3.5 h-3.5 ${isCalculating ? 'animate-spin' : ''}`} />
+            {isCalculating ? <ButtonSpinner className="text-white" /> : <Activity className="w-3.5 h-3.5" />}
             <span>{isCalculating ? 'Computing Spectra...' : 'Analyze Structure'}</span>
+            {!isCalculating && <ArrowRight className="w-3.5 h-3.5 arrow-micro text-white/80" />}
           </button>
         </div>
       </div>
@@ -227,11 +233,11 @@ export default function SpectroscopySuite() {
           onClick={() => setActiveTechnique('ir')}
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'ir'
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-black border-slate-900 dark:border-white shadow-xl font-black'
+              ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
               : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
           }`}
         >
-          <Radio className={`w-5 h-5 ${activeTechnique === 'ir' ? 'text-rose-400 dark:text-rose-600' : 'text-rose-400'}`} />
+          <Radio className={`w-5 h-5 ${activeTechnique === 'ir' ? 'text-orange-400' : 'text-rose-400'}`} />
           <div>
             <div className="font-bold text-xs">1. FT-IR Spectroscopy</div>
             <div className="text-[10px] opacity-70">4000 - 400 cm⁻¹ • Bands</div>
@@ -243,11 +249,11 @@ export default function SpectroscopySuite() {
           onClick={() => setActiveTechnique('uv')}
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'uv'
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-black border-slate-900 dark:border-white shadow-xl font-black'
+              ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
               : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
           }`}
         >
-          <Sun className={`w-5 h-5 ${activeTechnique === 'uv' ? 'text-amber-400 dark:text-amber-600' : 'text-amber-400'}`} />
+          <Sun className={`w-5 h-5 ${activeTechnique === 'uv' ? 'text-orange-400' : 'text-amber-400'}`} />
           <div>
             <div className="font-bold text-xs">2. UV-Visible Spec</div>
             <div className="text-[10px] opacity-70">λmax {dossier.uvVis.lambdaMax} nm • Transitions</div>
@@ -259,11 +265,11 @@ export default function SpectroscopySuite() {
           onClick={() => setActiveTechnique('nmr')}
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'nmr'
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-black border-slate-900 dark:border-white shadow-xl font-black'
+              ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
               : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
           }`}
         >
-          <Eye className={`w-5 h-5 ${activeTechnique === 'nmr' ? 'text-violet-400 dark:text-violet-600' : 'text-violet-400'}`} />
+          <Eye className={`w-5 h-5 ${activeTechnique === 'nmr' ? 'text-orange-400' : 'text-violet-400'}`} />
           <div>
             <div className="font-bold text-xs">3. NMR Spectroscopy</div>
             <div className="text-[10px] opacity-70">¹H & ¹³C / DEPT-135 Shifts</div>
@@ -275,7 +281,7 @@ export default function SpectroscopySuite() {
           onClick={() => setActiveTechnique('ms')}
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'ms'
-              ? 'bg-slate-900 text-white dark:bg-white dark:text-black border-slate-900 dark:border-white shadow-xl font-black'
+              ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
               : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
           }`}
         >

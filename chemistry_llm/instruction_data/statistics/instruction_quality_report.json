@@ -1,0 +1,55 @@
+{
+  "total_raw": 42,
+  "validated_count": 42,
+  "rejected_count": 0,
+  "deduplicated_count": 42,
+  "validation_pass_rate": 1.0,
+  "domain_distribution": {
+    "fundamentals": 5,
+    "general_chemistry": 4,
+    "organic_chemistry": 5,
+    "calculations": 4,
+    "spectroscopy": 2,
+    "molecules": 2,
+    "conversation": 6,
+    "medicinal_chemistry": 2,
+    "identity": 1,
+    "laboratory_safety": 2,
+    "inorganic_chemistry": 1,
+    "physical_chemistry": 1,
+    "analytical_chemistry": 1,
+    "biochemistry": 1,
+    "materials_chemistry": 1,
+    "environmental_chemistry": 1,
+    "nuclear_chemistry": 1,
+    "photochemistry": 1,
+    "computational_chemistry": 1
+  },
+  "difficulty_distribution": {
+    "introductory": 17,
+    "undergraduate": 23,
+    "advanced": 1,
+    "graduate": 1
+  },
+  "reasoning_distribution": {
+    "direct_recall": 5,
+    "deductive": 10,
+    "comparative": 7,
+    "step_by_step_numerical": 5,
+    "mechanistic": 3,
+    "clarification": 1,
+    "hypothetical": 1,
+    "uncertainty_assessment": 1,
+    "error_correction": 1,
+    "conversational": 6,
+    "safety_assessment": 2
+  },
+  "answer_type_distribution": {
+    "explanation": 31,
+    "reaction": 2,
+    "numerical": 4,
+    "smiles": 2,
+    "clarification": 1,
+    "redirection": 2
+  }
+}

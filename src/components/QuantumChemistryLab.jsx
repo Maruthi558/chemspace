@@ -312,7 +312,7 @@ export default function QuantumChemistryLab() {
                 disabled={(tab.id === 'results' && !calculationResult) || (tab.id === 'pes' && !hasMolecule)}
                 className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
                   activeTab === tab.id
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-black shadow-lg scale-105'
+                    ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border border-orange-500/50 shadow-md'
                     : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30'
                 }`}
               >
@@ -352,7 +352,7 @@ export default function QuantumChemistryLab() {
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => handleSmilesSubmit()}
-              className="px-5 py-3 rounded-2xl bg-cyan-500 hover:bg-cyan-400 text-black font-black text-xs uppercase tracking-wider transition shadow-lg shadow-cyan-500/20 shrink-0"
+              className="btn-horizontal btn-orange text-xs font-bold shrink-0"
             >
               Parse SMILES
             </button>

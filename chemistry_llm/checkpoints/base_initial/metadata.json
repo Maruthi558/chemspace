@@ -1,0 +1,9 @@
+{
+  "model_name": "ChemNova-LLM",
+  "version": "0.1.0-step1-empty",
+  "epoch": 0,
+  "step": 0,
+  "loss": 0.0,
+  "parameters": 1378560,
+  "timestamp": "2026-09-27T10:54:17Z"
+}

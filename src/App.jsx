@@ -29,31 +29,24 @@ const ResearchProjects = React.lazy(() => import('./pages/ResearchProjects'));
 const ChromatographyPage = React.lazy(() => import('./pages/ChromatographyPage'));
 const UserWorkspace = React.lazy(() => import('./pages/UserWorkspace'));
 
-function RouteFallback() {
-  return (
-    <div className="flex items-center justify-center min-h-[50vh] w-full select-none">
-      <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 rounded-2xl border border-white/10 dark:border-white/10 border-slate-300/40 flex items-center justify-center bg-white/5 dark:bg-white/5 bg-slate-100/60 shadow-sm">
-          <div className="w-5 h-5 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin" />
-        </div>
-        <span className="text-[11px] font-mono tracking-wider opacity-60 text-slate-400">Loading module...</span>
-      </div>
-    </div>
-  );
-}
+import GlobalLoadingBar from './components/common/GlobalLoadingBar';
+import PageLoader from './components/common/PageLoader';
+import GlobalInitialLoader from './components/loading/GlobalInitialLoader';
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <GestureProvider>
+          <GlobalInitialLoader />
+          <GlobalLoadingBar />
           <PrivacyOverlay />
           <VirtualAirCursor />
           <FloatingCameraPreview />
           <GestureTutorialModal />
           <GestureCalibrationModal />
           <BrowserRouter>
-            <Suspense fallback={<RouteFallback />}>
+            <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Protected Workspace Routes */}
                 <Route
@@ -85,6 +78,7 @@ export default function App() {
                 <Route path="/login" element={<Auth />} />
                 <Route path="/register" element={<Auth />} />
                 <Route path="/finish-signup" element={<FinishSignUp />} />
+                <Route path="/finishSignUp" element={<FinishSignUp />} />
 
                 {/* Fallback Redirect */}
                 <Route path="*" element={<Navigate to="/" replace />} />

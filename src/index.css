@@ -41,11 +41,30 @@ html[data-theme="dark"],
   --text-inverse: #090a0f;
   --text-sidebar: #cbd5e1;
 
+  /* Distinct High-Impact Scientific Accents */
+  --accent-orange: #f97316;
+  --accent-orange-hover: #ea580c;
+  --accent-orange-glow: rgba(249, 115, 22, 0.28);
+  --accent-orange-subtle: rgba(249, 115, 22, 0.12);
+  --accent-orange-border: rgba(249, 115, 22, 0.35);
+
+  --accent-emerald: #10b981;
+  --accent-emerald-hover: #059669;
+  --accent-emerald-glow: rgba(16, 185, 129, 0.25);
+  --accent-emerald-subtle: rgba(16, 185, 129, 0.10);
+  --accent-emerald-border: rgba(16, 185, 129, 0.30);
+
   /* Primary Solid Button (Monochrome Precision) */
   --btn-primary-bg: #f8fafc;
   --btn-primary-text: #090a0f;
   --btn-primary-hover: #e2e8f0;
-  --btn-primary-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --btn-primary-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+
+  /* Orange Action Button */
+  --btn-orange-bg: #f97316;
+  --btn-orange-text: #ffffff;
+  --btn-orange-hover: #ea580c;
+  --btn-orange-shadow: 0 2px 14px rgba(249, 115, 22, 0.35);
 
   /* Secondary Button */
   --btn-secondary-bg: #171a23;
@@ -92,6 +111,7 @@ html[data-theme="dark"],
   --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
   --card-shadow-hover: 0 8px 30px -4px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
   --ambient-bg: #090a0f;
+  --grid-pattern: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 html[data-theme="light"],
@@ -123,11 +143,30 @@ html[data-theme="light"],
   --text-inverse: #ffffff;
   --text-sidebar: #334155;
 
+  /* Distinct High-Impact Scientific Accents */
+  --accent-orange: #ea580c;
+  --accent-orange-hover: #c2410c;
+  --accent-orange-glow: rgba(234, 88, 12, 0.20);
+  --accent-orange-subtle: rgba(234, 88, 12, 0.08);
+  --accent-orange-border: rgba(234, 88, 12, 0.30);
+
+  --accent-emerald: #059669;
+  --accent-emerald-hover: #047857;
+  --accent-emerald-glow: rgba(5, 150, 105, 0.20);
+  --accent-emerald-subtle: rgba(5, 150, 105, 0.08);
+  --accent-emerald-border: rgba(5, 150, 105, 0.25);
+
   /* Primary Solid Button */
   --btn-primary-bg: #0f172a;
   --btn-primary-text: #ffffff;
   --btn-primary-hover: #1e293b;
   --btn-primary-shadow: 0 2px 8px rgba(15, 23, 42, 0.12);
+
+  /* Orange Action Button */
+  --btn-orange-bg: #ea580c;
+  --btn-orange-text: #ffffff;
+  --btn-orange-hover: #c2410c;
+  --btn-orange-shadow: 0 2px 14px rgba(234, 88, 12, 0.25);
 
   /* Secondary Button */
   --btn-secondary-bg: #ffffff;
@@ -173,6 +212,8 @@ html[data-theme="light"],
   /* Clean Shadows */
   --card-shadow: 0 4px 18px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
   --card-shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
+  --ambient-bg: #f6f8fa;
+  --grid-pattern: radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px);
   --ambient-bg: #f6f8fa;
 }
 
@@ -370,7 +411,7 @@ body {
   border: 1px solid var(--border-medium);
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-outline:hover {
@@ -392,12 +433,130 @@ body {
   border: none;
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-ghost:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+/* High-Impact Scientific Energetic Orange Button */
+.btn-orange {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--btn-orange-bg);
+  color: var(--btn-orange-text);
+  box-shadow: var(--btn-orange-shadow);
+  border: 1px solid rgba(249, 115, 22, 0.35);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-orange:hover {
+  background: var(--btn-orange-hover);
+  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-orange:active {
+  transform: scale(0.98);
+}
+
+/* Laboratory Emerald Button */
+.btn-emerald {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--accent-emerald);
+  color: #ffffff;
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-emerald:hover {
+  background: var(--accent-emerald-hover);
+  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.45);
+  transform: translateY(-1px);
+}
+
+.btn-emerald:active {
+  transform: scale(0.98);
+}
+
+/* Scientific Tool Button */
+.btn-tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--bg-inner);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.btn-tool:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-medium);
+  color: var(--text-primary);
+}
+
+/* Circular Action Button */
+.btn-circular {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--bg-inner);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-circular:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  transform: scale(1.05);
+}
+
+.btn-circular:active {
+  transform: scale(0.95);
+}
+
+/* Arrow Micro-Interaction: Smooth translation on hover */
+.arrow-micro {
+  display: inline-block;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.group:hover .arrow-micro,
+button:hover .arrow-micro {
+  transform: translateX(4px);
 }
 
 .btn-danger {
@@ -543,5 +702,119 @@ body {
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* ==========================================================================
+   CHEMSPACE SCIENTIFIC LOADING & TRANSITION SYSTEM
+   ========================================================================== */
+
+@keyframes chemspace-orbit {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes chemspace-orbit-reverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes chemspace-pulse-glow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes chemspace-node-float {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.08);
+  }
+}
+
+@keyframes chemspace-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes chemspace-laser {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.chemspace-orbit {
+  animation: chemspace-orbit 6s linear infinite;
+}
+
+.chemspace-orbit-reverse {
+  animation: chemspace-orbit-reverse 9s linear infinite;
+}
+
+.chemspace-orbit-fast {
+  animation: chemspace-orbit 2s linear infinite;
+}
+
+.chemspace-pulse-glow {
+  animation: chemspace-pulse-glow 2.4s ease-in-out infinite;
+}
+
+.chemspace-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: chemspace-shimmer 1.8s infinite;
+}
+
+html[data-theme="light"] .chemspace-shimmer,
+.light .chemspace-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.05) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: chemspace-shimmer 1.8s infinite;
+}
+
+/* Reduced motion accessibility support */
+@media (prefers-reduced-motion: reduce) {
+  .chemspace-orbit,
+  .chemspace-orbit-reverse,
+  .chemspace-orbit-fast,
+  .chemspace-pulse-glow,
+  .chemspace-shimmer {
+    animation: none !important;
+    transition: opacity 0.15s ease !important;
   }
 }

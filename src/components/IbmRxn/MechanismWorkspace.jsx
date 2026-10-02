@@ -1396,7 +1396,7 @@ ${currentStep.description}
                 </span>
               </div>
               <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 text-[9px] font-bold border border-cyan-500/20">
-                GPT/GEMINI PRO
+                CHEMNOVA AI
               </span>
             </div>
 

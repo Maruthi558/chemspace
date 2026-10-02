@@ -43,6 +43,7 @@ import {
   formatBytes
 } from '../services/downloadsManager';
 import SecurityWatermark from '../components/SecurityWatermark';
+import { SkeletonTable } from '../components/loading/SkeletonLoader';
 
 export default function UserWorkspace() {
   const navigate = useNavigate();
@@ -289,7 +290,7 @@ export default function UserWorkspace() {
           {/* TAB 1: HISTORY ITEMS */}
           {activeTab === 'history' && (
             loading ? (
-              <div className="p-12 text-center text-xs font-mono text-neutral-500">Loading history records...</div>
+              <SkeletonTable rows={4} cols={4} />
             ) : historyItems.length === 0 ? (
               <div className="p-16 text-center rounded-2xl border border-dashed border-neutral-800 space-y-2">
                 <Database className="w-8 h-8 text-neutral-600 mx-auto stroke-[1.5]" />
@@ -342,7 +343,7 @@ export default function UserWorkspace() {
           {/* TAB 2: DOWNLOADS ITEMS */}
           {activeTab === 'downloads' && (
             loading ? (
-              <div className="p-12 text-center text-xs font-mono text-neutral-500">Loading downloads...</div>
+              <SkeletonTable rows={4} cols={5} />
             ) : downloads.length === 0 ? (
               <div className="p-16 text-center rounded-2xl border border-dashed border-neutral-800 space-y-2">
                 <Download className="w-8 h-8 text-neutral-600 mx-auto stroke-[1.5]" />

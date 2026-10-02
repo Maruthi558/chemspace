@@ -1,0 +1,109 @@
+{
+  "total_concept_groups": 12,
+  "concept_groups": {
+    "concept_mw_water": {
+      "concept_id": "concept_mw_water",
+      "variations": [
+        "What is the molecular weight of water?",
+        "What is H2O's molar mass?",
+        "How much does one mole of water weigh in grams?",
+        "Calculate the molar mass of H2O.",
+        "What is the molecular mass of an H2O molecule?"
+      ],
+      "answer": "The molar mass of water (H2O) is 18.015 g/mol (molecular weight 18.015 u), calculated from two hydrogen atoms (2 × 1.008 g/mol) and one oxygen atom (15.999 g/mol)."
+    },
+    "concept_avogadro_constant": {
+      "concept_id": "concept_avogadro_constant",
+      "variations": [
+        "What is Avogadro's number?",
+        "How many atoms or molecules are in one mole?",
+        "What is the exact numerical value and units of Avogadro's constant?",
+        "Define Avogadro's constant N_A in modern SI units."
+      ],
+      "answer": "Avogadro's constant (N_A) is defined as exactly 6.02214076 × 10²³ reciprocal moles (mol⁻¹), representing the number of constituent particles per mole of substance in the SI system."
+    },
+    "hypo_exothermic_temp_increase": {
+      "concept_id": "hypo_exothermic_temp_increase",
+      "variations": [
+        "What would happen if the reaction temperature is increased during ammonia synthesis at equilibrium?",
+        "Suppose I increase the temperature of an exothermic equilibrium reaction. How does the product yield change and why?"
+      ],
+      "answer": "For an exothermic equilibrium reaction (such as the Haber synthesis N2 + 3H2 ⇌ 2NH3, Delta H < 0), increasing the temperature shifts the equilibrium toward the reactants (to the left), decreasing the equilibrium constant K_eq and reducing ammonia yield."
+    },
+    "common_mistake_en_vs_ea": {
+      "concept_id": "common_mistake_en_vs_ea",
+      "variations": [
+        "What is the difference between electronegativity and electron affinity, and why do students often confuse them?",
+        "Why does Chlorine have a higher electron affinity than Fluorine, but Fluorine has a higher electronegativity?"
+      ],
+      "answer": "A common mistake is confusing electronegativity with electron affinity. Electron affinity is a measurable thermodynamic quantity (energy released when an electron is added to an isolated gaseous atom, in kJ/mol), whereas electronegativity is a dimensionless relative index of an atom's ability to attract bonding electrons within a covalent chemical bond."
+    },
+    "concept_ph_definition": {
+      "concept_id": "concept_ph_definition",
+      "variations": [
+        "What is the mathematical definition of pH?",
+        "How is pH defined and calculated from hydrogen ion concentration?",
+        "Define pH in chemistry.",
+        "What does pH measure and how is it related to [H3O+]?",
+        "State the formula used to calculate pH from hydronium molarity."
+      ],
+      "answer": "pH is defined quantitatively as the negative logarithm (base 10) of the hydronium ion activity (or concentration in dilute solution): pH = -log10[H3O+]. In pure water at 25 °C, [H3O+] = 1.0 × 10⁻⁷ M, yielding a neutral pH of 7.00."
+    },
+    "beginner_chem_vs_phys_change": {
+      "concept_id": "beginner_chem_vs_phys_change",
+      "variations": [
+        "What is the fundamental difference between a physical change and a chemical change?",
+        "How do you distinguish between a physical property change and a chemical reaction?"
+      ],
+      "answer": "A physical change alters the physical form or state of a substance without breaking or forming chemical bonds or changing its chemical identity (e.g., ice melting, water boiling). A chemical change involves the breaking and forming of chemical bonds, converting reactants into new chemical substances with distinct chemical compositions (e.g., iron rusting, methane combustion)."
+    },
+    "intermed_catalyst_mechanism": {
+      "concept_id": "intermed_catalyst_mechanism",
+      "variations": [
+        "How does a catalyst increase reaction rate without altering the chemical equilibrium?",
+        "Explain the effect of a catalyst on activation energy, reaction rate, and equilibrium constant."
+      ],
+      "answer": "A catalyst increases the rate of a chemical reaction by providing an alternative reaction pathway with a lower activation energy (Ea). A catalyst accelerates both forward and reverse reaction rates equally without altering the equilibrium constant (K_eq) or thermodynamic Gibbs free energy change (Delta G°), and is regenerated chemically unchanged at the end of the catalytic cycle."
+    },
+    "advanced_cot_antiaromaticity": {
+      "concept_id": "advanced_cot_antiaromaticity",
+      "variations": [
+        "Why is cyclooctatetraene non-planar and non-aromatic rather than planar and antiaromatic?",
+        "Explain how cyclooctatetraene avoids antiaromaticity by conformational adaptation."
+      ],
+      "answer": "Planar 1,3,5,7-cyclooctatetraene (COT) would possess 8 pi electrons, satisfying the Hückel 4n antiaromaticity rule (n=2), which is thermodynamically destabilizing. To avoid antiaromatic destabilization, COT adopts a non-planar 'tub' conformation (D2d symmetry) where adjacent C=C double bonds are perpendicular, preventing continuous cyclic pi overlap and behaving as a non-aromatic, reactive polyene."
+    },
+    "univ_curtin_hammett_principle": {
+      "concept_id": "univ_curtin_hammett_principle",
+      "variations": [
+        "Explain the Curtin-Hammett principle and its implications for product distribution in conformational isomers.",
+        "Why is the ground-state ratio of conformers insufficient to predict product ratios under Curtin-Hammett kinetics?"
+      ],
+      "answer": "The Curtin-Hammett principle states that for a reaction of two rapidly interconverting conformational isomers (conformers A and B) that lead irreversibly to different products (P_A and P_B), the product distribution depends exclusively on the free energy difference between their respective transition states (Delta Delta G_double_dagger), and is independent of the ground-state equilibrium ratio of the conformers."
+    },
+    "hypo_solvent_change_sn2": {
+      "concept_id": "hypo_solvent_change_sn2",
+      "variations": [
+        "What would happen if the polar aprotic solvent is replaced with water in an SN2 substitution?",
+        "Suppose I perform an SN2 reaction in water instead of DMSO. How does the rate change and what side reactions occur?"
+      ],
+      "answer": "If the polar aprotic solvent DMSO is replaced with polar protic water in an SN2 reaction (e.g. bromobutane + NaCN), the reaction rate will decrease drastically by several orders of magnitude (often 10^4 to 10^6 times slower). In water, strong hydrogen bonding donates into the cyanide lone pairs, forming a tight solvation shell that dramatically stabilizes the ground-state nucleophile and raises the activation energy for backside attack."
+    },
+    "hypo_water_h2o_vs_h2s": {
+      "concept_id": "hypo_water_h2o_vs_h2s",
+      "variations": [
+        "What would happen to the physical and chemical properties if oxygen in water is replaced by sulfur?",
+        "Why is H2O a liquid at room temperature while H2S is a gas, despite sulfur being heavier?"
+      ],
+      "answer": "If oxygen in water (H2O) is replaced by sulfur to form hydrogen sulfide (H2S), hydrogen bonding essentially vanishes. Despite having a higher molecular weight (34.08 vs 18.02 g/mol), H2S is a foul-smelling gas at room temperature (boiling point -60 °C vs +100 °C for H2O), has a much smaller bond angle (92.1° vs 104.5°), and is significantly more acidic (pKa 7.0 vs 15.7 for H2O)."
+    },
+    "trouble_tlc_streaking_tailing": {
+      "concept_id": "trouble_tlc_streaking_tailing",
+      "variations": [
+        "Why do carboxylic acid or amine spots streak/tail on silica TLC plates, and how do you fix it?",
+        "How do you troubleshoot and eliminate tailing in thin-layer chromatography?"
+      ],
+      "answer": "Thin-layer chromatography (TLC) spot streaking or tailing occurs when a polar compound strongly interacts with acidic silanol (Si-OH) sites on the silica gel plate, or when the sample is overloaded. For carboxylic acids, adding 1% acetic acid to the mobile phase suppresses tailing by protonating silanol groups and keeping the acid unionized. For basic amines, adding 1% triethylamine (TEA) or ammonium hydroxide prevents tailing by neutralizing acidic silica sites."
+    }
+  }
+}

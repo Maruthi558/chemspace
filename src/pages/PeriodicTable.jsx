@@ -10,6 +10,7 @@ export default function PeriodicTable() {
   const [activePhaseFilter, setActivePhaseFilter] = useState('All');
   const [trendOverlay, setTrendOverlay] = useState('none'); // none, electronegativity, radius, ionEnergy, meltingPoint
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState('table'); // 'table' (18-column real table) | 'grid' (compact cards)
 
   const categories = ['All', ...new Set(PERIODIC_ELEMENTS.map((e) => e.category))];
   const phases = ['All', 'Solid', 'Gas', 'Liquid', 'Synthetic'];
@@ -74,13 +75,38 @@ export default function PeriodicTable() {
         </div>
 
         {/* Heatmap Overlay & Phase Selector */}
+        {/* View Mode & Heatmap Overlay */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Table vs Grid Switcher */}
+          <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10 text-xs">
+            <button
+              onClick={() => setViewMode('table')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                viewMode === 'table'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              18-Col IUPAC Table
+            </button>
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              Card Grid
+            </button>
+          </div>
+
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-slate-400 font-sans">Trend Mode:</span>
             <select
               value={trendOverlay}
               onChange={(e) => setTrendOverlay(e.target.value)}
-              className="px-2.5 py-1 bg-[#02040a] border border-white/20 rounded-xl text-xs font-mono text-white focus:border-emerald-400 focus:outline-none transition"
+              className="px-2.5 py-1 bg-[#02040a] border border-white/20 rounded-xl text-xs font-mono text-white focus:border-orange-400 focus:outline-none transition cursor-pointer"
             >
               <option value="none">Standard Category Colors</option>
               <option value="electronegativity">Electronegativity (Pauling)</option>
@@ -187,9 +213,9 @@ export default function PeriodicTable() {
             </div>
           </div>
 
-          {/* Element Cards Grid with Vibrant Chemical Family Color Coding */}
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-8 gap-2 max-h-[580px] overflow-y-auto pr-1">
-            {filteredElements.map((el) => {
+          {/* Helper function to render an element card in either Table or Grid mode */}
+          {(() => {
+            const renderCard = (el, isMatch = true, customStyle = {}) => {
               const isSelected = selectedElement.number === el.number;
               const catTheme = CATEGORY_THEMES[el.category] || {
                 color: '#10b981',
@@ -219,56 +245,59 @@ export default function PeriodicTable() {
                 <div
                   key={el.number}
                   onClick={() => handleSelectElement(el)}
-                  className={`p-2 rounded-xl cursor-pointer transition-all duration-200 flex flex-col justify-between relative group ${
+                  className={`p-1.5 rounded-lg cursor-pointer transition-all duration-150 flex flex-col justify-between relative group select-none ${
+                    !isMatch ? 'opacity-20 grayscale hover:opacity-100 hover:grayscale-0' : ''
+                  } ${
                     isSelected
-                      ? 'scale-105 z-10'
-                      : 'hover:-translate-y-1 hover:scale-[1.03]'
+                      ? 'scale-105 z-20 shadow-[0_0_16px_rgba(249,115,22,0.6)]'
+                      : 'hover:scale-[1.04] hover:z-10'
                   }`}
                   style={{
                     background: isSelected
                       ? `linear-gradient(135deg, ${displayColor}40 0%, #060a14 100%)`
                       : catTheme.bg,
                     border: isSelected
-                      ? `2px solid ${displayColor}`
+                      ? '2px solid #f97316'
                       : `1px solid ${catTheme.border}`,
                     boxShadow: isSelected
-                      ? `0 0 20px ${displayColor}77, inset 0 0 10px ${displayColor}33`
-                      : '0 2px 8px rgba(0,0,0,0.25)',
+                      ? `0 0 16px ${displayColor}77, inset 0 0 8px ${displayColor}33`
+                      : '0 1px 4px rgba(0,0,0,0.2)',
+                    minHeight: '52px',
+                    ...customStyle
                   }}
                 >
                   {/* Top: Atomic Number & Mass */}
-                  <div className="flex items-center justify-between text-[9px] font-mono font-bold">
+                  <div className="flex items-center justify-between text-[8px] font-mono font-bold leading-none">
                     <span
                       style={{
                         color: isSelected ? '#ffffff' : displayColor,
-                        textShadow: `0 0 8px ${displayColor}66`
                       }}
                     >
                       {el.number}
                     </span>
-                    <span className="text-slate-400 text-[8px]">
+                    <span className="text-slate-400 text-[7px] truncate max-w-[28px]">
                       {typeof el.mass === 'number' ? el.mass.toFixed(1) : el.mass}
                     </span>
                   </div>
 
-                  {/* Center: Large Chemical Symbol */}
+                  {/* Center: Chemical Symbol */}
                   <div
-                    className="text-lg font-black text-center my-0.5 tracking-tight transition-transform group-hover:scale-110"
+                    className="text-base font-black text-center my-0.5 tracking-tight transition-transform group-hover:scale-105"
                     style={{
-                      color: displayColor,
-                      textShadow: `0 0 12px ${displayColor}88`
+                      color: isSelected ? '#ffffff' : displayColor,
+                      textShadow: `0 0 8px ${displayColor}66`
                     }}
                   >
                     {el.symbol}
                   </div>
 
                   {/* Bottom: Element Name & Phase Indicator */}
-                  <div className="flex items-center justify-between text-[8.5px] font-medium truncate pt-0.5 border-t border-white/10">
+                  <div className="flex items-center justify-between text-[7.5px] font-medium truncate pt-0.5 border-t border-white/10 leading-none">
                     <span className="truncate text-slate-300">
                       {el.name}
                     </span>
                     <span
-                      className="w-1.5 h-1.5 rounded-full shrink-0 ml-1"
+                      className="w-1.5 h-1.5 rounded-full shrink-0 ml-0.5"
                       style={{
                         background:
                           el.phase === 'Gas'
@@ -284,8 +313,69 @@ export default function PeriodicTable() {
                   </div>
                 </div>
               );
-            })}
-          </div>
+            };
+
+            if (viewMode === 'table') {
+              return (
+                <div className="overflow-x-auto pb-4 no-scrollbar">
+                  <div
+                    className="min-w-[840px] select-none"
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(18, minmax(42px, 1fr))',
+                      gridTemplateRows: 'repeat(10, minmax(52px, auto))',
+                      gap: '4px'
+                    }}
+                  >
+                    {/* Lanthanide series indicator (Row 6, Col 3) */}
+                    <div
+                      className="p-1.5 rounded-lg border border-dashed border-amber-500/40 bg-amber-500/10 flex flex-col items-center justify-center text-center cursor-default select-none"
+                      style={{ gridRow: 6, gridColumn: 3 }}
+                      title="Lanthanide Series Elements (57-71)"
+                    >
+                      <span className="text-[8px] font-mono text-amber-400 font-bold">57-71</span>
+                      <span className="text-[9px] font-bold text-slate-200">La-Lu</span>
+                      <span className="text-[6.5px] text-amber-300/70 font-mono">f-block</span>
+                    </div>
+
+                    {/* Actinide series indicator (Row 7, Col 3) */}
+                    <div
+                      className="p-1.5 rounded-lg border border-dashed border-rose-500/40 bg-rose-500/10 flex flex-col items-center justify-center text-center cursor-default select-none"
+                      style={{ gridRow: 7, gridColumn: 3 }}
+                      title="Actinide Series Elements (89-103)"
+                    >
+                      <span className="text-[8px] font-mono text-rose-400 font-bold">89-103</span>
+                      <span className="text-[9px] font-bold text-slate-200">Ac-Lr</span>
+                      <span className="text-[6.5px] text-rose-300/70 font-mono">f-block</span>
+                    </div>
+
+                    {/* All 118 Elements placed in authentic IUPAC Coordinates */}
+                    {PERIODIC_ELEMENTS.map((el) => {
+                      let row = el.period;
+                      let col = el.group;
+
+                      if (el.number >= 57 && el.number <= 71) {
+                        row = 9;
+                        col = (el.number - 57) + 4;
+                      } else if (el.number >= 89 && el.number <= 103) {
+                        row = 10;
+                        col = (el.number - 89) + 4;
+                      }
+
+                      const isMatch = filteredElements.some((fe) => fe.number === el.number);
+                      return renderCard(el, isMatch, { gridRow: row, gridColumn: col });
+                    })}
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-8 gap-2 max-h-[580px] overflow-y-auto pr-1">
+                {filteredElements.map((el) => renderCard(el, true))}
+              </div>
+            );
+          })()}
         </div>
 
         {/* RIGHT COLUMN: Element Inspector & 3D Atomic Shell (4 Cols) */}

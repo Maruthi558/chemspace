@@ -1,0 +1,22 @@
+{
+  "id": "curr_2026_room_temp_sc",
+  "headline": "Nitrogen-Doped Lutetium Hydride Under Review",
+  "information": "Extensive independent laboratory replications evaluate high-pressure hydride phase diagrams and superconducting magnetic susceptibility thresholds.",
+  "domain": "Materials Chemistry",
+  "subdomain": "superconductivity",
+  "source": "Nature & Physical Review B Peer Reviews",
+  "source_url": "https://doi.org/10.1038/s41586-023-05742-0",
+  "publication_date": "2024-2026",
+  "retrieval_date": "2026-10-01T09:43:59.961629+00:00",
+  "verification_status": "peer_reviewed",
+  "doi": null,
+  "chemical_entities": [
+    "LuH3",
+    "Lu-N-H"
+  ],
+  "tags": [
+    "superconductivity",
+    "high-pressure",
+    "materials"
+  ]
+}

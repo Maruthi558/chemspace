@@ -1,0 +1,146 @@
+[
+  {
+    "category_code": "A",
+    "category_name": "Basic Chemistry",
+    "question": "What is a covalent bond?",
+    "base_model_output": "//withmpointin) OPauling/   , or-c(and mol areingto<END>\u2192or;standard 1the1al theechemicalmit\u207bchemical point",
+    "instruction_model_output": "08:  )\u207b10the;  -in molNtheA pm . and0(Twith(by\nTheTheit tooruF aredmolasV1",
+    "reference_answer": "A covalent bond is formed by the sharing of valence electron pairs between atoms, typically nonmetals."
+  },
+  {
+    "category_code": "B",
+    "category_name": "Organic Chemistry",
+    "question": "Why does benzene undergo electrophilic aromatic substitution instead of addition?",
+    "base_model_output": "/ The<END>iting;with8%c toal ;TheH,epointbase\u207bO) 0edchemicaluingweight \n,InChIKey ly%\n\u207b8areVatoritchemical",
+    "instruction_model_output": "m,Aor\u207basin Nmoluatwith .andTmolAmol-0 itchemical0htheingoxygen,e-ationC  ;spO-Fthe:, ale",
+    "reference_answer": "Addition permanently destroys the thermodynamic aromatic stabilization energy (~150 kJ/mol), while substitution regenerates the aromatic 6 pi-electron sextet."
+  },
+  {
+    "category_code": "C",
+    "category_name": "Inorganic Chemistry",
+    "question": "Explain crystal field splitting in octahedral transition metal complexes.",
+    "base_model_output": "8standard1oxygenitit\u207blysolid temperatureOweight1base toat  (solid *,inweightedandm  inoxygen) )weight   Pauling with0?%H",
+    "instruction_model_output": "TmolHinH1bedis8by /inationatitwith;O  oral toingandeFareCoxygen*m thechemicalNinareor:\n amol",
+    "reference_answer": "The five d-orbitals split into eg (higher energy) and t2g (lower energy) sets due to electrostatic repulsion from approaching ligands."
+  },
+  {
+    "category_code": "D",
+    "category_name": "Physical Chemistry",
+    "question": "How does temperature affect the rate constant according to the Arrhenius equation?",
+    "base_model_output": ",chemicalareereforeand,,H( transition 1edationin(Paulingoxygen0 baseThe110InChIKey8lychemical%with solid   u chemical  ing  \u2192\u207b",
+    "instruction_model_output": "<ANSWER>V in:1edt  ormolalandgatb/e0ing  mF      chemical oxygen((1isthe  0with (by.and",
+    "reference_answer": "Increasing temperature exponentially increases the fraction of molecules with kinetic energy exceeding activation energy (exp(-Ea/RT))."
+  },
+  {
+    "category_code": "E",
+    "category_name": "Analytical Chemistry",
+    "question": "Explain the Beer-Lambert law.",
+    "base_model_output": "V( O\u207b, %TheThe  0oxygenwith,oxygen1chemical *   toing \u2192itit. .eTheorstandard)-c9 weight\u207bstandardPauling<END>al",
+    "instruction_model_output": "g0chemicalto11with,.t  to8orTheit(toN bond   are10oxygenIaschemical)molandA-to:inoxygen F;arechemicalingchemicalb",
+    "reference_answer": "Absorbance is directly proportional to path length and analyte concentration: A = epsilon * b * c."
+  },
+  {
+    "category_code": "F",
+    "category_name": "Biochemistry",
+    "question": "What does the Michaelis constant Km represent in enzyme kinetics?",
+    "base_model_output": "(. (, and11uareereforeInChIKeytemperatureechemicalweightInChIKeyPauling%pointtocbaseAingwith or\u207btransitionhas) mol\u2192mAO standardchemicalmweight8in",
+    "instruction_model_output": "O;is  ( bond*O:  ing8(m, 9chemicalH) A;;0inAandly) <ANSWER>/ 1theb   oring\u207bitt",
+    "reference_answer": "Km is the substrate concentration at which the initial reaction velocity reaches half of Vmax, serving as an inverse measure of affinity."
+  },
+  {
+    "category_code": "G",
+    "category_name": "Reaction Reasoning",
+    "question": "What product is formed when acetone reacts with methylmagnesium bromide followed by acid workup?",
+    "base_model_output": "and areTheing  AtheAation \u207b0Paulingore%-  pointboilingand ithingInChIKey0  chemicalstandarduoxygen9The 9 -  9chemical<END>/",
+    "instruction_model_output": "ed;gas0 ((9chemicalal  /;andThe0to it;bA0<ANSWER>molThe)gor 9dH*  \u207barely1  oxygen \nF",
+    "reference_answer": "Nucleophilic addition of the methyl group to the carbonyl carbon followed by protonation yields tert-butanol (2-methylpropan-2-ol)."
+  },
+  {
+    "category_code": "H",
+    "category_name": "Mechanism Reasoning",
+    "question": "Compare the SN1 and SN2 reaction mechanisms.",
+    "base_model_output": "<END>mitsoliding Thepoint ;0;1 H9alor8arestandard O);e990h0  \u207bweight oxygen\ng.the  chemical ?ingerefore",
+    "instruction_model_output": "hchemical ) u 9ed(with,<ANSWER>\n   gm eby: .emolor0ctwith H /The0<ANSWER> ;ing10 N/.",
+    "reference_answer": "SN1 is a two-step unimolecular process via a carbocation intermediate; SN2 is a concerted bimolecular backside attack with stereochemical inversion."
+  },
+  {
+    "category_code": "I",
+    "category_name": "Numerical Chemistry",
+    "question": "How many moles of water are present in 18.015 g of pure water?",
+    "base_model_output": ";to VVO) standardH transition..ing  10)lyu0,  10theare8 mboilingtemperaturePaulinghasphysical 19 inwithalc  al",
+    "instruction_model_output": "standardA e,T  (ly /0F with are;andu :Owith. byhmolwith,chemical9 within ;or   :Oc it",
+    "reference_answer": "1.000 mole (n = m / M = 18.015 g / 18.015 g/mol)."
+  },
+  {
+    "category_code": "J",
+    "category_name": "Spectroscopy",
+    "question": "What IR absorption bands indicate an aliphatic carboxylic acid?",
+    "base_model_output": "weight  8 boilingInChIKey1basesolid )8to\u207borHare9aliting*ate,withchemicalinA<END>0 c)  orit%standardOwith   standard",
+    "instruction_model_output": "..,ing\u207boxygenby ingas the and toxygenmTec ing\u207b)The1andto ,chemicalHA-*-umolwith.,Vh chemical",
+    "reference_answer": "A very broad O-H stretch from 2500 to 3300 cm-1 and a sharp carbonyl C=O stretch at 1705-1725 cm-1."
+  },
+  {
+    "category_code": "K",
+    "category_name": "SMILES",
+    "question": "What is the canonical SMILES representation for ethanol?",
+    "base_model_output": "the- (;chemicalweightthe0chemical1mmPaulingOPaulingingtheing lywith,)* areedwith *ThePaulingingpointwithereforeVVstandard) with9191standard",
+    "instruction_model_output": "oxygen Vu9al\nased   mol\u207bAation,toite withb OHoxygen\u207b ingwith 0  tareoxygen1e *.ing  pointm",
+    "reference_answer": "CCO"
+  },
+  {
+    "category_code": "L",
+    "category_name": "Molecular Properties",
+    "question": "Why is water a polar molecule?",
+    "base_model_output": "in Theweight,)pointThe<END>weightstandardtheInChIKey  -solidalor 10ereforestandard)(orOstandard 5 with1the   in weight8 uitchemical9boiling",
+    "instruction_model_output": "htob:The  t The.  edwithg9,e.chemicalV )or,  (<ANSWER>H\u207b\nb;\u207bstandardFObond1;at<ANSWER> oxygen oxygen",
+    "reference_answer": "Oxygen is more electronegative than hydrogen and the molecule has a bent geometry (~104.5 degrees), preventing dipole cancellation."
+  },
+  {
+    "category_code": "M",
+    "category_name": "Hypothetical Questions",
+    "question": "What would happen if water were used as solvent in a Grignard reaction?",
+    "base_model_output": "baseoxygenor)Oare9e edutemperaturewithmol aretheH  8,%The\u21928 InChIKey Aittransition ing\u207bsolidPauling\u207bmchemically.8\nweight,A\u207b",
+    "instruction_model_output": ")\nto *thechemicalmH oxygeninby  1 isined0Ttowith,ortingpoint ing   Ce 1to ationarem  areit)",
+    "reference_answer": "The strongly basic Grignard reagent would undergo rapid acid-base quenching with water, destroying the reagent."
+  },
+  {
+    "category_code": "N",
+    "category_name": "Ambiguous Questions",
+    "question": "What happens with acetone?",
+    "base_model_output": "has)itpointand alweight\nor chemicalbaseed1or/Oare8and/ standard\u21928**lyedtemperature,\n*theand;10weight    withtobyF",
+    "instruction_model_output": "AO10 lylyAand: t 9The*gHas   <ANSWER>  10O\n\u207btheNly1,  0 itm);2ingA\norand",
+    "reference_answer": "The question is ambiguous; acetone can undergo nucleophilic addition, condensation, or serve as a polar aprotic solvent. Clarification is requested."
+  },
+  {
+    "category_code": "O",
+    "category_name": "Conversation",
+    "question": "Why is benzene so stable?",
+    "base_model_output": "ingu<END> standardInChIKey 8, as andthe oraltemperatureA\nmolA%<END>InChIKeytransitionmchemicalweight are*8* 1.mPauling oxygenareweightitedhaswith*",
+    "instruction_model_output": "are,gtoalwithV110<END>Thee;H; 11*chemicalmolstandard chemical )HThein .to/withare  withIwith;bat\n arealO",
+    "reference_answer": "Benzene possesses aromatic resonance stabilization energy due to a cyclic, planar (4n+2) pi-electron delocalized system."
+  },
+  {
+    "category_code": "P",
+    "category_name": "Uncertainty",
+    "question": "Can computational docking guarantee 100% in vivo drug efficacy and safety?",
+    "base_model_output": "temperaturestandarderefore ationOorLocatedstandardInChIKey  Varem ingpoint -10withbase,and.lythe transitionTheA<ANSWER>chemical into The solidweight ; thehaswith",
+    "instruction_model_output": "oxygenat:edHwithm withbyor oxygen.(hly Fis10bondchemical<ANSWER>* andc8 -standardit1<ANSWER>   \u207b\nN\u207b;temperatureA 9",
+    "reference_answer": "No. Computational docking produces model hypotheses that neglect many in vivo biological factors; experimental validation is required."
+  },
+  {
+    "category_code": "Q",
+    "category_name": "Safety",
+    "question": "Why must you always add acid to water rather than water to acid?",
+    "base_model_output": "ly Aoxygenare  )orwith . (-InChIKeyu,edwith./% ;solidtemperaturetransitionwithbase\nVpointare \u2192*it<END>csolid Hmand standard(",
+    "instruction_model_output": "\u207band A.thealmol-aslyoredwith -algemolNV1oring0standard edspwithwith1at)<ANSWER> itO  Tor-)oxygen9to",
+    "reference_answer": "Acid hydration is highly exothermic; adding water to concentrated acid can flash-boil and violently spatter corrosive acid."
+  },
+  {
+    "category_code": "R",
+    "category_name": "Non-Chemistry Redirection",
+    "question": "What is the capital of France?",
+    "base_model_output": "m are0 . and/standardare  withu\n9  oxygenlyitO etheerefore 8  Paulinging \u2192A/with1mol *InChIKeyation with\nH",
+    "instruction_model_output": "and)twithV\u207b/\u207b  (0 Nbwith1um.Thewithin in)ly  are1 toA chemicalC10\u207b.tolyally  g",
+    "reference_answer": "Paris is the capital of France; however, ChemNova specializes in chemistry. Please ask a chemistry-related question."
+  }
+]

@@ -45,6 +45,7 @@ import MechanismWorkspace from './MechanismWorkspace';
 import ThreeMoleculeViewer from '../ThreeMoleculeViewer';
 import { logActivity } from '../../services/activityStore';
 import { useTheme } from '../../context/ThemeContext';
+import ButtonSpinner from '../common/ButtonSpinner';
 
 export default function IbmRxnUnifiedStudio() {
   const navigate = useNavigate();
@@ -255,12 +256,12 @@ export default function IbmRxnUnifiedStudio() {
             <button
               key={id}
               onClick={() => setStudioMode(id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 studioMode === id
                   ? id === 'mechanism'
-                    ? 'bg-violet-500 text-white shadow-md font-black shadow-violet-500/30'
-                    : 'bg-cyan-500 text-slate-950 shadow-md font-black'
-                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                    ? 'bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-md font-bold shadow-violet-500/25'
+                    : 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md font-bold shadow-orange-500/25'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/5'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -394,10 +395,11 @@ export default function IbmRxnUnifiedStudio() {
                 <button
                   onClick={handleRunForwardPrediction}
                   disabled={isPredicting}
-                  className="w-full py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-black text-xs font-mono transition flex items-center justify-center gap-1.5 shadow-lg shadow-cyan-500/20 mt-2"
+                  className="w-full btn-horizontal btn-orange text-xs font-mono font-bold transition flex items-center justify-center gap-2 mt-2 shadow-lg group"
                 >
-                  <Play className="w-3.5 h-3.5 fill-current" />
+                  {isPredicting ? <ButtonSpinner className="text-white" /> : <Play className="w-3.5 h-3.5 fill-current" />}
                   <span>{isPredicting ? 'Predicting...' : 'Run Forward Prediction'}</span>
+                  {!isPredicting && <ArrowRight className="w-3.5 h-3.5 arrow-micro text-white/80" />}
                 </button>
               </div>
 
@@ -542,10 +544,11 @@ export default function IbmRxnUnifiedStudio() {
               <button
                 onClick={handleRunRetrosynthesis}
                 disabled={isRetrosynthesizing}
-                className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 text-slate-950 font-black text-xs font-mono transition flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 sm:mt-5"
+                className="btn-horizontal btn-orange text-xs font-mono font-bold transition flex items-center justify-center gap-2 shadow-lg sm:mt-5 group"
               >
-                <GitBranch className="w-4 h-4" />
+                {isRetrosynthesizing ? <ButtonSpinner className="text-white" /> : <GitBranch className="w-4 h-4" />}
                 <span>{isRetrosynthesizing ? 'Planning Disconnections...' : 'Plan Retrosynthesis'}</span>
+                {!isRetrosynthesizing && <ArrowRight className="w-3.5 h-3.5 arrow-micro text-white/80" />}
               </button>
             </div>
           </div>

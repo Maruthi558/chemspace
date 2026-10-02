@@ -1,0 +1,66 @@
+{
+  "total_conflicts_detected": 5,
+  "generated_at": "2026-10-01T09:43:59.960179+00:00",
+  "conflicts": [
+    {
+      "conflict_id": "conf_9254000",
+      "entity_name": "Nitrogen (N)",
+      "property_name": "electronegativity",
+      "source_a": "Pauling Electronegativity Scale",
+      "value_a": 3.04,
+      "source_b": "Allred-Rochow Scale",
+      "value_b": 3.07,
+      "discrepancy_description": "Numerical discrepancy for 'electronegativity' of 'Nitrogen (N)': 3.04 (Pauling Electronegativity Scale) vs 3.07 (Allred-Rochow Scale) (relative diff: 1.0%)",
+      "detected_at": "2026-10-01T09:43:59.959727+00:00",
+      "resolution_status": "documented_unresolved"
+    },
+    {
+      "conflict_id": "conf_0659294",
+      "entity_name": "Ethanol (C2H5OH)",
+      "property_name": "boiling_point_celsius",
+      "source_a": "NIST Chemistry WebBook",
+      "value_a": 78.37,
+      "source_b": "PubChem Experimental Properties",
+      "value_b": 78.24,
+      "discrepancy_description": "Numerical discrepancy for 'boiling_point_celsius' of 'Ethanol (C2H5OH)': 78.37 (NIST Chemistry WebBook) vs 78.24 (PubChem Experimental Properties) (relative diff: 0.2%)",
+      "detected_at": "2026-10-01T09:43:59.959745+00:00",
+      "resolution_status": "documented_unresolved"
+    },
+    {
+      "conflict_id": "conf_3598487",
+      "entity_name": "Acetic Acid (CH3COOH)",
+      "property_name": "pKa_at_25C",
+      "source_a": "IUPAC Dissociation Constants",
+      "value_a": 4.756,
+      "source_b": "CRC Handbook of Chemistry and Physics",
+      "value_b": 4.76,
+      "discrepancy_description": "Numerical discrepancy for 'pKa_at_25C' of 'Acetic Acid (CH3COOH)': 4.756 (IUPAC Dissociation Constants) vs 4.76 (CRC Handbook of Chemistry and Physics) (relative diff: 0.1%)",
+      "detected_at": "2026-10-01T09:43:59.959755+00:00",
+      "resolution_status": "documented_unresolved"
+    },
+    {
+      "conflict_id": "conf_3126048",
+      "entity_name": "Fluorine vs Chlorine",
+      "property_name": "electron_affinity_kJ_per_mol",
+      "source_a": "Fluorine Experimental Electron Affinity (NIST)",
+      "value_a": -328.0,
+      "source_b": "Chlorine Experimental Electron Affinity (NIST)",
+      "value_b": -349.0,
+      "discrepancy_description": "Numerical discrepancy for 'electron_affinity_kJ_per_mol' of 'Fluorine vs Chlorine': -328.0 (Fluorine Experimental Electron Affinity (NIST)) vs -349.0 (Chlorine Experimental Electron Affinity (NIST)) (relative diff: 6.2%)",
+      "detected_at": "2026-10-01T09:43:59.959761+00:00",
+      "resolution_status": "documented_unresolved"
+    },
+    {
+      "conflict_id": "conf_0900321",
+      "entity_name": "Fluorine F2 vs Chlorine Cl2",
+      "property_name": "bond_dissociation_energy_kJ_per_mol",
+      "source_a": "F2 Experimental BDE (CRC Handbook)",
+      "value_a": 155.0,
+      "source_b": "Cl2 Experimental BDE (CRC Handbook)",
+      "value_b": 242.0,
+      "discrepancy_description": "Numerical discrepancy for 'bond_dissociation_energy_kJ_per_mol' of 'Fluorine F2 vs Chlorine Cl2': 155.0 (F2 Experimental BDE (CRC Handbook)) vs 242.0 (Cl2 Experimental BDE (CRC Handbook)) (relative diff: 43.8%)",
+      "detected_at": "2026-10-01T09:43:59.959766+00:00",
+      "resolution_status": "documented_unresolved"
+    }
+  ]
+}

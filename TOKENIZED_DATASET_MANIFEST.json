@@ -1,0 +1,53 @@
+{
+  "manifest_name": "ChemNova Tokenized Dataset Manifest",
+  "corpus_version": "1.0.0",
+  "source_corpus_version": "1.0.0",
+  "tokenizer_version": "1.0.0",
+  "tokenizer_type": "ChemistryAwareBPE",
+  "vocabulary_size": 4096,
+  "preprocessing_version": "1.0.0",
+  "creation_timestamp": "2026-10-01T10:04:25.797922+00:00",
+  "context_length": 512,
+  "total_records": 320,
+  "token_count": 111405,
+  "training_token_count": 91012,
+  "validation_token_count": 11332,
+  "test_token_count": 9061,
+  "split_record_counts": {
+    "training": 264,
+    "validation": 33,
+    "test": 23
+  },
+  "split_window_counts": {
+    "training": 322,
+    "validation": 38,
+    "test": 30
+  },
+  "sequence_length_statistics": {
+    "maximum_sequence_length": 1138,
+    "minimum_sequence_length": 95,
+    "average_sequence_length": 348.14
+  },
+  "data_leakage_audit": {
+    "leakage_violations_count": 0,
+    "leakage_violations": [],
+    "near_duplicate_overlap_count": 0,
+    "near_duplicate_overlap": [],
+    "zero_leakage_confirmed": true
+  },
+  "output_files": {
+    "training": {
+      "npz": "chemistry_llm\\data\\tokenized\\training\\tokenized_arrays.npz",
+      "jsonl": "chemistry_llm\\data\\tokenized\\training\\training_tokenized.jsonl"
+    },
+    "validation": {
+      "npz": "chemistry_llm\\data\\tokenized\\validation\\tokenized_arrays.npz",
+      "jsonl": "chemistry_llm\\data\\tokenized\\validation\\validation_tokenized.jsonl"
+    },
+    "test": {
+      "npz": "chemistry_llm\\data\\tokenized\\test\\tokenized_arrays.npz",
+      "jsonl": "chemistry_llm\\data\\tokenized\\test\\test_tokenized.jsonl"
+    }
+  },
+  "status": "APPROVED_FOR_MODEL_TRAINING"
+}

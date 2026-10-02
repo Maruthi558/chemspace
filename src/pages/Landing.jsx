@@ -183,27 +183,29 @@ export default function Landing() {
               <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   onClick={() => navigate('/chemdraw')}
-                  className="btn-primary py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2 shadow-sm"
+                  className="btn-orange group py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2 shadow-md cursor-pointer"
                 >
                   <PenTool className="w-3.5 h-3.5" />
                   <span>Open ChemDraw CAD</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-3.5 h-3.5 arrow-micro" />
                 </button>
 
                 <button
                   onClick={() => navigate('/rdkit-lab')}
-                  className="btn-secondary py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2"
+                  className="btn-secondary group py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2 cursor-pointer"
                 >
-                  <Cpu className="w-3.5 h-3.5" />
+                  <Cpu className="w-3.5 h-3.5 text-emerald-400" />
                   <span>RDKit Lab</span>
+                  <ChevronRight className="w-3 h-3 text-[var(--text-muted)] arrow-micro" />
                 </button>
 
                 <button
                   onClick={() => navigate('/workspace')}
-                  className="btn-outline py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2"
+                  className="btn-outline group py-2.5 px-4 text-xs uppercase tracking-wider font-bold flex items-center gap-2 cursor-pointer"
                 >
-                  <FolderLock className="w-3.5 h-3.5" />
+                  <FolderLock className="w-3.5 h-3.5 text-[var(--text-secondary)]" />
                   <span>Workspace</span>
+                  <ChevronRight className="w-3 h-3 text-[var(--text-muted)] arrow-micro" />
                 </button>
               </div>
             </div>

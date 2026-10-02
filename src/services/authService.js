@@ -2,6 +2,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 import {
   auth,
   loginWithGoogle,
+  loginWithMicrosoft,
+  loginWithGithub,
   checkGoogleRedirectResult,
   signUpWithEmailPassword,
   signInWithEmailPassword,
@@ -54,6 +56,20 @@ export async function resetPassword(email) {
  */
 export async function signInWithGoogle(profileMeta = {}) {
   return loginWithGoogle();
+}
+
+/**
+ * Sign in with Microsoft (OAuth Provider)
+ */
+export async function signInWithMicrosoft(profileMeta = {}) {
+  return loginWithMicrosoft();
+}
+
+/**
+ * Sign in with GitHub (OAuth Provider)
+ */
+export async function signInWithGithub(profileMeta = {}) {
+  return loginWithGithub();
 }
 
 /**
@@ -135,6 +151,8 @@ export function onAuthChange(callback) {
 
 export {
   loginWithGoogle,
+  loginWithMicrosoft,
+  loginWithGithub,
   sendEmailVerificationLink,
   completeEmailLinkSignIn,
   setupRecaptcha,

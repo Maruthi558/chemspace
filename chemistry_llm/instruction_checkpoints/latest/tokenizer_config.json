@@ -1,0 +1,27 @@
+{
+  "vocab_size": 4096,
+  "merges_count": 3556,
+  "special_tokens": [
+    "<PAD>",
+    "<UNK>",
+    "<BOS>",
+    "<EOS>",
+    "<MASK>",
+    "<CHEM>",
+    "<FORMULA>",
+    "<SMILES>",
+    "<REACTION>",
+    "<QUESTION>",
+    "<ANSWER>",
+    "<REASONING>",
+    "<END>",
+    "<USER>",
+    "<ASSISTANT>",
+    "<CHEMISTRY>"
+  ],
+  "pad_token_id": 0,
+  "unk_token_id": 1,
+  "bos_token_id": 2,
+  "eos_token_id": 3,
+  "mask_token_id": 4
+}

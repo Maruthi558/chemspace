@@ -4,6 +4,8 @@ import {
   setPersistence,
   browserLocalPersistence,
   GoogleAuthProvider,
+  OAuthProvider,
+  GithubAuthProvider,
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
@@ -76,6 +78,13 @@ if (typeof window !== 'undefined') {
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+const microsoftProvider = new OAuthProvider('microsoft.com');
+microsoftProvider.setCustomParameters({ prompt: 'select_account' });
+
+const githubProvider = new GithubAuthProvider();
+githubProvider.addScope('read:user');
+githubProvider.addScope('user:email');
 
 /**
  * Reinitializes Firebase if the API key was updated in local storage or environment
@@ -311,6 +320,106 @@ export async function loginWithGoogleIdToken(idToken) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 1b. Microsoft Sign-In
+// ─────────────────────────────────────────────────────────────────────────────
+export const loginWithMicrosoft = async () => {
+  ensureFreshFirebaseAuth();
+  const profile = getSavedScientistProfile();
+
+  try {
+    const result = await signInWithPopup(auth, microsoftProvider);
+    const user = result.user;
+    const token = await user.getIdToken();
+
+    const userData = {
+      uid: user.uid,
+      name: user.displayName || profile.name || 'Verified Scientist',
+      username: user.displayName || profile.name || 'Scientist',
+      email: user.email || profile.email || '',
+      avatar: user.photoURL || profile.avatar || '',
+      workplace: profile.workplace || 'ChemNova Research Institute',
+      role: profile.title || 'Lead Research Chemist',
+      department: profile.department,
+      safetyLevel: profile.safetyLevel,
+      workingCondition: profile.workingCondition,
+      researchField: profile.researchField,
+      orcid: profile.orcid,
+      provider: 'microsoft',
+      verified: true,
+      lastLoginAt: new Date().toISOString()
+    };
+
+    localStorage.setItem('chemspace_token', token);
+    localStorage.setItem('chemspace_user', JSON.stringify(userData));
+    localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
+
+    window.dispatchEvent(new Event('chemspace-auth-changed'));
+    return userData;
+  } catch (err) {
+    console.warn('Microsoft Sign-In notice:', err.code || err.message);
+    if (
+      err.code === 'auth/popup-blocked' ||
+      err.code === 'auth/cancelled-popup-request' ||
+      (err.code === 'auth/popup-closed-by-user' && typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+    ) {
+      await signInWithRedirect(auth, microsoftProvider);
+      return null;
+    }
+    throw err;
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 1c. GitHub Sign-In
+// ─────────────────────────────────────────────────────────────────────────────
+export const loginWithGithub = async () => {
+  ensureFreshFirebaseAuth();
+  const profile = getSavedScientistProfile();
+
+  try {
+    const result = await signInWithPopup(auth, githubProvider);
+    const user = result.user;
+    const token = await user.getIdToken();
+
+    const userData = {
+      uid: user.uid,
+      name: user.displayName || profile.name || 'Verified Scientist',
+      username: user.displayName || profile.name || 'Scientist',
+      email: user.email || profile.email || '',
+      avatar: user.photoURL || profile.avatar || '',
+      workplace: profile.workplace || 'ChemNova Research Institute',
+      role: profile.title || 'Lead Research Chemist',
+      department: profile.department,
+      safetyLevel: profile.safetyLevel,
+      workingCondition: profile.workingCondition,
+      researchField: profile.researchField,
+      orcid: profile.orcid,
+      provider: 'github',
+      verified: true,
+      lastLoginAt: new Date().toISOString()
+    };
+
+    localStorage.setItem('chemspace_token', token);
+    localStorage.setItem('chemspace_user', JSON.stringify(userData));
+    localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
+
+    window.dispatchEvent(new Event('chemspace-auth-changed'));
+    return userData;
+  } catch (err) {
+    console.warn('GitHub Sign-In notice:', err.code || err.message);
+    if (
+      err.code === 'auth/popup-blocked' ||
+      err.code === 'auth/cancelled-popup-request' ||
+      (err.code === 'auth/popup-closed-by-user' && typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+    ) {
+      await signInWithRedirect(auth, githubProvider);
+      return null;
+    }
+    throw err;
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // 2. Email / Password Authentication
 // ─────────────────────────────────────────────────────────────────────────────
 export async function signUpWithEmailPassword(email, password, displayName, profileMeta = {}) {
@@ -516,6 +625,9 @@ export const setupRecaptcha = (containerId = 'recaptcha-container') => {
 export const sendSMS = async (phoneNumber, appVerifier) => {
   ensureFreshFirebaseAuth();
   try {
+    if (typeof window !== 'undefined' && auth && !auth.languageCode) {
+      auth.languageCode = 'en';
+    }
     let verifier = appVerifier || window.recaptchaVerifier;
     if (!verifier) {
       verifier = setupRecaptcha('recaptcha-container');
@@ -524,6 +636,9 @@ export const sendSMS = async (phoneNumber, appVerifier) => {
       throw new Error('Security verification element not initialized. Please refresh and try again.');
     }
     const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, verifier);
+    if (typeof window !== 'undefined') {
+      window.confirmationResult = confirmationResult;
+    }
     console.log("SMS Sent successfully!");
     return confirmationResult;
   } catch (error) {
@@ -537,7 +652,11 @@ export const sendSMS = async (phoneNumber, appVerifier) => {
 
 export const confirmSMS = async (confirmationResult, otpCode) => {
   const profile = getSavedScientistProfile();
-  const result = await confirmationResult.confirm(otpCode);
+  const activeConfirmation = confirmationResult || (typeof window !== 'undefined' ? window.confirmationResult : null);
+  if (!activeConfirmation) {
+    throw new Error('SMS verification session has expired. Please request a new verification code.');
+  }
+  const result = await activeConfirmation.confirm(otpCode);
   const user = result.user;
   const token = await user.getIdToken();
 
@@ -592,4 +711,4 @@ export function setCustomFirebaseApiKey(key) {
   ensureFreshFirebaseAuth();
 }
 
-export { app, auth, db, googleProvider, analytics };
+export { app, auth, db, googleProvider, microsoftProvider, githubProvider, analytics };

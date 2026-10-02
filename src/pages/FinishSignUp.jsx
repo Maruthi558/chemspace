@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Atom, ShieldCheck, AlertCircle, Loader2, CheckCircle2, ArrowRight, Mail } from 'lucide-react';
+import { Atom, ShieldCheck, AlertCircle, CheckCircle2, ArrowRight, Mail } from 'lucide-react';
+import ChemSpaceLoader from '../components/loading/ChemSpaceLoader';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -89,9 +90,13 @@ export default function FinishSignUp() {
 
         {/* Loading State */}
         {loading && (
-          <div className="py-8 text-center space-y-3">
-            <Loader2 className="w-8 h-8 text-emerald-500 animate-spin mx-auto" />
-            <p className="text-xs font-mono text-emerald-400">Securing your laboratory session...</p>
+          <div className="py-4">
+            <ChemSpaceLoader
+              variant="card"
+              size="md"
+              label="Securing your laboratory session..."
+              sublabel="Verifying cryptographic token"
+            />
           </div>
         )}
 

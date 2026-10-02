@@ -1,0 +1,62 @@
+{
+  "total_records": 320,
+  "average_text_length": 1187.4,
+  "maximum_text_length": 4780,
+  "minimum_text_length": 237,
+  "records_by_domain": {
+    "inorganic_chemistry": 107,
+    "organic_chemistry": 76,
+    "general_chemistry": 72,
+    "physical_chemistry": 25,
+    "analytical_chemistry": 15,
+    "chemical_safety": 9,
+    "biochemistry": 7,
+    "computational_chemistry": 5,
+    "medicinal_chemistry": 4
+  },
+  "records_by_dataset_type": {
+    "element_information": 72,
+    "compound_information": 50,
+    "chemistry_concepts": 39,
+    "chemistry_qa": 26,
+    "chemical_reactions": 22,
+    "molecular_information": 18,
+    "scientist_discovery": 15,
+    "chemistry_terminology": 15,
+    "spectroscopy_information": 13,
+    "worked_solutions": 10,
+    "chemistry_reasoning": 9,
+    "safety_knowledge": 9,
+    "physical_chemistry": 7,
+    "hypothetical_chemistry_questions": 6,
+    "inorganic_chemistry": 4,
+    "computational_chemistry": 3,
+    "quantum_chemistry": 2
+  },
+  "records_by_source": {
+    "IUPAC Periodic Table & NIST Physical Reference Data": 72,
+    "National Center for Biotechnology Information (NCBI PubChem PUG REST)": 50,
+    "ChemNova Educational Chemistry Corpus & IUPAC Compendium": 32,
+    "OpenStax Chemistry 2e & IUPAC Gold Book": 31,
+    "NIST Isotope Abundance & IUPAC Inorganic Nomenclature": 18,
+    "March's Advanced Organic Chemistry & NIST Chemical Kinetics Database": 17,
+    "Atkins' Physical Chemistry & Miessler-Fischer Inorganic Chemistry & Levine Quantum Chemistry": 16,
+    "Nobel Prize Official Archives & Royal Society of Chemistry Historical Collection": 15,
+    "IUPAC Compendium of Chemical Terminology (Gold Book)": 15,
+    "Silverstein Spectrometric Identification of Organic Compounds & NIST Chemistry WebBook": 13,
+    "OpenStax Chemistry 2e Worked Examples & Analytical Chemistry Principles": 10,
+    "March's Advanced Organic Chemistry & Carey-Sundberg Advanced Organic Chemistry": 9,
+    "OSHA Laboratory Safety Standard & Prudent Practices in the Laboratory (NRC)": 9,
+    "OpenStax Chemistry 2e & IUPAC Compendium of Chemical Terminology": 8,
+    "ChemNova Computational & Retrosynthetic Corpus": 3,
+    "ChemNova Generative Hypothesis Engine": 2
+  },
+  "records_by_license_status": {
+    "verified": 320
+  },
+  "records_by_difficulty": {
+    "introductory": 0,
+    "intermediate": 18,
+    "advanced": 302
+  }
+}

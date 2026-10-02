@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import {
   onAuthChange,
   signInWithGoogle as authServiceSignInWithGoogle,
+  signInWithMicrosoft as authServiceSignInWithMicrosoft,
+  signInWithGithub as authServiceSignInWithGithub,
   signOut as authServiceSignOut,
   signUpWithEmail as authServiceSignUpWithEmail,
   signInWithEmail as authServiceSignInWithEmail,
@@ -230,6 +232,68 @@ export function AuthProvider({ children }) {
   }
 
   /**
+   * 4b. Microsoft Sign-In
+   */
+  async function handleMicrosoftSignIn(profileData = {}) {
+    setError('');
+    try {
+      const res = await authServiceSignInWithMicrosoft(profileData);
+      if (!res) return null;
+
+      try {
+        await createUserProfile(res.uid, {
+          displayName: res.name,
+          email: res.email,
+          photoURL: res.avatar,
+          workplace: res.workplace,
+          role: res.role
+        });
+      } catch {
+        // non-critical
+      }
+
+      const fullUser = { ...res, isGuest: false };
+      setUser(fullUser);
+      return fullUser;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
+   * 4c. GitHub Sign-In
+   */
+  async function handleGithubSignIn(profileData = {}) {
+    setError('');
+    try {
+      const res = await authServiceSignInWithGithub(profileData);
+      if (!res) return null;
+
+      try {
+        await createUserProfile(res.uid, {
+          displayName: res.name,
+          email: res.email,
+          photoURL: res.avatar,
+          workplace: res.workplace,
+          role: res.role
+        });
+      } catch {
+        // non-critical
+      }
+
+      const fullUser = { ...res, isGuest: false };
+      setUser(fullUser);
+      return fullUser;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
    * 5. Email Link Passwordless Sign-In
    */
   async function handleSendEmailVerificationLink(email) {
@@ -419,6 +483,8 @@ export function AuthProvider({ children }) {
     signInWithEmail: handleSignInWithEmail,
     resetPassword: handleResetPassword,
     signInWithGoogle: handleGoogleSignIn,
+    signInWithMicrosoft: handleMicrosoftSignIn,
+    signInWithGithub: handleGithubSignIn,
     sendEmailOtp: handleSendEmailOtp,
     verifyEmailOtp: handleVerifyEmailOtp,
     sendEmailVerificationLink: handleSendEmailVerificationLink,
@@ -453,14 +519,23 @@ function formatAuthError(err) {
   const code = err.code || '';
   const message = err.message || '';
 
+  if (code === 'auth/account-exists-with-different-credential' || message.includes('account-exists-with-different-credential')) {
+    return 'An account with this email already exists under a different sign-in method. Please sign in with that method (e.g. Google or Password).';
+  }
   if (code === 'auth/invalid-verification-code' || message.includes('invalid-verification-code')) {
     return 'Invalid verification code. Please check the code and try again.';
   }
   if (code === 'auth/code-expired' || message.includes('expired')) {
     return 'Verification code has expired. Please request a new code.';
   }
-  if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
-    return 'Invalid email or password. Please verify your credentials or create an account.';
+  if (code === 'auth/invalid-credential' || code === 'auth/wrong-password') {
+    return 'Invalid email or password. Please verify your credentials or reset your password.';
+  }
+  if (code === 'auth/user-not-found') {
+    return 'No account was found matching this email. Please check your spelling or register.';
+  }
+  if (code === 'auth/user-disabled') {
+    return 'This researcher account has been deactivated. Please contact laboratory administration.';
   }
   if (code === 'auth/email-already-in-use') {
     return 'An account with this email address already exists. Please sign in instead.';
@@ -469,25 +544,34 @@ function formatAuthError(err) {
     return 'Password is too weak. Please use at least 6 characters.';
   }
   if (code === 'auth/too-many-requests' || message.includes('Too many')) {
-    return 'Too many attempts. Please wait a moment before trying again.';
+    return 'Too many attempts. Please wait a few moments before trying again.';
+  }
+  if (code === 'auth/quota-exceeded' || message.includes('quota-exceeded')) {
+    return 'SMS quota for this project has been exceeded. Please try again later or sign in with Email OTP.';
+  }
+  if (code === 'auth/app-not-authorized' || message.includes('app-not-authorized')) {
+    return 'This domain is not authorized for Firebase Phone Authentication. Please add this domain to Authorized Domains in the Firebase Console.';
+  }
+  if (code === 'auth/missing-phone-number') {
+    return 'Please enter a valid mobile phone number.';
   }
   if (code === 'auth/invalid-phone-number' || message.includes('phone-number')) {
     return 'Please enter a valid mobile phone number with country code.';
   }
   if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
-    return 'Sign-in popup was closed before completing.';
+    return 'Sign-in window was closed before completion.';
   }
   if (code === 'auth/popup-blocked') {
-    return 'Sign-in popup was blocked by your browser. Please enable popups for this site.';
+    return 'Sign-in window was blocked by your browser. Please allow popups for ChemSpace.';
   }
   if (code === 'auth/unauthorized-domain') {
     return 'Authentication domain not authorized. In Firebase Console, ensure "localhost" is listed in Authorized Domains.';
   }
   if (code === 'auth/operation-not-allowed') {
-    return 'This sign-in provider is not enabled in Firebase Console. Please enable it in Authentication > Sign-in method.';
+    return 'This sign-in provider is not yet enabled in Firebase Console. You can sign in using Google, Email OTP, or Password.';
   }
   if (code === 'auth/configuration-not-found') {
-    return 'Firebase Authentication is not activated in project chemistry1-e2723. Click "Get Started" in Firebase Console.';
+    return 'Authentication configuration not found in project chemistry1-e2723. Please check Authentication settings in Firebase Console.';
   }
   if (code === 'auth/captcha-check-failed') {
     return 'Security reCAPTCHA verification failed. Please refresh and try again.';

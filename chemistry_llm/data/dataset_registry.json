@@ -1,0 +1,21 @@
+{
+  "registry_version": "1.0.0",
+  "last_updated": "2026-10-01T09:44:00Z",
+  "dataset_count": 1,
+  "datasets": {
+    "chemnova_chemistry_corpus_v1": {
+      "dataset_id": "chemnova_chemistry_corpus_v1",
+      "dataset_name": "ChemNova Comprehensive Chemistry Knowledge Corpus",
+      "version": "1.0.0",
+      "source": "ChemNova Curated Multi-Source (IUPAC, NIST, PubChem, OpenStax, Carey-Sundberg)",
+      "source_url": "https://chemnova.ai/corpus",
+      "license": "CC-BY-4.0 / Public Domain / CC0",
+      "record_count": 320,
+      "validated_count": 320,
+      "rejected_count": 0,
+      "date_added": "2026-10-01T09:44:00Z",
+      "status": "approved",
+      "description": "Comprehensive master chemistry corpus covering 30 dataset types, periodic table, reactions, spectroscopy, calculations, and reasoning."
+    }
+  }
+}

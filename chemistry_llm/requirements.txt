@@ -1,0 +1,8 @@
+# ChemNova Self-Hosted Chemistry LLM - Step 1 Foundation Dependencies
+# Lightweight foundation requirements: No heavy training frameworks or CUDA packages in Step 1.
+
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+python-dotenv>=1.0.0
+pytest>=8.0.0

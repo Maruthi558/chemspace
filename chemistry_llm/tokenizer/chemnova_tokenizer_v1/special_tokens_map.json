@@ -1,0 +1,38 @@
+{
+  "special_tokens": [
+    "<PAD>",
+    "<UNK>",
+    "<BOS>",
+    "<EOS>",
+    "<MASK>",
+    "<CHEM>",
+    "<FORMULA>",
+    "<SMILES>",
+    "<REACTION>",
+    "<QUESTION>",
+    "<ANSWER>",
+    "<REASONING>",
+    "<END>",
+    "<USER>",
+    "<ASSISTANT>",
+    "<CHEMISTRY>"
+  ],
+  "special_token_to_id": {
+    "<PAD>": 0,
+    "<UNK>": 1,
+    "<BOS>": 2,
+    "<EOS>": 3,
+    "<MASK>": 4,
+    "<CHEM>": 5,
+    "<FORMULA>": 6,
+    "<SMILES>": 7,
+    "<REACTION>": 8,
+    "<QUESTION>": 9,
+    "<ANSWER>": 10,
+    "<REASONING>": 11,
+    "<END>": 12,
+    "<USER>": 13,
+    "<ASSISTANT>": 14,
+    "<CHEMISTRY>": 15
+  }
+}

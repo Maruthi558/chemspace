@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Activity, Play, RotateCcw, TrendingUp, Info, ChevronRight, Zap } from 'lucide-react';
 import { quantumService } from '../../services/quantumService';
+import ButtonSpinner from '../common/ButtonSpinner';
 
 export default function PESScanWorkspace({ atoms, coordinates }) {
   const [atom1Idx, setAtom1Idx] = useState(0);
@@ -54,7 +55,7 @@ export default function PESScanWorkspace({ atoms, coordinates }) {
           disabled={isScanning}
           className="btn-primary px-6 py-2.5 text-xs font-black rounded-2xl flex items-center gap-2 shadow-lg shadow-cyan-500/20"
         >
-          {isScanning ? <Activity className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
+          {isScanning ? <ButtonSpinner className="text-current" /> : <Play className="w-4 h-4" />}
           {isScanning ? 'Computing Scan...' : 'Calculate PES Curve'}
         </button>
       </div>

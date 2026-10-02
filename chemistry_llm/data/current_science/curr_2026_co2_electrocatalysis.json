@@ -1,0 +1,24 @@
+{
+  "id": "curr_2026_co2_electrocatalysis",
+  "headline": "Direct Electrochemical CO2 Reduction to C2+ Products via Bimetallic Cu-Ag Interfaces",
+  "information": "Nanostructured tandem catalyst achieving >85% Faradaic efficiency toward ethylene and ethanol using zero-gap membrane electrode assemblies.",
+  "domain": "Physical Chemistry",
+  "subdomain": "electrocatalysis",
+  "source": "Journal of the American Chemical Society (JACS)",
+  "source_url": "https://doi.org/10.1021/jacs.c2co2reduction",
+  "publication_date": "2025-2026",
+  "retrieval_date": "2026-10-01T09:43:59.965423+00:00",
+  "verification_status": "peer_reviewed",
+  "doi": null,
+  "chemical_entities": [
+    "CO2",
+    "C2H4",
+    "C2H5OH",
+    "Cu-Ag"
+  ],
+  "tags": [
+    "electrocatalysis",
+    "green_chemistry",
+    "carbon_capture"
+  ]
+}
