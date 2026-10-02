@@ -465,14 +465,6 @@ export default function Layout() {
             </div>
           </button>
 
-          <button
-            onClick={() => setAiModalOpen(true)}
-            className={`w-full flex items-center justify-center gap-2 p-2 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 text-xs font-mono transition hover:bg-emerald-500/20 font-semibold`}
-            title="ChemSpace AI"
-          >
-            <Sparkles className="w-3.5 h-3.5 shrink-0" />
-            {!sidebarCollapsed && <span>ChemSpace AI</span>}
-          </button>
 
           {/* User authentication pill */}
           {user ? (

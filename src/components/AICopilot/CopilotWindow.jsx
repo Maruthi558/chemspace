@@ -280,9 +280,13 @@ export default function CopilotWindow({ isOpen = true, onClose, onOpen }) {
   };
 
   // =========================================================================
-  // 1. DEFAULT COLLAPSED / MINIMIZED STATE: Small Round AI Launcher Button
+  // 1. DEFAULT COLLAPSED / MINIMIZED STATE: Precision Circular AI Launcher
   // =========================================================================
   if (!isOpen || isMinimized) {
+    const isProcessing = isLoading || micState === 'processing';
+    const isListening = micState === 'listening';
+    const isSpeaking = micState === 'speaking';
+
     return (
       <aside aria-label="ChemSpace AI Launcher" className="fixed bottom-6 right-6 z-50">
         <button
@@ -290,13 +294,51 @@ export default function CopilotWindow({ isOpen = true, onClose, onOpen }) {
             setIsMinimized(false);
             if (onOpen) onOpen();
           }}
-          className="relative w-12 h-12 rounded-full bg-gradient-to-tr from-orange-600 via-amber-500 to-orange-400 text-white shadow-[0_4px_24px_rgba(249,115,22,0.4)] hover:shadow-[0_6px_30px_rgba(249,115,22,0.6)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border border-orange-300/40 group"
-          title="ChemSpace AI (Click to Open)"
+          className={`relative w-12 h-12 rounded-full flex items-center justify-center cursor-pointer transition-all duration-200 select-none group border shadow-lg ${
+            isListening
+              ? 'bg-rose-600 text-white border-rose-300 shadow-[0_4px_24px_rgba(244,63,94,0.45)] animate-pulse'
+              : isProcessing
+              ? 'bg-[#121622] text-amber-400 border-amber-500/40 shadow-[0_4px_24px_rgba(245,158,11,0.35)]'
+              : isSpeaking
+              ? 'bg-emerald-600 text-white border-emerald-300 shadow-[0_4px_24px_rgba(16,185,129,0.45)]'
+              : 'bg-gradient-to-tr from-orange-600 via-amber-500 to-orange-400 text-white border-orange-300/40 shadow-[0_4px_20px_rgba(249,115,22,0.35)] hover:shadow-[0_6px_28px_rgba(249,115,22,0.55)] hover:scale-105 active:scale-95'
+          }`}
+          title={
+            isListening
+              ? 'ChemSpace AI (Listening...)'
+              : isProcessing
+              ? 'ChemSpace AI (Analyzing Chemistry...)'
+              : 'ChemSpace AI (Click to Open)'
+          }
           aria-label="Open ChemSpace AI"
         >
-          {/* Subtle Rotating Orbital Ring around the Launcher */}
-          <span className="absolute -inset-1 rounded-full border border-orange-400/30 animate-spin [animation-duration:8s] pointer-events-none" />
-          <Sparkles className="w-5 h-5 text-white transition-transform duration-200 group-hover:rotate-12" />
+          {/* Outer Orbital Ring with Contextual Motion */}
+          <span
+            className={`absolute -inset-1 rounded-full border pointer-events-none ${
+              isProcessing
+                ? 'border-amber-400/50 chemspace-orbit'
+                : isListening
+                ? 'border-rose-400/50 animate-ping opacity-30'
+                : 'border-orange-400/30 group-hover:border-orange-300/50 transition-colors'
+            }`}
+          />
+
+          {isProcessing ? (
+            /* Thinking / Processing: Dual orbital node cyclotron */
+            <div className="relative w-5 h-5 flex items-center justify-center">
+              <svg viewBox="0 0 24 24" className="w-5 h-5 chemspace-orbit" fill="none">
+                <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" strokeDasharray="14 10" />
+                <circle cx="12" cy="3" r="2" fill="#f97316" />
+                <circle cx="21" cy="12" r="1.5" fill="#10b981" />
+              </svg>
+            </div>
+          ) : isListening ? (
+            <Mic className="w-5 h-5 text-white" />
+          ) : isSpeaking ? (
+            <Volume2 className="w-5 h-5 text-white animate-pulse" />
+          ) : (
+            <Sparkles className="w-5 h-5 text-white transition-transform duration-200 group-hover:rotate-12" />
+          )}
         </button>
       </aside>
     );

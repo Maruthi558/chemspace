@@ -112,6 +112,21 @@ html[data-theme="dark"],
   --card-shadow-hover: 0 8px 30px -4px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
   --ambient-bg: #090a0f;
   --grid-pattern: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+
+  /* Home Page Dedicated Scientific Palette (Dark Mode: Deep Graphite & Obsidian) */
+  --home-bg-base: #0a0c10;
+  --home-surface-subtle: #10131c;
+  --home-surface-card: #131622;
+  --home-surface-card-hover: #181d2c;
+  --home-surface-ivory: rgba(19, 22, 34, 0.85);
+  --home-border: rgba(255, 255, 255, 0.08);
+  --home-border-subtle: rgba(255, 255, 255, 0.05);
+  --home-border-strong: rgba(255, 255, 255, 0.20);
+  --home-text-primary: #f8fafc;
+  --home-text-secondary: #94a3b8;
+  --home-text-muted: #64748b;
+  --home-card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.6), 0 1px 3px rgba(0, 0, 0, 0.4);
+  --home-card-shadow-hover: 0 12px 36px -4px rgba(0, 0, 0, 0.75), 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 html[data-theme="light"],
@@ -214,7 +229,21 @@ html[data-theme="light"],
   --card-shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
   --ambient-bg: #f6f8fa;
   --grid-pattern: radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px);
-  --ambient-bg: #f6f8fa;
+
+  /* Home Page Dedicated Luxury Neutral Palette (Light Mode: Warm Cream, Milk-White & Ivory) */
+  --home-bg-base: #faf8f5; /* Warm off-white / milk cream paper (not yellow) */
+  --home-surface-subtle: #f4f1ea; /* Slightly darker cream surface */
+  --home-surface-card: #ffffff; /* Clean milk-white card */
+  --home-surface-card-hover: #fcfbf9;
+  --home-surface-ivory: rgba(247, 244, 237, 0.90); /* Soft ivory translucent layer */
+  --home-border: rgba(30, 41, 59, 0.08); /* Fine graphite/slate border */
+  --home-border-subtle: rgba(30, 41, 59, 0.05);
+  --home-border-strong: rgba(30, 41, 59, 0.20);
+  --home-text-primary: #14171f; /* Deep graphite */
+  --home-text-secondary: #4a5468; /* Balanced slate */
+  --home-text-muted: #727e94;
+  --home-card-shadow: 0 2px 10px rgba(30, 41, 59, 0.04), 0 1px 3px rgba(30, 41, 59, 0.02);
+  --home-card-shadow-hover: 0 10px 28px rgba(30, 41, 59, 0.09), 0 2px 6px rgba(30, 41, 59, 0.03);
 }
 
 /* ==========================================================================
@@ -234,6 +263,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+}
+
+/* Cohesive, Premium Theme Transition Across All Surfaces and Structural Boundaries */
+html,
+body,
+aside,
+header,
+main,
+nav,
+.card-scientific,
+.glass-panel {
+  transition: background-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Reduced Motion Compliance */
@@ -807,13 +851,53 @@ html[data-theme="light"] .chemspace-shimmer,
   animation: chemspace-shimmer 1.8s infinite;
 }
 
+/* Organic Scientific Background Slow Drift Animation */
+@keyframes scientific-background-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(10px, -14px, 0);
+  }
+  100% {
+    transform: translate3d(-8px, 8px, 0);
+  }
+}
+
+.scientific-background-motion {
+  animation: scientific-background-drift 110s ease-in-out infinite alternate;
+  will-change: transform;
+}
+
+/* Feature Interactive Card with Micro-Interactions */
+.card-feature-interactive {
+  border-radius: 1rem;
+  background: var(--home-surface-card);
+  border: 1px solid var(--home-border);
+  box-shadow: var(--home-card-shadow);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-feature-interactive:hover {
+  transform: translateY(-2px);
+  border-color: var(--home-border-strong);
+  box-shadow: var(--home-card-shadow-hover);
+}
+
+.card-feature-interactive:active {
+  transform: translateY(0px) scale(0.99);
+}
+
 /* Reduced motion accessibility support */
 @media (prefers-reduced-motion: reduce) {
   .chemspace-orbit,
   .chemspace-orbit-reverse,
   .chemspace-orbit-fast,
   .chemspace-pulse-glow,
-  .chemspace-shimmer {
+  .chemspace-shimmer,
+  .scientific-background-motion {
     animation: none !important;
     transition: opacity 0.15s ease !important;
   }
