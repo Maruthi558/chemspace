@@ -82,6 +82,10 @@ googleProvider.setCustomParameters({ prompt: 'select_account' });
 const microsoftProvider = new OAuthProvider('microsoft.com');
 microsoftProvider.setCustomParameters({ prompt: 'select_account' });
 
+const appleProvider = new OAuthProvider('apple.com');
+appleProvider.addScope('email');
+appleProvider.addScope('name');
+
 const githubProvider = new GithubAuthProvider();
 githubProvider.addScope('read:user');
 githubProvider.addScope('user:email');
@@ -363,6 +367,56 @@ export const loginWithMicrosoft = async () => {
       (err.code === 'auth/popup-closed-by-user' && typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
     ) {
       await signInWithRedirect(auth, microsoftProvider);
+      return null;
+    }
+    throw err;
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 1b-2. Apple Sign-In
+// ─────────────────────────────────────────────────────────────────────────────
+export const loginWithApple = async () => {
+  ensureFreshFirebaseAuth();
+  const profile = getSavedScientistProfile();
+
+  try {
+    const result = await signInWithPopup(auth, appleProvider);
+    const user = result.user;
+    const token = await user.getIdToken();
+
+    const userData = {
+      uid: user.uid,
+      name: user.displayName || profile.name || 'Verified Scientist',
+      username: user.displayName || profile.name || 'Scientist',
+      email: user.email || profile.email || '',
+      avatar: user.photoURL || profile.avatar || '',
+      workplace: profile.workplace || 'ChemNova Research Institute',
+      role: profile.title || 'Lead Research Chemist',
+      department: profile.department,
+      safetyLevel: profile.safetyLevel,
+      workingCondition: profile.workingCondition,
+      researchField: profile.researchField,
+      orcid: profile.orcid,
+      provider: 'apple',
+      verified: true,
+      lastLoginAt: new Date().toISOString()
+    };
+
+    localStorage.setItem('chemspace_token', token);
+    localStorage.setItem('chemspace_user', JSON.stringify(userData));
+    localStorage.setItem('chemspace_scientist_profile', JSON.stringify({ ...profile, ...userData }));
+
+    window.dispatchEvent(new Event('chemspace-auth-changed'));
+    return userData;
+  } catch (err) {
+    console.warn('Apple Sign-In notice:', err.code || err.message);
+    if (
+      err.code === 'auth/popup-blocked' ||
+      err.code === 'auth/cancelled-popup-request' ||
+      (err.code === 'auth/popup-closed-by-user' && typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent))
+    ) {
+      await signInWithRedirect(auth, appleProvider);
       return null;
     }
     throw err;

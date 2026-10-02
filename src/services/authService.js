@@ -3,6 +3,7 @@ import {
   auth,
   loginWithGoogle,
   loginWithMicrosoft,
+  loginWithApple,
   loginWithGithub,
   checkGoogleRedirectResult,
   signUpWithEmailPassword,
@@ -63,6 +64,13 @@ export async function signInWithGoogle(profileMeta = {}) {
  */
 export async function signInWithMicrosoft(profileMeta = {}) {
   return loginWithMicrosoft();
+}
+
+/**
+ * Sign in with Apple (OAuth Provider)
+ */
+export async function signInWithApple(profileMeta = {}) {
+  return loginWithApple();
 }
 
 /**

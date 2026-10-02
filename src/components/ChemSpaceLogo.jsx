@@ -11,7 +11,9 @@ export default function ChemSpaceLogo({
   size = 'md', // 'sm' | 'md' | 'lg'
   showText = true,
   interactive = true,
-  className = ''
+  className = '',
+  brandName = 'ChemNova',
+  subtitle = 'AI WORKSTATION'
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -144,11 +146,11 @@ export default function ChemSpaceLogo({
         <div className="flex flex-col truncate leading-none">
           <div className="flex items-center gap-1">
             <span className={`${currentSize.text} font-bold tracking-wider text-[var(--text-primary)] font-sans truncate`}>
-              CHEMSPACE
+              {brandName.toUpperCase()}
             </span>
           </div>
           <span className={`${currentSize.sub} font-mono text-[var(--text-muted)] tracking-[0.2em] uppercase font-semibold mt-0.5`}>
-            STUDIO
+            {subtitle}
           </span>
         </div>
       )}

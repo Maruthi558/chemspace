@@ -3,6 +3,7 @@ import {
   onAuthChange,
   signInWithGoogle as authServiceSignInWithGoogle,
   signInWithMicrosoft as authServiceSignInWithMicrosoft,
+  signInWithApple as authServiceSignInWithApple,
   signInWithGithub as authServiceSignInWithGithub,
   signOut as authServiceSignOut,
   signUpWithEmail as authServiceSignUpWithEmail,
@@ -263,6 +264,37 @@ export function AuthProvider({ children }) {
   }
 
   /**
+   * 4b-2. Apple Sign-In
+   */
+  async function handleAppleSignIn(profileData = {}) {
+    setError('');
+    try {
+      const res = await authServiceSignInWithApple(profileData);
+      if (!res) return null;
+
+      try {
+        await createUserProfile(res.uid, {
+          displayName: res.name,
+          email: res.email,
+          photoURL: res.avatar,
+          workplace: res.workplace,
+          role: res.role
+        });
+      } catch {
+        // non-critical
+      }
+
+      const fullUser = { ...res, isGuest: false };
+      setUser(fullUser);
+      return fullUser;
+    } catch (err) {
+      const msg = formatAuthError(err);
+      setError(msg);
+      throw new Error(msg);
+    }
+  }
+
+  /**
    * 4c. GitHub Sign-In
    */
   async function handleGithubSignIn(profileData = {}) {
@@ -484,6 +516,7 @@ export function AuthProvider({ children }) {
     resetPassword: handleResetPassword,
     signInWithGoogle: handleGoogleSignIn,
     signInWithMicrosoft: handleMicrosoftSignIn,
+    signInWithApple: handleAppleSignIn,
     signInWithGithub: handleGithubSignIn,
     sendEmailOtp: handleSendEmailOtp,
     verifyEmailOtp: handleVerifyEmailOtp,
