@@ -278,19 +278,19 @@ export default function QuantumChemistryLab() {
       {/* 1. WORKSPACE HEADER */}
       <div className="workspace-header">
         <div className="flex items-center gap-4">
-          <div className="p-3 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 shadow-inner">
-            <Zap className="w-6 h-6 text-cyan-400" />
+          <div className="p-3 rounded-2xl bg-orange-500/10 border border-orange-500/20 shadow-inner">
+            <Zap className="w-6 h-6 text-orange-500" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-black text-slate-900 dark:text-white tracking-widest uppercase">
+              <span className="text-sm font-bold text-[var(--text-primary)] tracking-wider uppercase">
                 Quantum Chemistry Workspace
               </span>
-              <span className="text-[9px] bg-cyan-500 text-black font-black px-2.5 py-0.5 rounded-full uppercase tracking-tight shadow-md shadow-cyan-500/20">
-                Input-Driven Engine
+              <span className="telemetry-pill text-[9px] font-bold text-orange-500">
+                DFT &amp; Ab Initio
               </span>
             </div>
-            <p className="text-[11px] text-slate-500 font-sans mt-0.5">
+            <p className="text-[10px] text-[var(--text-secondary)] font-sans mt-0.5">
               Input SMILES or load molecular structures to run precision HF/DFT electronic calculations.
             </p>
           </div>
@@ -298,7 +298,7 @@ export default function QuantumChemistryLab() {
 
         {/* Navigation Tabs & Status */}
         <div className="flex items-center gap-3">
-          <div className="flex bg-slate-200/60 dark:bg-black/40 p-1.5 rounded-2xl border border-slate-200 dark:border-white/10 shadow-inner">
+          <div className="flex inner-box p-1 rounded-2xl shadow-inner">
             {[
               { id: 'setup', label: 'Setup & Input' },
               { id: 'monitor', label: 'SCF Monitor' },
@@ -310,10 +310,10 @@ export default function QuantumChemistryLab() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 disabled={(tab.id === 'results' && !calculationResult) || (tab.id === 'pes' && !hasMolecule)}
-                className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                className={`px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   activeTab === tab.id
-                    ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border border-orange-500/50 shadow-md'
-                    : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white disabled:opacity-30'
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-30'
                 }`}
               >
                 {tab.label}
@@ -323,19 +323,19 @@ export default function QuantumChemistryLab() {
 
           <button
             onClick={() => setShowOutputParserModal(true)}
-            className="px-3.5 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-slate-200 dark:border-white/10 text-xs font-bold text-slate-700 dark:text-gray-300 flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-2xl inner-box hover:border-orange-500/50 text-xs font-bold text-[var(--text-secondary)] hover:text-[var(--text-primary)] flex items-center gap-1.5 transition cursor-pointer"
             title="Upload or paste existing Quantum Chemistry output file (.out / .log)"
           >
-            <Upload className="w-3.5 h-3.5" /> Parse Log
+            <Upload className="w-3.5 h-3.5 text-orange-500" /> Parse Log
           </button>
         </div>
       </div>
 
       {/* 2. PRIMARY SMILES & STRUCTURE ENTRY BAR */}
-      <div className="glass-panel p-4 rounded-[28px] border border-cyan-500/20 bg-cyan-500/5 shadow-lg flex flex-col gap-3">
+      <div className="glass-panel p-4 rounded-3xl border border-[var(--border-subtle)] shadow-xl flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row items-center gap-3">
           <div className="flex-1 relative w-full">
-            <Search className="w-4 h-4 text-cyan-500 absolute left-4 top-3.5" />
+            <Search className="w-4 h-4 text-orange-500/70 absolute left-4 top-3.5" />
             <input
               type="text"
               value={smilesInput}
@@ -345,23 +345,23 @@ export default function QuantumChemistryLab() {
               }}
               onKeyDown={(e) => e.key === 'Enter' && handleSmilesSubmit()}
               placeholder="Enter a SMILES string (e.g. CCO, c1ccccc1, CC(=O)O, Aspirin)..."
-              className="w-full bg-slate-900/90 dark:bg-black/90 border border-cyan-500/30 rounded-2xl pl-11 pr-4 py-3 text-xs text-cyan-300 font-mono outline-none focus:border-cyan-400 shadow-inner"
+              className="w-full bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:border-orange-500 rounded-2xl pl-11 pr-4 py-3 text-xs text-[var(--text-primary)] font-mono outline-none shadow-sm transition-all"
             />
           </div>
 
           <div className="flex items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => handleSmilesSubmit()}
-              className="btn-horizontal btn-orange text-xs font-bold shrink-0"
+              className="btn-horizontal btn-orange text-xs font-bold shrink-0 shadow-lg"
             >
               Parse SMILES
             </button>
             <button
               onClick={handleLoadFromChemDraw}
-              className="px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 shrink-0 border border-white/10"
+              className="px-4 py-3 rounded-2xl inner-box hover:border-orange-500/50 text-[var(--text-primary)] font-bold text-xs flex items-center gap-1.5 shrink-0 transition"
               title="Import active drawn molecule from ChemDraw Studio"
             >
-              <PenTool className="w-3.5 h-3.5 text-cyan-400" /> From ChemDraw
+              <PenTool className="w-3.5 h-3.5 text-orange-500" /> From ChemDraw
             </button>
             {hasMolecule && (
               <button

@@ -1,5 +1,5 @@
 /**
- * ChemNova Analytical Separation Science & Chromatography Calculation Engine
+ * ChemSpace Analytical Separation Science & Chromatography Calculation Engine
  * Contains verified, mathematically rigorous formulas and step-by-step explanations
  * for Paper, TLC, GC, HPLC, Column, Ion-Exchange, SEC, and Affinity chromatography.
  */

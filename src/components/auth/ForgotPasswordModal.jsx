@@ -112,7 +112,7 @@ export default function ForgotPasswordModal({
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="scientist@chemnova.org"
+                  placeholder="scientist@chemspace.org"
                   className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-[var(--bg-input)] border border-[var(--border-subtle)] focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 text-[var(--text-primary)] outline-none transition"
                 />
               </div>

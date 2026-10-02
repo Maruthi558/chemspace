@@ -5,13 +5,13 @@ import { useTheme } from '../../context/ThemeContext';
 
 /**
  * AuthLayout
- * Refined, minimal, centered scientific authentication layout for ChemNova.
+ * Refined, minimal, centered scientific authentication layout for ChemSpace.
  * Features restrained ambient depth, controlled glass/surface balance,
  * high-contrast typography, and strict visual consistency.
  */
 export default function AuthLayout({
   children,
-  title = 'Welcome to ChemNova',
+  title = 'Welcome to ChemSpace',
   subtitle = 'Sign in to access your scientific AI workstation',
   className = ''
 }) {
@@ -21,7 +21,7 @@ export default function AuthLayout({
   return (
     <div
       className={`min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-6 transition-colors duration-200 relative select-none ${
-        isDark ? 'bg-[#090a0f] text-slate-100' : 'bg-[#f8fafc] text-slate-900'
+        isDark ? 'bg-[#0a0c10] text-slate-100' : 'bg-[#faf8f5] text-slate-900'
       }`}
     >
       {/* Background Micro-Grid & Subtle Scientific Glow */}
@@ -45,19 +45,19 @@ export default function AuthLayout({
       <div
         className={`w-full max-w-[420px] rounded-3xl p-7 sm:p-9 shadow-2xl border transition-all relative z-10 space-y-6 ${
           isDark
-            ? 'bg-[#111319]/90 border-white/10 shadow-black/60 backdrop-blur-xl'
-            : 'bg-white/95 border-slate-200/90 shadow-slate-200/60 backdrop-blur-xl'
+            ? 'bg-[#121520]/90 border-white/10 shadow-black/60 backdrop-blur-xl'
+            : 'bg-white/95 border-slate-200/90 shadow-slate-200/50 backdrop-blur-xl'
         } ${className}`}
       >
-        {/* ChemNova Branding & Welcome Header */}
+        {/* ChemSpace Branding & Welcome Header */}
         <div className="text-center space-y-3">
           <div className="flex justify-center mb-1">
             <ChemSpaceLogo
               size="lg"
               showText={true}
               interactive={true}
-              brandName="ChemNova"
-              subtitle="AI WORKSTATION"
+              brandName="ChemSpace"
+              subtitle="MOLECULAR PLATFORM"
             />
           </div>
 

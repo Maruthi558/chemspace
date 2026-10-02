@@ -63,18 +63,18 @@ export default function QuantumConfigurator({
   return (
     <div className="space-y-4 font-sans">
       {/* 1. Theory & Engine Selection */}
-      <div className="glass-panel p-6 rounded-[28px] space-y-5 border border-white/10 shadow-xl bg-slate-50/50 dark:bg-black/40 backdrop-blur-2xl">
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/5 pb-3">
+      <div className="glass-panel p-6 rounded-3xl space-y-5 border border-[var(--border-subtle)] shadow-xl">
+        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
           <div className="flex items-center gap-2">
-            <Sliders className="w-4 h-4 text-cyan-500" />
-            <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white">
+            <Sliders className="w-4 h-4 text-orange-500" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
               Calculation Parameters
             </h3>
           </div>
           <select
             value={config.engine || 'pyscf'}
             onChange={(e) => update('engine', e.target.value)}
-            className="text-[10px] font-mono font-bold bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-2.5 py-1 text-cyan-600 dark:text-cyan-400 outline-none"
+            className="input-control text-[10px] font-mono font-bold py-1 px-2.5 rounded-xl cursor-pointer"
           >
             <option value="pyscf">PySCF (Local Engine)</option>
             <option value="orca">ORCA 5.0</option>
@@ -86,7 +86,7 @@ export default function QuantumConfigurator({
 
         {/* Calculation Job Type */}
         <div>
-          <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-2">
+          <label className="text-[9px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block mb-2">
             Workflow Job Type
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -98,10 +98,10 @@ export default function QuantumConfigurator({
               <button
                 key={t.id}
                 onClick={() => update('calc_type', t.id)}
-                className={`py-2 px-3 rounded-2xl text-[10px] font-bold uppercase transition ${
+                className={`py-2 px-3 rounded-2xl text-[10px] font-bold uppercase transition-all cursor-pointer ${
                   config.calc_type === t.id
-                    ? 'bg-cyan-500 text-black shadow-lg shadow-cyan-500/20 font-black'
-                    : 'bg-slate-100 dark:bg-white/5 text-slate-500 dark:text-gray-400 hover:text-white'
+                    ? 'bg-orange-500 text-white shadow-md font-bold'
+                    : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)]'
                 }`}
               >
                 {t.label}
@@ -160,7 +160,7 @@ export default function QuantumConfigurator({
               <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest block">
                 Exchange-Correlation Functional
               </label>
-              <span className="text-[8px] font-mono text-cyan-500 font-bold">
+              <span className="text-[8px] font-mono text-orange-500 font-bold">
                 {config.functional || 'B3LYP'}
               </span>
             </div>
@@ -169,10 +169,10 @@ export default function QuantumConfigurator({
                 <button
                   key={f}
                   onClick={() => update('functional', f)}
-                  className={`py-1.5 px-2 rounded-xl text-[9px] font-black border transition ${
+                  className={`py-1.5 px-2 rounded-xl text-[9px] font-bold border transition-all cursor-pointer ${
                     config.functional === f
-                      ? 'bg-cyan-500 text-black border-cyan-400 shadow-md'
-                      : 'bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 text-slate-600 dark:text-gray-400 hover:border-cyan-500/40'
+                      ? 'bg-orange-500 text-white border-orange-500 shadow-md'
+                      : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)]'
                   }`}
                 >
                   {f}
@@ -245,17 +245,17 @@ export default function QuantumConfigurator({
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-              <span className="text-[8px] text-gray-500 uppercase block">Basis Functions</span>
-              <span className="text-xs font-bold text-white font-mono">{costEstimate.basis_functions}</span>
+            <div className="p-2.5 rounded-xl inner-box">
+              <span className="text-[8px] text-[var(--text-muted)] uppercase block font-mono">Basis Functions</span>
+              <span className="text-xs font-bold text-[var(--text-primary)] font-mono">{costEstimate.basis_functions}</span>
             </div>
-            <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-              <span className="text-[8px] text-gray-500 uppercase block">Memory Req.</span>
-              <span className="text-xs font-bold text-white font-mono">{costEstimate.memory_gb} GB</span>
+            <div className="p-2.5 rounded-xl inner-box">
+              <span className="text-[8px] text-[var(--text-muted)] uppercase block font-mono">Memory Req.</span>
+              <span className="text-xs font-bold text-[var(--text-primary)] font-mono">{costEstimate.memory_gb} GB</span>
             </div>
-            <div className="p-2 rounded-xl bg-white/5 border border-white/5">
-              <span className="text-[8px] text-gray-500 uppercase block">Est. Runtime</span>
-              <span className="text-xs font-bold text-white font-mono">{costEstimate.estimated_time_seconds}s</span>
+            <div className="p-2.5 rounded-xl inner-box">
+              <span className="text-[8px] text-[var(--text-muted)] uppercase block font-mono">Est. Runtime</span>
+              <span className="text-xs font-bold text-orange-500 font-mono">{costEstimate.estimated_time_seconds}s</span>
             </div>
           </div>
         </div>

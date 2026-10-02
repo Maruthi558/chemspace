@@ -3,7 +3,7 @@ import ButtonSpinner from '../common/ButtonSpinner';
 
 /**
  * SocialAuthButtons
- * Strict 3-provider authentication interface for ChemNova:
+ * Strict 3-provider authentication interface for ChemSpace:
  * 1. Continue with Google
  * 2. Continue with Microsoft
  * 3. Continue with Apple

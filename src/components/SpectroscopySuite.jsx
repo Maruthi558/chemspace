@@ -234,10 +234,10 @@ export default function SpectroscopySuite() {
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'ir'
               ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
-              : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
+              : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          <Radio className={`w-5 h-5 ${activeTechnique === 'ir' ? 'text-orange-400' : 'text-rose-400'}`} />
+          <Radio className={`w-5 h-5 ${activeTechnique === 'ir' ? 'text-orange-500' : 'text-rose-500'}`} />
           <div>
             <div className="font-bold text-xs">1. FT-IR Spectroscopy</div>
             <div className="text-[10px] opacity-70">4000 - 400 cm⁻¹ • Bands</div>
@@ -250,10 +250,10 @@ export default function SpectroscopySuite() {
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'uv'
               ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
-              : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
+              : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          <Sun className={`w-5 h-5 ${activeTechnique === 'uv' ? 'text-orange-400' : 'text-amber-400'}`} />
+          <Sun className={`w-5 h-5 ${activeTechnique === 'uv' ? 'text-orange-500' : 'text-amber-500'}`} />
           <div>
             <div className="font-bold text-xs">2. UV-Visible Spec</div>
             <div className="text-[10px] opacity-70">λmax {dossier.uvVis.lambdaMax} nm • Transitions</div>
@@ -266,10 +266,10 @@ export default function SpectroscopySuite() {
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'nmr'
               ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
-              : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
+              : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          <Eye className={`w-5 h-5 ${activeTechnique === 'nmr' ? 'text-orange-400' : 'text-violet-400'}`} />
+          <Eye className={`w-5 h-5 ${activeTechnique === 'nmr' ? 'text-orange-500' : 'text-violet-500'}`} />
           <div>
             <div className="font-bold text-xs">3. NMR Spectroscopy</div>
             <div className="text-[10px] opacity-70">¹H & ¹³C / DEPT-135 Shifts</div>
@@ -282,10 +282,10 @@ export default function SpectroscopySuite() {
           className={`p-4 rounded-2xl border transition flex items-center gap-3 text-left ${
             activeTechnique === 'ms'
               ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-xl font-black'
-              : 'bg-white/50 dark:bg-[#02040a] border-inherit opacity-70 hover:opacity-100'
+              : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          <BarChart2 className={`w-5 h-5 ${activeTechnique === 'ms' ? 'text-amber-400 dark:text-amber-500' : 'text-amber-400'}`} />
+          <BarChart2 className={`w-5 h-5 ${activeTechnique === 'ms' ? 'text-orange-500' : 'text-amber-500'}`} />
           <div>
             <div className="font-bold text-xs">4. Mass Spectrometry</div>
             <div className="text-[10px] opacity-70">EI 70 eV • Isotope Cluster</div>
@@ -384,7 +384,7 @@ export default function SpectroscopySuite() {
 
         {/* INTERACTIVE SVG SPECTRUM CANVAS */}
         <div
-          className="w-full h-80 bg-[#02040a] rounded-xl border border-inherit p-4 relative overflow-hidden cursor-crosshair"
+          className="w-full h-80 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-canvas)] p-4 relative overflow-hidden cursor-crosshair shadow-inner"
           onMouseMove={handleChartMouseMove}
           onMouseLeave={() => setCrosshairPos(null)}
         >
@@ -394,8 +394,8 @@ export default function SpectroscopySuite() {
             viewBox="0 0 600 240"
             preserveAspectRatio="none"
           >
-            <line x1="50" y1="20" x2="50" y2="200" stroke="#334155" strokeWidth="1.5" />
-            <line x1="50" y1="200" x2="580" y2="200" stroke="#334155" strokeWidth="1.5" />
+            <line x1="50" y1="20" x2="50" y2="200" stroke="currentColor" className="text-slate-400 dark:text-slate-600" strokeWidth="1.5" />
+            <line x1="50" y1="200" x2="580" y2="200" stroke="currentColor" className="text-slate-400 dark:text-slate-600" strokeWidth="1.5" />
 
             {/* ================= FT-IR SPECTRUM ================= */}
             {activeTechnique === 'ir' && (
@@ -404,8 +404,8 @@ export default function SpectroscopySuite() {
                   const x = 580 - ((w - 400) / 3600) * 530;
                   return (
                     <g key={w}>
-                      <line x1={x} y1="196" x2={x} y2="204" stroke="#64748b" strokeWidth="1.2" />
-                      <text x={x} y="218" fill="#64748b" fontSize="8" textAnchor="middle">
+                      <line x1={x} y1="196" x2={x} y2="204" stroke="currentColor" className="text-slate-400 dark:text-slate-600" strokeWidth="1.2" />
+                      <text x={x} y="218" fill="currentColor" className="text-slate-600 dark:text-slate-400" fontSize="8" textAnchor="middle">
                         {w} cm⁻¹
                       </text>
                     </g>
@@ -416,8 +416,8 @@ export default function SpectroscopySuite() {
                   const y = 20 + ((100 - val) / 100) * 180;
                   return (
                     <g key={val}>
-                      <line x1="45" y1={y} x2="580" y2={y} stroke="#1e293b" strokeDasharray="3 3" />
-                      <text x="40" y={y + 3} fill="#64748b" fontSize="8" textAnchor="end">
+                      <line x1="45" y1={y} x2="580" y2={y} stroke="currentColor" className="text-slate-300 dark:text-slate-700/60" strokeDasharray="3 3" />
+                      <text x="40" y={y + 3} fill="currentColor" className="text-slate-600 dark:text-slate-400" fontSize="8" textAnchor="end">
                         {irDisplayMode === 'transmittance' ? `${val}%T` : (val / 50).toFixed(1)}
                       </text>
                     </g>

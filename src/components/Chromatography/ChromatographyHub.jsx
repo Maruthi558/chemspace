@@ -224,15 +224,15 @@ export default function ChromatographyHub() {
       {/* 1. WORKSPACE HEADER */}
       <div className="workspace-header">
         <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+          <div className="p-2.5 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-500">
             <FlaskConical className="w-5 h-5 animate-pulse" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-black tracking-wider text-[var(--text-primary)]">
-                Analytical Chromatography &amp; Separation Science Studio
+              <h1 className="text-sm font-bold tracking-wider text-[var(--text-primary)]">
+                ANALYTICAL CHROMATOGRAPHY &amp; SEPARATION STUDIO
               </h1>
-              <span className="telemetry-pill text-[9px] font-bold">
+              <span className="telemetry-pill text-[9px] font-bold text-orange-500">
                 8 TECHNIQUES INTEGRATED
               </span>
             </div>
@@ -243,7 +243,7 @@ export default function ChromatographyHub() {
         </div>
 
         {/* Global Hub Tab Switcher */}
-        <div className="flex items-center gap-1.5 bg-white/5 p-1 rounded-2xl border border-[var(--border-subtle)]">
+        <div className="flex items-center gap-1.5 p-1 rounded-2xl inner-box">
           {[
             { id: 'experiment', label: 'Analysis & Workspace', icon: Activity },
             { id: 'calculator', label: 'Step-by-Step Calculator', icon: Calculator },
@@ -253,9 +253,9 @@ export default function ChromatographyHub() {
             <button
               key={id}
               onClick={() => setActiveTab(id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
                 activeTab === id
-                  ? 'bg-cyan-500 text-slate-950 shadow-md font-black'
+                  ? 'bg-orange-500 text-white shadow-md font-bold'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -274,16 +274,16 @@ export default function ChromatographyHub() {
             <button
               key={tech.id}
               onClick={() => setSelectedTechniqueId(tech.id)}
-              className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 border ${
+              className={`px-3.5 py-2 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 border cursor-pointer ${
                 isSelected
-                  ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-cyan-400/50 shadow-md font-black'
-                  : 'bg-white/5 border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-white/10'
+                  ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-md font-bold'
+                  : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <span>{tech.name}</span>
               <span
                 className={`text-[8px] font-mono px-1.5 py-0.5 rounded-md ${
-                  isSelected ? 'bg-black/30 text-cyan-200' : 'bg-white/10 text-slate-400'
+                  isSelected ? 'bg-black/30 text-orange-200' : 'bg-white/10 text-slate-400'
                 }`}
               >
                 {tech.shortCode}

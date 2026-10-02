@@ -3,7 +3,7 @@ import { Mic, MicOff, Check, AlertCircle } from 'lucide-react';
 
 /**
  * CircularVoiceButton
- * Premium circular microphone action button following ChemNova Section 7 specification.
+ * Premium circular microphone action button following ChemSpace specification.
  * 
  * States:
  * - IDLE: Clean circular button, subtle depth, elegant mic icon

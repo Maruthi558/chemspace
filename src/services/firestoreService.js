@@ -33,7 +33,7 @@ export async function createUserProfile(uid, data = {}) {
     displayName: data.displayName || data.name || '',
     email: data.email || '',
     photoURL: data.photoURL || data.avatar || '',
-    workplace: data.workplace || 'ChemNova Advanced Institute',
+    workplace: data.workplace || 'ChemSpace Advanced Institute',
     role: data.role || 'Lead Research Chemist',
     department: data.department || 'Department of Synthetic & Computational Chemistry',
     updatedAt: serverTimestamp(),

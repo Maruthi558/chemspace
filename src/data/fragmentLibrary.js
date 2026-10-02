@@ -1,5 +1,5 @@
 /**
- * ChemNova Extended Chemical Fragment & Functional Group Library
+ * ChemSpace Extended Chemical Fragment & Functional Group Library
  * Comprehensive, categorized library of organic fragments, substituents, and chemical groups
  * Supports: direct insertion, atom-attachment workflow, real coordinates & attachment points.
  */

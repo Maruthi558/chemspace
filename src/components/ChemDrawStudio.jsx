@@ -370,13 +370,13 @@ export default function ChemDrawStudio() {
 
     ctx.clearRect(0, 0, width, height);
 
-    // 1. Grid Background
-    ctx.fillStyle = isDark ? '#050608' : '#fafafa';
+    // 1. Grid Background (ChemSpace Milk Ivory in Light / Obsidian Graphite in Dark)
+    ctx.fillStyle = isDark ? '#0a0c10' : '#faf8f5';
     ctx.fillRect(0, 0, width, height);
 
-    // Subtle grid lines with zoom & pan
+    // Subtle CAD grid lines with zoom & pan
     ctx.save();
-    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.035)' : 'rgba(0,0,0,0.035)';
+    ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(30,41,59,0.045)';
     ctx.lineWidth = 1;
     const gridSize = 40 * zoom;
     const offsetX = panOffset.x % gridSize;
@@ -501,7 +501,7 @@ export default function ChemDrawStudio() {
 
         // Selection / Snap ring
         if (isSel) {
-          ctx.strokeStyle = '#38bdf8';
+          ctx.strokeStyle = '#f97316';
           ctx.lineWidth = 3;
           ctx.stroke();
         } else if (isSnap || isDrawingPivot) {
@@ -1727,7 +1727,7 @@ export default function ChemDrawStudio() {
                 fileSize: blob.size
               });
             }}
-            className="btn-primary px-5 py-2 text-xs font-black rounded-2xl flex items-center gap-1.5 shadow-lg shadow-cyan-500/20"
+            className="btn-orange px-5 py-2 text-xs font-bold rounded-xl flex items-center gap-1.5"
           >
             <Download className="w-3.5 h-3.5" /> Export MDL
           </button>
@@ -1735,12 +1735,12 @@ export default function ChemDrawStudio() {
       </header>
 
       {/* QUICK FUNCTIONAL GROUPS / FRAGMENT TEMPLATES RIBBON */}
-      <div className="px-6 py-2 bg-slate-100/90 dark:bg-black/40 border-b border-slate-200 dark:border-white/5 flex items-center gap-3 overflow-x-auto no-scrollbar shrink-0 shadow-inner">
-        <div className="flex items-center gap-1.5 shrink-0 text-slate-500 dark:text-slate-400 font-black text-[10px] uppercase tracking-wider pr-1">
-          <Layers className="w-3.5 h-3.5 text-cyan-500" />
+      <div className="px-6 py-2 bg-[var(--bg-inner)] border-b border-[var(--border-subtle)] flex items-center gap-3 overflow-x-auto no-scrollbar shrink-0 shadow-inner">
+        <div className="flex items-center gap-1.5 shrink-0 text-[var(--text-secondary)] font-bold text-[10px] uppercase tracking-wider pr-1">
+          <Layers className="w-3.5 h-3.5 text-orange-500" />
           <span>Fragments</span>
         </div>
-        <div className="h-4 w-px bg-slate-300 dark:bg-white/10 shrink-0" />
+        <div className="h-4 w-px bg-[var(--border-subtle)] shrink-0" />
         <div className="flex items-center gap-1.5 shrink-0">
           {FUNCTIONAL_GROUPS.map((fg) => {
             const isActive = selectedTool === 'fragment' && activeFragment === fg.id;
@@ -1753,8 +1753,8 @@ export default function ChemDrawStudio() {
                 }}
                 className={`px-2.5 py-1 rounded-xl text-xs font-mono font-bold transition-all flex items-center gap-1 border relative group ${
                   isActive
-                    ? 'bg-cyan-500 text-white border-cyan-400 shadow-md shadow-cyan-500/20 scale-105 z-10'
-                    : 'bg-white dark:bg-white/5 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-cyan-500/40 hover:bg-cyan-500/5'
+                    ? 'bg-gradient-to-tr from-orange-600 to-amber-500 text-white border-orange-400 shadow-md shadow-orange-500/25 scale-105 z-10'
+                    : 'bg-[var(--bg-card)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:border-orange-500/40 hover:text-[var(--text-primary)]'
                 }`}
                 title={`${fg.name} (${fg.label}): ${fg.desc}`}
               >
@@ -1772,20 +1772,20 @@ export default function ChemDrawStudio() {
       {/* 2. MAIN CAD WORKSPACE */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT TOOLBAR: Tools, Comprehensive Bonds, Rings, and Quick Elements */}
-        <aside className="w-20 border-r border-slate-200 dark:border-white/5 flex flex-col items-center py-5 gap-4 bg-slate-50/40 dark:bg-black/20 overflow-y-auto no-scrollbar shadow-inner">
+        <aside className="w-20 border-r border-[var(--border-subtle)] flex flex-col items-center py-5 gap-4 bg-[var(--bg-card)] overflow-y-auto no-scrollbar shadow-inner">
           {/* Main Pointer Tools */}
           <div className="flex flex-col gap-2">
             <ToolButton active={selectedTool === 'select'} onClick={() => setSelectedTool('select')} icon={MousePointer2} label="Select (S)" />
             <ToolButton active={selectedTool === 'eraser'} onClick={() => setSelectedTool('eraser')} icon={Eraser} label="Eraser (E)" color="text-rose-500" />
-            <ToolButton active={selectedTool === 'charge_pos'} onClick={() => setSelectedTool('charge_pos')} icon={Plus} label="Add Positive Charge (+)" color="text-cyan-500" />
+            <ToolButton active={selectedTool === 'charge_pos'} onClick={() => setSelectedTool('charge_pos')} icon={Plus} label="Add Positive Charge (+)" color="text-orange-500" />
             <ToolButton active={selectedTool === 'charge_neg'} onClick={() => setSelectedTool('charge_neg')} icon={Minus} label="Add Negative Charge (-)" color="text-rose-400" />
           </div>
 
-          <div className="w-10 h-px bg-slate-200 dark:bg-white/10" />
+          <div className="w-10 h-px bg-[var(--border-subtle)]" />
 
           {/* Complete Bond Types Selection */}
           <div className="flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase text-slate-400 tracking-wider text-center block">Bonds</span>
+            <span className="text-[8px] font-black uppercase text-[var(--text-muted)] tracking-wider text-center block">Bonds</span>
             {BOND_DEFINITIONS.map((b) => (
               <button
                 key={b.id}
@@ -1795,8 +1795,8 @@ export default function ChemDrawStudio() {
                 }}
                 className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center transition-all relative group shadow-sm ${
                   selectedTool === 'bond' && activeBondType === b.id
-                    ? 'bg-cyan-500 text-white shadow-xl scale-105'
-                    : 'text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/5 border border-transparent'
+                    ? 'bg-gradient-to-tr from-orange-600 via-amber-500 to-orange-400 text-white shadow-lg shadow-orange-500/25 scale-105 border border-orange-400/40'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] border border-transparent'
                 }`}
                 title={b.label}
               >
@@ -1809,11 +1809,11 @@ export default function ChemDrawStudio() {
             ))}
           </div>
 
-          <div className="w-10 h-px bg-slate-200 dark:bg-white/10" />
+          <div className="w-10 h-px bg-[var(--border-subtle)]" />
 
           {/* Ring & Cyclic Templates */}
           <div className="flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase text-slate-400 tracking-wider text-center block">Rings</span>
+            <span className="text-[8px] font-black uppercase text-[var(--text-muted)] tracking-wider text-center block">Rings</span>
             {RING_TEMPLATES.slice(0, 4).map((r) => (
               <button
                 key={r.id}
@@ -1823,8 +1823,8 @@ export default function ChemDrawStudio() {
                 }}
                 className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center transition-all relative group shadow-sm ${
                   selectedTool === 'ring' && activeRing === r.id
-                    ? 'bg-violet-600 text-white shadow-xl scale-105'
-                    : 'text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/5 border border-transparent'
+                    ? 'bg-gradient-to-tr from-orange-600 via-amber-500 to-orange-400 text-white shadow-lg shadow-orange-500/25 scale-105 border border-orange-400/40'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] border border-transparent'
                 }`}
                 title={r.label}
               >
@@ -1837,19 +1837,19 @@ export default function ChemDrawStudio() {
             ))}
           </div>
 
-          <div className="w-10 h-px bg-slate-200 dark:bg-white/10" />
+          <div className="w-10 h-px bg-[var(--border-subtle)]" />
 
           {/* Functional Groups Quick Section */}
           <div className="flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase text-slate-400 tracking-wider text-center block">Groups</span>
+            <span className="text-[8px] font-black uppercase text-[var(--text-muted)] tracking-wider text-center block">Groups</span>
             <button
               onClick={() => {
                 setSelectedTool('fragment');
               }}
               className={`w-12 h-12 rounded-2xl flex flex-col items-center justify-center transition-all relative group shadow-sm ${
                 selectedTool === 'fragment'
-                  ? 'bg-cyan-500 text-white shadow-xl scale-105'
-                  : 'text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/5 border border-transparent'
+                  ? 'bg-gradient-to-tr from-orange-600 via-amber-500 to-orange-400 text-white shadow-lg shadow-orange-500/25 scale-105 border border-orange-400/40'
+                  : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] border border-transparent'
               }`}
               title="Functional Groups Palette"
             >
@@ -1861,11 +1861,11 @@ export default function ChemDrawStudio() {
             </button>
           </div>
 
-          <div className="w-10 h-px bg-slate-200 dark:bg-white/10" />
+          <div className="w-10 h-px bg-[var(--border-subtle)]" />
 
           {/* Quick Elements Palette */}
           <div className="flex flex-col gap-2 pb-6">
-            <span className="text-[8px] font-black uppercase text-slate-400 tracking-wider text-center block">Atoms</span>
+            <span className="text-[8px] font-black uppercase text-[var(--text-muted)] tracking-wider text-center block">Atoms</span>
             {COMMON_ELEMENTS.map((el) => (
               <button
                 key={el}
@@ -1875,8 +1875,8 @@ export default function ChemDrawStudio() {
                 }}
                 className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all font-black text-sm relative group shadow-sm ${
                   selectedTool === 'atom' && activeElement === el
-                    ? 'bg-slate-900 dark:bg-white text-white dark:text-black shadow-xl scale-105'
-                    : 'text-slate-400 hover:bg-slate-200/50 dark:hover:bg-white/5 border border-transparent'
+                    ? 'bg-gradient-to-tr from-orange-600 via-amber-500 to-orange-400 text-white shadow-lg shadow-orange-500/25 scale-105 border border-orange-400/40'
+                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-hover)] border border-transparent'
                 }`}
                 style={{ color: selectedTool === 'atom' && activeElement === el ? '' : getElementColor(el, isDark) }}
               >
@@ -1890,7 +1890,7 @@ export default function ChemDrawStudio() {
             {/* Complete Periodic Table Modal Trigger */}
             <button
               onClick={() => setShowPeriodicModal(true)}
-              className="w-12 h-12 rounded-2xl flex flex-col items-center justify-center bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 transition-all group relative"
+              className="w-12 h-12 rounded-2xl flex flex-col items-center justify-center bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 transition-all group relative"
               title="Full Periodic Table"
             >
               <Search className="w-4 h-4" />
@@ -1900,7 +1900,7 @@ export default function ChemDrawStudio() {
         </aside>
 
         {/* CENTRAL MOLECULAR CANVAS */}
-        <main ref={containerRef} className="flex-1 relative cursor-crosshair overflow-hidden bg-white dark:bg-[#050608]">
+        <main ref={containerRef} className="flex-1 relative cursor-crosshair overflow-hidden bg-[var(--bg-page)]">
           <canvas
             ref={canvasRef}
             onPointerDown={handlePointerDown}

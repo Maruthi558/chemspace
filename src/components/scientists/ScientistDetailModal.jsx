@@ -247,8 +247,8 @@ export default function ScientistDetailModal({
             }}
             className="px-2.5 py-1 rounded-xl text-[10px] font-mono font-bold transition flex items-center gap-1.5 text-[var(--text-primary)] bg-[var(--bg-card)] border border-[var(--border-subtle)] hover:bg-[var(--bg-hover)]"
           >
-            <Bot className="w-3 h-3 text-emerald-400" />
-            <span>Consult ChemAI</span>
+            <Bot className="w-3 h-3 text-orange-500" />
+            <span>Consult ChemSpace AI</span>
           </button>
         </div>
 

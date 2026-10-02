@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, CheckCircle, HelpCircle, Award, ArrowRight, Box } from 'lucide-react';
+import { BookOpen, CheckCircle2, HelpCircle, Award, ArrowRight, Atom, Check, X } from 'lucide-react';
 import ThreeMoleculeViewer from '../components/ThreeMoleculeViewer';
 import { MOLECULES } from '../data/moleculeData';
 
@@ -65,101 +65,147 @@ export default function LearningCenter() {
   }
 
   return (
-    <div className="w-full space-y-6">
-      {/* Header */}
-      <div className="bg-[#111319]/90 backdrop-blur-md p-6 rounded-2xl border border-white/10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="telemetry-pill">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-              CURRICULUM & METHODOLOGY
-            </span>
-            <span className="text-[10px] font-mono text-slate-500 uppercase">Self-Paced Exploration</span>
+    <div className="workspace-container font-sans select-none space-y-6 max-w-6xl mx-auto">
+      {/* Workspace Header */}
+      <div className="workspace-header">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-2xl bg-orange-500/10 border border-orange-500/20 text-orange-500">
+            <BookOpen className="w-5 h-5" />
           </div>
-          <h1 className="text-2xl md:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
-            <BookOpen className="w-7 h-7 text-emerald-400" />
-            Chemistry & AI Learning Center
-          </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Interactive educational modules on VSEPR geometry, organic aromaticity, and QSAR machine-learning models.
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <h1 className="text-sm font-bold tracking-wider text-[var(--text-primary)]">
+                CHEMISTRY & AI LEARNING CENTER
+              </h1>
+              <span className="telemetry-pill text-[9px] font-bold">
+                CURRICULUM & METHODOLOGY
+              </span>
+            </div>
+            <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">
+              Interactive educational modules on VSEPR geometry, organic aromaticity, and QSAR machine-learning models.
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2 font-mono text-xs text-emerald-400 bg-emerald-950/60 px-4 py-2 rounded-xl border border-emerald-500/30">
-          <Award className="w-4 h-4 text-emerald-400" /> Score: {score} Correct
+
+        <div className="flex items-center gap-2">
+          <div className="telemetry-pill text-[10px] font-mono text-emerald-500 font-bold">
+            <Award className="w-4 h-4" /> Score: {score} Correct
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Lesson Navigation */}
-        <div className="lg:col-span-4 bg-[#111319]/90 border border-white/10 rounded-2xl p-4 space-y-3">
-          <span className="text-xs font-mono text-slate-400 block px-1">Curriculum Modules:</span>
-          {LESSONS.map((l) => (
-            <button
-              key={l.id}
-              onClick={() => {
-                setSelectedLesson(l);
-                setUserAnswer(null);
-                setShowExplanation(false);
-              }}
-              className={`w-full text-left p-3.5 rounded-xl border text-xs transition ${
-                l.id === selectedLesson.id
-                  ? 'bg-emerald-950/40 border-emerald-500/50 text-emerald-300 shadow-md font-medium'
-                  : 'bg-[#090a0f] border-white/10 text-slate-300 hover:bg-[#181b24]'
-              }`}
-            >
-              <div className="font-bold">{l.title}</div>
-              <div className="text-[11px] text-slate-400 mt-1 line-clamp-2">{l.summary}</div>
-            </button>
-          ))}
+        <div className="lg:col-span-4 glass-panel p-4 rounded-3xl border border-[var(--border-subtle)] space-y-3 shadow-xl">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--text-muted)] block px-1">
+            Curriculum Modules:
+          </span>
+          <div className="space-y-2">
+            {LESSONS.map((l) => {
+              const isSelected = l.id === selectedLesson.id;
+              return (
+                <button
+                  key={l.id}
+                  onClick={() => {
+                    setSelectedLesson(l);
+                    setUserAnswer(null);
+                    setShowExplanation(false);
+                  }}
+                  className={`w-full text-left p-3.5 rounded-2xl border text-xs transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-[var(--sidebar-active-bg)] text-[var(--sidebar-active-text)] border-orange-500/50 shadow-md font-bold'
+                      : 'inner-box hover:border-[var(--border-strong)] text-[var(--text-primary)]'
+                  }`}
+                >
+                  <div className="font-bold flex items-center justify-between gap-1">
+                    <span>{l.title}</span>
+                    <span className="text-[9px] font-mono text-orange-500 shrink-0">{l.category}</span>
+                  </div>
+                  <div className="text-[11px] text-[var(--text-secondary)] mt-1 line-clamp-2 font-normal">
+                    {l.summary}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Right Lesson Content & Quiz */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-[#111319]/90 border border-white/10 rounded-2xl p-6 space-y-4">
-            <h2 className="text-xl font-bold text-white tracking-tight">{selectedLesson.title}</h2>
-            <p className="text-xs text-slate-300 leading-relaxed font-sans">{selectedLesson.details}</p>
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-5 shadow-xl">
+            <div className="border-b border-[var(--border-subtle)] pb-3">
+              <span className="telemetry-pill text-[9px] font-mono text-orange-500 font-bold mb-2 inline-block">
+                {selectedLesson.category}
+              </span>
+              <h2 className="text-lg font-bold text-[var(--text-primary)] tracking-tight">
+                {selectedLesson.title}
+              </h2>
+            </div>
+
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed font-sans">
+              {selectedLesson.details}
+            </p>
 
             {/* Interactive 3D Demonstration */}
-            <div className="pt-2">
-              <span className="text-xs font-mono text-emerald-400 font-bold block mb-2">3D Molecular Demonstration ({demoMolecule.name}):</span>
-              <div className="h-64 w-full rounded-xl overflow-hidden border border-white/10 bg-[#090a0f]">
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold text-orange-500 flex items-center gap-1.5">
+                  <Atom className="w-4 h-4" /> 3D Molecular Demonstration ({demoMolecule.name}):
+                </span>
+                <span className="text-[10px] font-mono text-[var(--text-muted)]">
+                  Formula: {demoMolecule.formula || 'C6H6'}
+                </span>
+              </div>
+              <div className="h-64 w-full rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-canvas)] shadow-inner">
                 <ThreeMoleculeViewer molecule={demoMolecule} styleMode="ball-stick" />
               </div>
             </div>
 
             {/* Interactive Quiz Section */}
-            <div className="pt-4 border-t border-white/10 space-y-3">
-              <h3 className="text-xs font-mono font-bold text-violet-300 flex items-center gap-1.5">
-                <HelpCircle className="w-4 h-4 text-violet-400" /> Interactive Knowledge Check
+            <div className="pt-4 border-t border-[var(--border-subtle)] space-y-3">
+              <h3 className="text-xs font-mono font-bold text-orange-500 flex items-center gap-1.5">
+                <HelpCircle className="w-4 h-4" /> Interactive Knowledge Check
               </h3>
-              <p className="text-xs text-slate-200 font-semibold">{selectedLesson.quiz.question}</p>
+              <p className="text-xs text-[var(--text-primary)] font-semibold">
+                {selectedLesson.quiz.question}
+              </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                 {selectedLesson.quiz.options.map((opt, idx) => {
                   const isCorrect = idx === selectedLesson.quiz.correctAnswer;
                   const isUserChosen = userAnswer === idx;
+                  let btnStyle = 'inner-box hover:border-orange-500/50 text-[var(--text-primary)]';
+
+                  if (showExplanation) {
+                    if (isCorrect) {
+                      btnStyle = 'bg-emerald-500/15 border-emerald-500 text-emerald-500 font-bold';
+                    } else if (isUserChosen && !isCorrect) {
+                      btnStyle = 'bg-rose-500/15 border-rose-500 text-rose-500 font-bold';
+                    } else {
+                      btnStyle = 'inner-box opacity-50 text-[var(--text-muted)]';
+                    }
+                  }
+
                   return (
                     <button
                       key={idx}
                       onClick={() => handleSelectOption(idx)}
                       disabled={userAnswer !== null}
-                      className={`p-3 rounded-xl border text-left font-mono transition ${
-                        showExplanation && isCorrect
-                          ? 'bg-emerald-950 border-emerald-500 text-emerald-300'
-                          : showExplanation && isUserChosen && !isCorrect
-                          ? 'bg-red-950 border-red-500 text-red-300'
-                          : 'bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800'
-                      }`}
+                      className={`p-3 rounded-xl border text-left font-mono transition-all cursor-pointer ${btnStyle}`}
                     >
-                      {opt}
+                      <div className="flex items-center justify-between">
+                        <span>{opt}</span>
+                        {showExplanation && isCorrect && <Check className="w-4 h-4 text-emerald-500" />}
+                        {showExplanation && isUserChosen && !isCorrect && <X className="w-4 h-4 text-rose-500" />}
+                      </div>
                     </button>
                   );
                 })}
               </div>
 
               {showExplanation && (
-                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 font-sans space-y-1">
-                  <strong className="text-emerald-400 block font-mono">Explanation:</strong>
+                <div className="p-3.5 rounded-2xl inner-box border border-emerald-500/30 text-xs text-[var(--text-secondary)] font-sans space-y-1 animate-in fade-in">
+                  <strong className="text-emerald-500 block font-mono">Scientific Explanation:</strong>
                   <span>{selectedLesson.quiz.explanation}</span>
                 </div>
               )}

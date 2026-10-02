@@ -11,7 +11,7 @@ const DEFAULT_PHASES = [
 
 /**
  * AILoader
- * Premium atomic thinking indicator for ChemNova AI responses.
+ * Premium atomic thinking indicator for ChemSpace AI responses.
  * Displays a dual-ring cyclotron orbital loader with rotating valence nodes,
  * scientific phase telemetry, and instant cancellation.
  */

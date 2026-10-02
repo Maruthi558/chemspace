@@ -178,12 +178,8 @@ export default function Landing() {
   const isDark = theme === 'dark';
 
   return (
-    <div className="w-full min-h-screen relative select-none bg-[var(--home-bg-base)] text-[var(--home-text-primary)] overflow-x-hidden font-sans">
-      {/* ───────────────────────────────────────────────────────────────────────
-          1. 5-LAYER PRECISION SCIENTIFIC BACKGROUND
-          Exclusive to Home Page: Cream/Milk-White paper (Light) / Charcoal (Dark)
-         ─────────────────────────────────────────────────────────────────────── */}
-      <ScientificLayeredBackground />
+    <div className="w-full min-h-screen relative select-none bg-transparent text-[var(--home-text-primary)] overflow-x-hidden font-sans">
+      {/* Main Content Workspace Container */}
 
       {/* Main Content Workspace Container */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-16 sm:space-y-24">
@@ -251,7 +247,7 @@ export default function Landing() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-lg bg-black/75 backdrop-blur-md border border-white/10 text-white text-[10px] font-mono flex items-center gap-2">
                 <Microscope className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Analytical Instrumentation • ChemNova Certified Facility</span>
+                <span>Analytical Instrumentation • ChemSpace Certified Facility</span>
               </div>
             </div>
           </div>

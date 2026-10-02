@@ -1,5 +1,5 @@
 /**
- * ChemNova Chemical Reaction & Retrosynthesis Intelligence Engine
+ * ChemSpace Chemical Reaction & Retrosynthesis Intelligence Engine
  * Provides validated chemical reaction parsing, reaction SMILES generation,
  * forward organic transformation prediction, retrosynthetic disconnection mapping,
  * atom-mapping algorithms, and file import/export utilities.

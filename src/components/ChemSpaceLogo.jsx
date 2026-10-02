@@ -12,8 +12,8 @@ export default function ChemSpaceLogo({
   showText = true,
   interactive = true,
   className = '',
-  brandName = 'ChemNova',
-  subtitle = 'AI WORKSTATION'
+  brandName = 'ChemSpace',
+  subtitle = 'MOLECULAR PLATFORM'
 }) {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -47,7 +47,7 @@ export default function ChemSpaceLogo({
         {/* Subtle Ambient Depth Glow (Calm & Restrained) */}
         <div
           className={`absolute inset-0 rounded-xl opacity-30 pointer-events-none transition-opacity duration-300 ${
-            isDark ? 'bg-gradient-to-br from-emerald-500/10 via-transparent to-slate-800/20' : 'bg-gradient-to-br from-emerald-500/5 via-transparent to-slate-100'
+            isDark ? 'bg-gradient-to-br from-orange-500/10 via-transparent to-slate-800/20' : 'bg-gradient-to-br from-orange-500/5 via-transparent to-slate-100'
           }`}
         />
 
@@ -63,65 +63,64 @@ export default function ChemSpaceLogo({
           {/* Outer Hexagonal Molecular Geometry */}
           <polygon
             points="16,3 27.5,9.5 27.5,22.5 16,29 4.5,22.5 4.5,9.5"
-            stroke={isDark ? '#64748b' : '#94a3b8'}
-            strokeWidth="1.5"
+            stroke={isDark ? '#cbd5e1' : '#0f172a'}
+            strokeWidth="1.8"
             strokeLinejoin="round"
-            strokeOpacity="0.8"
           />
 
-          {/* Internal Resonant Chemical Bonds (Subtle) */}
+          {/* Internal Resonant Chemical Bonds */}
           <line
             x1="16"
             y1="3"
             x2="16"
             y2="10"
-            stroke={isDark ? '#475569' : '#cbd5e1'}
-            strokeWidth="1.2"
-            strokeOpacity="0.7"
+            stroke={isDark ? '#64748b' : '#64748b'}
+            strokeWidth="1.3"
+            strokeLinecap="round"
           />
           <line
             x1="27.5"
             y1="22.5"
             x2="21.5"
             y2="19"
-            stroke={isDark ? '#475569' : '#cbd5e1'}
-            strokeWidth="1.2"
-            strokeOpacity="0.7"
+            stroke={isDark ? '#64748b' : '#64748b'}
+            strokeWidth="1.3"
+            strokeLinecap="round"
           />
           <line
             x1="4.5"
             y1="22.5"
             x2="10.5"
             y2="19"
-            stroke={isDark ? '#475569' : '#cbd5e1'}
-            strokeWidth="1.2"
-            strokeOpacity="0.7"
+            stroke={isDark ? '#64748b' : '#64748b'}
+            strokeWidth="1.3"
+            strokeLinecap="round"
           />
 
-          {/* Precision Orbital Ring */}
+          {/* Precision Molecular Orbital Ring (ChemSpace Signature Orange Accent) */}
           <ellipse
             cx="16"
             cy="16"
             rx="10.5"
             ry="4.2"
             transform="rotate(-28 16 16)"
-            stroke={isDark ? '#38bdf8' : '#0284c7'}
-            strokeWidth="1.2"
-            strokeOpacity="0.8"
-            strokeDasharray="1.5 2"
+            stroke="#f97316"
+            strokeWidth="1.4"
+            strokeDasharray="2 1.5"
+            strokeOpacity="0.95"
           />
 
-          {/* Central Nucleus Node */}
+          {/* Central Nucleus Node (Emerald Core) */}
           <circle
             cx="16"
             cy="16"
             r="2.8"
-            fill={isDark ? '#10b981' : '#059669'}
+            fill="#10b981"
           />
           <circle
             cx="16"
             cy="16"
-            r="1.2"
+            r="1.1"
             fill="#ffffff"
           />
 
@@ -129,14 +128,14 @@ export default function ChemSpaceLogo({
           <circle
             cx="24.5"
             cy="11.5"
-            r="1.4"
-            fill={isDark ? '#f8fafc' : '#0f172a'}
+            r="1.5"
+            fill="#f97316"
           />
           <circle
             cx="7.5"
             cy="20.5"
             r="1.4"
-            fill={isDark ? '#94a3b8' : '#475569'}
+            fill={isDark ? '#f8fafc' : '#0f172a'}
           />
         </svg>
       </div>
@@ -144,9 +143,16 @@ export default function ChemSpaceLogo({
       {/* Typography Hierarchy */}
       {showText && (
         <div className="flex flex-col truncate leading-none">
-          <div className="flex items-center gap-1">
-            <span className={`${currentSize.text} font-bold tracking-wider text-[var(--text-primary)] font-sans truncate`}>
-              {brandName.toUpperCase()}
+          <div className="flex items-center gap-0.5">
+            <span className={`${currentSize.text} font-bold tracking-tight text-[var(--text-primary)] font-sans`}>
+              {brandName.startsWith('Chem') ? (
+                <>
+                  <span>Chem</span>
+                  <span className="text-orange-500">Space</span>
+                </>
+              ) : (
+                brandName.toUpperCase()
+              )}
             </span>
           </div>
           <span className={`${currentSize.sub} font-mono text-[var(--text-muted)] tracking-[0.2em] uppercase font-semibold mt-0.5`}>

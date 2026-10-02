@@ -90,11 +90,11 @@ export default function Dashboard() {
               logActivity('ChemDraw', 'Started New 2D Sketch', 'Initialized blank canvas workspace', 'sketch');
               navigate('/chemdraw');
             }}
-            className="btn-horizontal btn-primary text-xs shadow-md flex items-center gap-2"
+            className="btn-horizontal btn-orange text-xs font-bold shadow-lg flex items-center gap-2"
           >
             <PenTool className="w-3.5 h-3.5" />
             <span>Launch ChemDraw</span>
-            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/30 text-slate-300 border border-white/20">
+            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-black/30 text-white border border-white/20">
               CH₃-C(=O)OH
             </span>
           </button>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Database, Download, Check, ShieldCheck, Key, RefreshCw, Code, Layers } from 'lucide-react';
 
-const MYSQL_SCHEMA_SQL = `-- ChemNova MySQL Database Schema (v3.0)
+const MYSQL_SCHEMA_SQL = `-- ChemSpace MySQL Database Schema (v3.0)
 CREATE DATABASE IF NOT EXISTS chemspace_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE chemspace_db;
 

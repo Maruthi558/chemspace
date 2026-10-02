@@ -4,7 +4,7 @@ import { useTheme } from '../../context/ThemeContext';
 /**
  * ScientificLayeredBackground
  * 
- * 5-Layer Precision Scientific Environment designed exclusively for the ChemNova Home Page.
+ * 5-Layer Precision Scientific Environment designed exclusively for the ChemSpace Home Page.
  * 
  * Layer 1: Premium cream / milk-white base (Light) / Deep graphite & charcoal (Dark).
  * Layer 2: Subtle tonal variations & soft ivory translucent surfaces (Warm paper vellum feel).

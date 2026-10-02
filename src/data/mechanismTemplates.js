@@ -1,5 +1,5 @@
 /**
- * ChemNova Organic Reaction Mechanism Templates Library
+ * ChemSpace Organic Reaction Mechanism Templates Library
  * Rich, editable multi-step organic reaction mechanisms with:
  * - Starting materials, Intermediates, Transition states [‡], Final products
  * - Curved electron-pushing arrows (double-barb pair & single fishhook radical)

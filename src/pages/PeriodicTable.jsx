@@ -3,8 +3,12 @@ import { PERIODIC_ELEMENTS, CATEGORY_COLORS, CATEGORY_THEMES } from '../data/per
 import ThreeAtomShell from '../components/ThreeAtomShell';
 import { Grid, Layers, Search, Info, Atom, Eye, CheckCircle2, Sliders, Flame, Droplets, Wind, Zap } from 'lucide-react';
 import { logActivity } from '../services/activityStore';
+import { useTheme } from '../context/ThemeContext';
 
 export default function PeriodicTable() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const [selectedElement, setSelectedElement] = useState(PERIODIC_ELEMENTS[0]);
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('All');
   const [activePhaseFilter, setActivePhaseFilter] = useState('All');
@@ -40,61 +44,59 @@ export default function PeriodicTable() {
   };
 
   return (
-    <div className="workspace-container font-mono select-none">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 select-none font-sans">
       {/* 1. WORKSPACE HEADER */}
-      <div className="workspace-header">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[var(--border-subtle)]">
         <div className="flex items-center gap-3">
           <div
-            className="p-2.5 rounded-xl border transition-all duration-300"
+            className="w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-300 shadow-sm"
             style={{
               background: `${selectedTheme.color}20`,
-              borderColor: `${selectedTheme.color}60`,
-              boxShadow: `0 0 16px ${selectedTheme.color}40`
+              borderColor: `${selectedTheme.color}50`
             }}
           >
             <Atom className="w-5 h-5" style={{ color: selectedTheme.color }} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-black text-white tracking-wider">PERIODIC TABLE OF ELEMENTS</span>
+              <span className="text-base font-bold text-[var(--text-primary)] tracking-tight">PERIODIC TABLE OF ELEMENTS</span>
               <span
-                className="text-[10px] font-bold px-2 py-0.5 rounded-md border"
+                className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full border"
                 style={{
-                  background: `${selectedTheme.color}25`,
+                  background: `${selectedTheme.color}15`,
                   color: selectedTheme.color,
-                  borderColor: `${selectedTheme.color}50`
+                  borderColor: `${selectedTheme.color}35`
                 }}
               >
                 118 ELEMENTS • 3D ATOMIC SHELLS
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-sans">
+            <p className="text-xs text-[var(--text-secondary)] font-normal mt-0.5">
               Dynamic category color system, interactive 3D Bohr & Quantum probability cloud models, Pauling electronegativities, and orbital telemetry.
             </p>
           </div>
         </div>
 
-        {/* Heatmap Overlay & Phase Selector */}
         {/* View Mode & Heatmap Overlay */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Table vs Grid Switcher */}
-          <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10 text-xs">
+          <div className="flex items-center gap-1 bg-[var(--bg-inner)] p-1 rounded-xl border border-[var(--border-subtle)] text-xs">
             <button
               onClick={() => setViewMode('table')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 viewMode === 'table'
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'btn-orange py-1 px-3 text-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               18-Col IUPAC Table
             </button>
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer ${
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${
                 viewMode === 'grid'
-                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-sm'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'btn-orange py-1 px-3 text-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               Card Grid
@@ -102,11 +104,11 @@ export default function PeriodicTable() {
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] text-slate-400 font-sans">Trend Mode:</span>
+            <span className="text-xs text-[var(--text-muted)] font-mono">Trend:</span>
             <select
               value={trendOverlay}
               onChange={(e) => setTrendOverlay(e.target.value)}
-              className="px-2.5 py-1 bg-[#02040a] border border-white/20 rounded-xl text-xs font-mono text-white focus:border-orange-400 focus:outline-none transition cursor-pointer"
+              className="px-2.5 py-1.5 bg-[var(--bg-input)] border border-[var(--border-subtle)] rounded-xl text-xs font-sans text-[var(--text-primary)] focus:border-orange-500 focus:outline-none transition cursor-pointer"
             >
               <option value="none">Standard Category Colors</option>
               <option value="electronegativity">Electronegativity (Pauling)</option>
@@ -119,11 +121,11 @@ export default function PeriodicTable() {
       </div>
 
       {/* 2. SEARCH & FILTER CONTROLS BAR */}
-      <div className="glass-panel p-3 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      <div className="card-scientific p-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
         {/* Search Input & Phase Pills */}
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <div className="relative w-full md:w-56">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+          <div className="relative w-full md:w-60">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[var(--text-muted)]" />
             <input
               type="text"
               placeholder="Search symbol, name, or #..."
@@ -134,15 +136,15 @@ export default function PeriodicTable() {
           </div>
 
           {/* Phase Filter Chips */}
-          <div className="flex items-center gap-1 bg-black/50 p-1 rounded-xl border border-white/10 text-[10px]">
+          <div className="flex items-center gap-1 bg-[var(--bg-inner)] p-1 rounded-xl border border-[var(--border-subtle)] text-[10px] font-mono">
             {phases.map((ph) => (
               <button
                 key={ph}
                 onClick={() => setActivePhaseFilter(ph)}
-                className={`px-2 py-0.5 rounded-lg font-bold transition ${
+                className={`px-2 py-0.5 rounded-lg font-semibold transition ${
                   activePhaseFilter === ph
-                    ? 'bg-white text-black font-black shadow-sm'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-[var(--btn-primary-bg)] text-[var(--btn-primary-text)] font-bold shadow-sm'
+                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
                 {ph}
@@ -152,7 +154,7 @@ export default function PeriodicTable() {
         </div>
 
         {/* Category Filter Chips with Vibrant Color Badges */}
-        <div className="flex items-center gap-1 overflow-x-auto py-0.5 max-w-full">
+        <div className="flex items-center gap-1 overflow-x-auto py-0.5 max-w-full no-scrollbar">
           {categories.map((cat) => {
             const catColor = CATEGORY_COLORS[cat];
             const isCatActive = activeCategoryFilter === cat;
@@ -161,17 +163,17 @@ export default function PeriodicTable() {
               <button
                 key={cat}
                 onClick={() => setActiveCategoryFilter(cat)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition flex items-center gap-1.5 border ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 border ${
                   isCatActive
-                    ? 'text-white font-black shadow-md'
-                    : 'bg-[#02040a] text-slate-400 border-white/10 hover:border-white/30 hover:text-white'
+                    ? 'shadow-sm'
+                    : 'bg-[var(--bg-inner)] text-[var(--text-secondary)] border-[var(--border-subtle)] hover:text-[var(--text-primary)] hover:border-[var(--border-medium)]'
                 }`}
                 style={
                   isCatActive
                     ? {
-                        background: catColor ? `${catColor}30` : 'rgba(255,255,255,0.2)',
-                        borderColor: catColor || '#ffffff',
-                        boxShadow: catColor ? `0 0 12px ${catColor}55` : '0 0 10px rgba(255,255,255,0.2)'
+                        background: catColor ? `${catColor}25` : 'var(--bg-hover)',
+                        borderColor: catColor || 'var(--border-strong)',
+                        color: catColor || 'var(--text-primary)'
                       }
                     : {}
                 }
@@ -179,7 +181,7 @@ export default function PeriodicTable() {
                 {catColor && (
                   <span
                     className="w-2 h-2 rounded-full inline-block"
-                    style={{ background: catColor, boxShadow: `0 0 6px ${catColor}` }}
+                    style={{ background: catColor }}
                   />
                 )}
                 <span>{cat}</span>
@@ -192,23 +194,23 @@ export default function PeriodicTable() {
       {/* 3. DUAL-PANE WORKSPACE: Left (Periodic Grid) + Right (Element Inspector & 3D Shell) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 flex-1">
         {/* LEFT COLUMN: 118 Elements Mendeleev Grid (8 Cols) */}
-        <div className="lg:col-span-8 glass-panel p-4 rounded-2xl border border-white/15 space-y-3">
-          <div className="flex items-center justify-between text-xs text-slate-400 border-b border-white/10 pb-2">
+        <div className="lg:col-span-8 card-scientific p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between text-xs text-[var(--text-secondary)] border-b border-[var(--border-subtle)] pb-2.5">
             <span className="font-mono">
-              Showing <strong className="text-white">{filteredElements.length}</strong> of 118 Elements
+              Showing <strong className="text-[var(--text-primary)]">{filteredElements.length}</strong> of 118 Elements
             </span>
-            <div className="flex items-center gap-2 text-[10px]">
-              <span className="flex items-center gap-1 text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Solid
+            <div className="flex items-center gap-3 text-[10px] font-mono">
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Solid
               </span>
-              <span className="flex items-center gap-1 text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-400" /> Gas
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" /> Gas
               </span>
-              <span className="flex items-center gap-1 text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-teal-400" /> Liquid
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500" /> Liquid
               </span>
-              <span className="flex items-center gap-1 text-slate-400">
-                <span className="w-1.5 h-1.5 rounded-full bg-rose-400" /> Synthetic
+              <span className="flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" /> Synthetic
               </span>
             </div>
           </div>
@@ -227,16 +229,16 @@ export default function PeriodicTable() {
               let trendColor = null;
               if (trendOverlay === 'electronegativity' && el.electronegativity) {
                 const ratio = Math.min(1, Math.max(0, el.electronegativity / 4.0));
-                trendColor = `hsl(${Math.round(240 - ratio * 240)}, 85%, 60%)`;
+                trendColor = `hsl(${Math.round(240 - ratio * 240)}, 85%, 55%)`;
               } else if (trendOverlay === 'radius' && el.radius) {
                 const ratio = Math.min(1, Math.max(0, (el.radius - 30) / 240));
-                trendColor = `hsl(${Math.round(180 - ratio * 180)}, 85%, 60%)`;
+                trendColor = `hsl(${Math.round(180 - ratio * 180)}, 85%, 55%)`;
               } else if (trendOverlay === 'ionEnergy' && el.ionEnergy) {
                 const ratio = Math.min(1, Math.max(0, (el.ionEnergy - 350) / 2000));
-                trendColor = `hsl(${Math.round(280 - ratio * 280)}, 85%, 60%)`;
+                trendColor = `hsl(${Math.round(280 - ratio * 280)}, 85%, 55%)`;
               } else if (trendOverlay === 'meltingPoint' && el.meltingPoint) {
                 const ratio = Math.min(1, Math.max(0, el.meltingPoint / 4000));
-                trendColor = `hsl(${Math.round(200 - ratio * 200)}, 90%, 60%)`;
+                trendColor = `hsl(${Math.round(200 - ratio * 200)}, 90%, 55%)`;
               }
 
               const displayColor = trendColor || catTheme.color;
@@ -245,37 +247,41 @@ export default function PeriodicTable() {
                 <div
                   key={el.number}
                   onClick={() => handleSelectElement(el)}
-                  className={`p-1.5 rounded-lg cursor-pointer transition-all duration-150 flex flex-col justify-between relative group select-none ${
+                  className={`p-1.5 rounded-xl cursor-pointer transition-all duration-150 flex flex-col justify-between relative group select-none ${
                     !isMatch ? 'opacity-20 grayscale hover:opacity-100 hover:grayscale-0' : ''
                   } ${
                     isSelected
-                      ? 'scale-105 z-20 shadow-[0_0_16px_rgba(249,115,22,0.6)]'
+                      ? 'scale-105 z-20 shadow-[0_0_18px_rgba(249,115,22,0.45)]'
                       : 'hover:scale-[1.04] hover:z-10'
                   }`}
                   style={{
                     background: isSelected
-                      ? `linear-gradient(135deg, ${displayColor}40 0%, #060a14 100%)`
-                      : catTheme.bg,
+                      ? isDark
+                        ? `linear-gradient(135deg, ${displayColor}35 0%, #121520 100%)`
+                        : `linear-gradient(135deg, ${displayColor}20 0%, #ffffff 100%)`
+                      : isDark
+                      ? catTheme.bg
+                      : `${displayColor}10`,
                     border: isSelected
                       ? '2px solid #f97316'
-                      : `1px solid ${catTheme.border}`,
+                      : `1px solid ${isDark ? catTheme.border : `${displayColor}35`}`,
                     boxShadow: isSelected
-                      ? `0 0 16px ${displayColor}77, inset 0 0 8px ${displayColor}33`
-                      : '0 1px 4px rgba(0,0,0,0.2)',
+                      ? `0 0 16px ${displayColor}55, inset 0 0 8px ${displayColor}25`
+                      : '0 1px 3px rgba(0,0,0,0.04)',
                     minHeight: '52px',
                     ...customStyle
                   }}
                 >
                   {/* Top: Atomic Number & Mass */}
-                  <div className="flex items-center justify-between text-[8px] font-mono font-bold leading-none">
+                  <div className="flex items-center justify-between text-[8.5px] font-mono font-bold leading-none">
                     <span
                       style={{
-                        color: isSelected ? '#ffffff' : displayColor,
+                        color: displayColor,
                       }}
                     >
                       {el.number}
                     </span>
-                    <span className="text-slate-400 text-[7px] truncate max-w-[28px]">
+                    <span className="text-[var(--text-muted)] text-[7.5px] truncate max-w-[28px]">
                       {typeof el.mass === 'number' ? el.mass.toFixed(1) : el.mass}
                     </span>
                   </div>
@@ -284,16 +290,15 @@ export default function PeriodicTable() {
                   <div
                     className="text-base font-black text-center my-0.5 tracking-tight transition-transform group-hover:scale-105"
                     style={{
-                      color: isSelected ? '#ffffff' : displayColor,
-                      textShadow: `0 0 8px ${displayColor}66`
+                      color: isDark ? (isSelected ? '#ffffff' : displayColor) : (isSelected ? '#0f172a' : displayColor)
                     }}
                   >
                     {el.symbol}
                   </div>
 
                   {/* Bottom: Element Name & Phase Indicator */}
-                  <div className="flex items-center justify-between text-[7.5px] font-medium truncate pt-0.5 border-t border-white/10 leading-none">
-                    <span className="truncate text-slate-300">
+                  <div className="flex items-center justify-between text-[8px] font-medium truncate pt-0.5 border-t border-[var(--border-subtle)] leading-none">
+                    <span className="truncate text-[var(--text-secondary)]">
                       {el.name}
                     </span>
                     <span
@@ -301,12 +306,12 @@ export default function PeriodicTable() {
                       style={{
                         background:
                           el.phase === 'Gas'
-                            ? '#22d3ee'
+                            ? '#f59e0b'
                             : el.phase === 'Liquid'
-                            ? '#38bdf8'
+                            ? '#0ea5e9'
                             : el.phase === 'Synthetic'
                             ? '#f43f5e'
-                            : '#34d399'
+                            : '#10b981'
                       }}
                       title={`Phase: ${el.phase}`}
                     />
@@ -329,24 +334,24 @@ export default function PeriodicTable() {
                   >
                     {/* Lanthanide series indicator (Row 6, Col 3) */}
                     <div
-                      className="p-1.5 rounded-lg border border-dashed border-amber-500/40 bg-amber-500/10 flex flex-col items-center justify-center text-center cursor-default select-none"
+                      className="p-1.5 rounded-xl border border-dashed border-amber-500/40 bg-amber-500/10 flex flex-col items-center justify-center text-center cursor-default select-none"
                       style={{ gridRow: 6, gridColumn: 3 }}
                       title="Lanthanide Series Elements (57-71)"
                     >
-                      <span className="text-[8px] font-mono text-amber-400 font-bold">57-71</span>
-                      <span className="text-[9px] font-bold text-slate-200">La-Lu</span>
-                      <span className="text-[6.5px] text-amber-300/70 font-mono">f-block</span>
+                      <span className="text-[8px] font-mono text-amber-500 font-bold">57-71</span>
+                      <span className="text-[9px] font-bold text-[var(--text-primary)]">La-Lu</span>
+                      <span className="text-[7px] text-amber-500/80 font-mono">f-block</span>
                     </div>
 
                     {/* Actinide series indicator (Row 7, Col 3) */}
                     <div
-                      className="p-1.5 rounded-lg border border-dashed border-rose-500/40 bg-rose-500/10 flex flex-col items-center justify-center text-center cursor-default select-none"
+                      className="p-1.5 rounded-xl border border-dashed border-rose-500/40 bg-rose-500/10 flex flex-col items-center justify-center text-center cursor-default select-none"
                       style={{ gridRow: 7, gridColumn: 3 }}
                       title="Actinide Series Elements (89-103)"
                     >
-                      <span className="text-[8px] font-mono text-rose-400 font-bold">89-103</span>
-                      <span className="text-[9px] font-bold text-slate-200">Ac-Lr</span>
-                      <span className="text-[6.5px] text-rose-300/70 font-mono">f-block</span>
+                      <span className="text-[8px] font-mono text-rose-500 font-bold">89-103</span>
+                      <span className="text-[9px] font-bold text-[var(--text-primary)]">Ac-Lr</span>
+                      <span className="text-[7px] text-rose-500/80 font-mono">f-block</span>
                     </div>
 
                     {/* All 118 Elements placed in authentic IUPAC Coordinates */}
@@ -379,89 +384,91 @@ export default function PeriodicTable() {
         </div>
 
         {/* RIGHT COLUMN: Element Inspector & 3D Atomic Shell (4 Cols) */}
-        <div className="lg:col-span-4 flex flex-col gap-3">
-          <div className="glass-panel p-5 rounded-2xl border border-white/15 space-y-4 shadow-2xl flex-1">
+        <div className="lg:col-span-4 flex flex-col gap-4">
+          <div className="card-scientific p-5 space-y-4 flex-1">
             {/* Header with Symbol & Name */}
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
+            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
               <div>
-                <span className="text-2xl font-black text-white flex items-center gap-2">
+                <span className="text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
                   {selectedElement.name}
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-md border"
+                  <span className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full border"
                     style={{
-                      background: `${selectedTheme.color}25`,
+                      background: `${selectedTheme.color}15`,
                       color: selectedTheme.color,
-                      borderColor: `${selectedTheme.color}50`
+                      borderColor: `${selectedTheme.color}35`
                     }}
                   >
                     #{selectedElement.number}
                   </span>
                 </span>
-                <span className="text-xs block font-sans mt-1" style={{ color: selectedTheme.color }}>
+                <span className="text-xs block font-sans mt-0.5" style={{ color: selectedTheme.color }}>
                   {selectedElement.category} • Group {selectedElement.group}, Period {selectedElement.period}
                 </span>
               </div>
 
               {/* Glowing Hero Symbol Card */}
               <div
-                className="w-14 h-14 p-2 rounded-2xl border flex flex-col items-center justify-center shadow-xl relative overflow-hidden"
+                className="w-14 h-14 p-2 rounded-2xl border flex flex-col items-center justify-center shadow-md relative overflow-hidden"
                 style={{
-                  background: `linear-gradient(135deg, ${selectedTheme.color}35 0%, #03060f 100%)`,
+                  background: isDark
+                    ? `linear-gradient(135deg, ${selectedTheme.color}35 0%, #121520 100%)`
+                    : `linear-gradient(135deg, ${selectedTheme.color}20 0%, #ffffff 100%)`,
                   borderColor: selectedTheme.color,
-                  boxShadow: `0 0 24px ${selectedTheme.glow}`
+                  boxShadow: `0 2px 14px ${selectedTheme.color}35`
                 }}
               >
-                <span className="text-xl font-black text-white" style={{ textShadow: `0 0 10px ${selectedTheme.color}` }}>
+                <span className="text-xl font-black" style={{ color: selectedTheme.color }}>
                   {selectedElement.symbol}
                 </span>
-                <span className="text-[8px] font-mono text-slate-300">
+                <span className="text-[8px] font-mono text-[var(--text-muted)]">
                   {typeof selectedElement.mass === 'number' ? selectedElement.mass.toFixed(2) : selectedElement.mass}
                 </span>
               </div>
             </div>
 
-            {/* Upgraded 3D Revolving Bohr Atom & Quantum Shell with Mode Switcher */}
-            <div className="h-[270px] w-full rounded-xl overflow-hidden bg-[#02040a] border border-white/15 relative shadow-inner">
+            {/* 3D Revolving Bohr Atom & Quantum Shell with Mode Switcher */}
+            <div className="h-[270px] w-full rounded-2xl overflow-hidden bg-[var(--bg-inner)] border border-[var(--border-subtle)] relative shadow-inner">
               <ThreeAtomShell element={selectedElement} />
             </div>
 
             {/* Element Properties Dossier */}
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-3 inner-box">
-                <span className="opacity-60 text-[10px] block font-sans">Atomic Number</span>
-                <span className="font-bold text-sm text-white font-mono">#{selectedElement.number}</span>
+              <div className="p-3 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]">
+                <span className="text-[var(--text-muted)] text-[10px] block font-sans">Atomic Number</span>
+                <span className="font-bold text-sm text-[var(--text-primary)] font-mono">#{selectedElement.number}</span>
               </div>
-              <div className="p-3 inner-box">
-                <span className="opacity-60 text-[10px] block font-sans">Atomic Weight</span>
-                <span className="font-bold text-sm text-white font-mono">{selectedElement.mass} u</span>
+              <div className="p-3 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]">
+                <span className="text-[var(--text-muted)] text-[10px] block font-sans">Atomic Weight</span>
+                <span className="font-bold text-sm text-[var(--text-primary)] font-mono">{selectedElement.mass} u</span>
               </div>
-              <div className="p-3 inner-box">
-                <span className="opacity-60 text-[10px] block font-sans">Electronegativity</span>
-                <span className="text-emerald-400 font-bold text-sm font-mono">{selectedElement.electronegativity || 'N/A'}</span>
+              <div className="p-3 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]">
+                <span className="text-[var(--text-muted)] text-[10px] block font-sans">Electronegativity</span>
+                <span className="text-emerald-500 font-bold text-sm font-mono">{selectedElement.electronegativity || 'N/A'}</span>
               </div>
-              <div className="p-3 inner-box">
-                <span className="opacity-60 text-[10px] block font-sans">Atomic Radius</span>
-                <span className="text-teal-400 font-bold text-sm font-mono">{selectedElement.radius} pm</span>
+              <div className="p-3 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]">
+                <span className="text-[var(--text-muted)] text-[10px] block font-sans">Atomic Radius</span>
+                <span className="text-sky-500 font-bold text-sm font-mono">{selectedElement.radius} pm</span>
               </div>
-              <div className="p-3 inner-box">
-                <span className="opacity-60 text-[10px] block font-sans">Ionization Energy</span>
-                <span className="text-violet-400 font-bold text-sm font-mono">{selectedElement.ionEnergy} kJ/mol</span>
+              <div className="p-3 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]">
+                <span className="text-[var(--text-muted)] text-[10px] block font-sans">Ionization Energy</span>
+                <span className="text-purple-500 font-bold text-sm font-mono">{selectedElement.ionEnergy} kJ/mol</span>
               </div>
-              <div className="p-3 inner-box">
-                <span className="opacity-60 text-[10px] block font-sans">Standard State</span>
-                <span className="text-amber-400 font-bold text-sm font-mono">{selectedElement.phase}</span>
+              <div className="p-3 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)]">
+                <span className="text-[var(--text-muted)] text-[10px] block font-sans">Standard State</span>
+                <span className="text-amber-500 font-bold text-sm font-mono">{selectedElement.phase}</span>
               </div>
             </div>
 
             {/* Electron Configuration */}
-            <div className="p-3 inner-box text-xs space-y-1">
-              <span className="opacity-60 text-[10px] block font-sans">Electron Configuration:</span>
+            <div className="p-3 rounded-xl bg-[var(--bg-inner)] border border-[var(--border-subtle)] text-xs space-y-1">
+              <span className="text-[var(--text-muted)] text-[10px] block font-sans">Electron Configuration:</span>
               <div className="font-mono font-bold" style={{ color: selectedTheme.color }}>
                 {selectedElement.config || '1s² 2s² 2p⁶...'}
               </div>
             </div>
 
             {/* Discovery Information */}
-            <div className="text-[11px] opacity-70 font-sans flex items-center justify-between pt-1 border-t border-white/10">
+            <div className="text-[11px] text-[var(--text-secondary)] font-sans flex items-center justify-between pt-1 border-t border-[var(--border-subtle)]">
               <span>Discovered: {selectedElement.discovered}</span>
               <span>MP: {selectedElement.meltingPoint ? `${selectedElement.meltingPoint} K` : 'N/A'}</span>
             </div>
@@ -471,4 +478,3 @@ export default function PeriodicTable() {
     </div>
   );
 }
-

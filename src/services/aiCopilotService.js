@@ -351,7 +351,7 @@ class AICopilotService {
 
       const replyText = response?.response || response?.responseText;
       if (response && (response.status === 'success' || replyText)) {
-        const text = replyText || 'ChemNova Chemistry AI responded.';
+        const text = replyText || 'ChemSpace Chemistry AI responded.';
         const citations = response.citations || [];
         const metadata = response.metadata || {};
         const tools = response.tools || [];

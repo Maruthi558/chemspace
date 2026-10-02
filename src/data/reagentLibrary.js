@@ -1,5 +1,5 @@
 /**
- * ChemNova Analytical & Synthetic Reagent Library
+ * ChemSpace Analytical & Synthetic Reagent Library
  * Comprehensive categorized database of organic synthetic reagents, catalysts, solvents, and reaction conditions.
  */
 

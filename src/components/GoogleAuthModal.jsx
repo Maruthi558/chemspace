@@ -19,7 +19,7 @@ export default function GoogleAuthModal({ onClose }) {
 
   const savedProfile = getSavedScientistProfile();
   const [scientistName, setScientistName] = useState(savedProfile.name || 'Dr. Maruthi Chemist');
-  const [scientistWorkplace, setScientistWorkplace] = useState(savedProfile.workplace || 'ChemNova Advanced Institute of Chemical Sciences');
+  const [scientistWorkplace, setScientistWorkplace] = useState(savedProfile.workplace || 'ChemSpace Advanced Institute of Chemical Sciences');
   const [scientistRole, setScientistRole] = useState(savedProfile.title || 'Lead Research Chemist');
   const [showScientistEdit, setShowScientistEdit] = useState(false);
 
@@ -191,9 +191,9 @@ export default function GoogleAuthModal({ onClose }) {
           </div>
 
           <div>
-            <h3 className="text-xl font-black font-serif-editorial">Sign in to ChemNova</h3>
+            <h3 className="text-xl font-black font-serif-editorial">Sign in to ChemSpace</h3>
             <p className="text-xs opacity-70 font-sans mt-0.5">
-              Authenticate via Google SSO to access ChemNova cloud sync, 3D labs, and RDKit workflows.
+              Authenticate via Google SSO to access ChemSpace cloud sync, 3D labs, and RDKit workflows.
             </p>
           </div>
 
@@ -254,7 +254,7 @@ export default function GoogleAuthModal({ onClose }) {
                     type="text"
                     value={scientistWorkplace}
                     onChange={(e) => setScientistWorkplace(e.target.value)}
-                    placeholder="ChemNova Advanced Institute"
+                    placeholder="ChemSpace Advanced Institute"
                     className="w-full px-2.5 py-1.5 rounded-lg bg-black/40 border border-slate-700 text-slate-100 text-xs focus:border-cyan-400 focus:outline-none"
                   />
                 </div>
@@ -265,7 +265,7 @@ export default function GoogleAuthModal({ onClose }) {
                     type="button"
                     onClick={() => {
                       setScientistName('Dr. Maruthi Chemist');
-                      setScientistWorkplace('ChemNova Synthetic Organic Institute');
+                      setScientistWorkplace('ChemSpace Synthetic Organic Institute');
                       setScientistRole('Lead Research Chemist');
                     }}
                     className="px-2 py-0.5 rounded-md text-[9px] bg-white/5 hover:bg-white/10 text-cyan-300 border border-cyan-500/30 transition"

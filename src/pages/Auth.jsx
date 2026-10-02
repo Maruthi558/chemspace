@@ -6,7 +6,7 @@ import AuthLayout from '../components/auth/AuthLayout';
 import SocialAuthButtons from '../components/auth/SocialAuthButtons';
 
 /**
- * Auth Page — ChemNova Scientific Authentication
+ * Auth Page — ChemSpace Scientific Authentication
  * Strict scope: Centered, minimal, professional authentication experience
  * featuring ONLY:
  * 1. Continue with Google
@@ -48,7 +48,7 @@ export default function Auth() {
 
     try {
       const res = await authFn({
-        workplace: 'ChemNova Research Institute',
+        workplace: 'ChemSpace Research Institute',
         role: 'Research Chemist'
       });
 
@@ -56,7 +56,7 @@ export default function Auth() {
         navigate(fromDestination, { replace: true });
       }
     } catch (err) {
-      console.warn(`[ChemNova Auth] ${providerName} notice:`, err.code || err.message);
+      console.warn(`[ChemSpace Auth] ${providerName} notice:`, err.code || err.message);
 
       // Handle user-cancelled popups gracefully without intimidating error banners
       if (
@@ -84,7 +84,7 @@ export default function Auth() {
 
   return (
     <AuthLayout
-      title="Welcome to ChemNova"
+      title="Welcome to ChemSpace"
       subtitle="Sign in to access your scientific AI workstation"
     >
       {/* Contextual Error Message Banner */}

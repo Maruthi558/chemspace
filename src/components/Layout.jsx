@@ -39,6 +39,7 @@ import { useAuth } from '../context/AuthContext';
 import { useGestures } from '../context/GestureContext';
 import GestureControlPanel from './Gestures/GestureControlPanel';
 import ChemSpaceLogo from './ChemSpaceLogo';
+import ScientificWorkspaceBackground from './common/ScientificWorkspaceBackground';
 import { getRecentActivities } from '../services/activityStore';
 import { logoutUser } from '../services/firebase';
 
@@ -211,9 +212,7 @@ export default function Layout() {
       {/* ───────────────────────────────────────────────────────────────────────
           MOBILE TOP APP BAR (< 768px)
          ─────────────────────────────────────────────────────────────────────── */}
-      <header className={`flex md:hidden sticky top-0 z-40 w-full items-center justify-between px-4 py-3 border-b backdrop-blur-xl transition-colors ${
-        isDark ? 'bg-[#090a0f]/95 border-white/10' : 'bg-white/95 border-slate-200'
-      }`}>
+      <header className="flex md:hidden sticky top-0 z-40 w-full items-center justify-between px-4 py-3 border-b backdrop-blur-xl transition-colors bg-[var(--bg-header)] border-[var(--border-subtle)]">
         <div
           onClick={() => navigate('/')}
           className="flex items-center cursor-pointer select-none touch-target"
@@ -252,9 +251,7 @@ export default function Layout() {
           />
 
           {/* Drawer content */}
-          <div className={`relative w-4/5 max-w-xs h-full flex flex-col justify-between p-4 border-r shadow-2xl z-10 transition-transform ${
-            isDark ? 'bg-[#0d0f15] border-white/10 text-slate-100' : 'bg-white border-slate-200 text-slate-900'
-          }`}>
+          <div className="relative w-4/5 max-w-xs h-full flex flex-col justify-between p-4 border-r shadow-2xl z-10 transition-transform bg-[var(--bg-sidebar)] border-[var(--border-sidebar)] text-[var(--text-primary)]">
             <div>
               {/* Header */}
               <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-subtle)]">
@@ -349,12 +346,8 @@ export default function Layout() {
           DESKTOP SIDEBAR (>= 768px)
          ─────────────────────────────────────────────────────────────────────── */}
       <aside
-        className={`hidden md:flex h-full max-h-screen z-30 flex-col justify-between border-r transition-all duration-300 ease-in-out select-none backdrop-blur-xl shrink-0 overflow-hidden ${
+        className={`hidden md:flex h-full max-h-screen z-30 flex-col justify-between border-r transition-all duration-300 ease-in-out select-none backdrop-blur-xl shrink-0 overflow-hidden bg-[var(--bg-sidebar)] border-[var(--border-sidebar)] text-[var(--text-primary)] ${
           sidebarCollapsed ? 'w-18' : 'w-60'
-        } ${
-          isDark
-            ? 'bg-[#0d0f15] border-white/10 text-slate-200'
-            : 'bg-white border-slate-200 text-slate-800'
         }`}
       >
         {/* Sidebar Top Header */}
@@ -509,10 +502,11 @@ export default function Layout() {
           Assigned id="main-scroll-container" so hand gesture vision scrolling works!
          ─────────────────────────────────────────────────────────────────────── */}
       <div id="main-scroll-container" className="flex-1 h-full min-w-0 w-full flex flex-col overflow-y-auto overflow-x-hidden relative z-10">
+        {/* Adaptive 5-Layer Precision Scientific Environment */}
+        <ScientificWorkspaceBackground />
+
         {/* Desktop Top Header Bar */}
-        <header className={`hidden md:flex h-13 border-b px-5 items-center justify-between backdrop-blur-xl shrink-0 sticky top-0 z-20 ${
-          isDark ? 'bg-[#090a0f]/90 border-white/10' : 'bg-white/90 border-slate-200'
-        }`}>
+        <header className="hidden md:flex h-13 border-b px-5 items-center justify-between backdrop-blur-xl shrink-0 sticky top-0 z-20 bg-[var(--bg-header)] border-[var(--border-subtle)]">
           {/* Quick Search */}
           <form onSubmit={handleSearchSubmit} className="relative w-80">
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 opacity-40 pointer-events-none" />
@@ -571,7 +565,7 @@ export default function Layout() {
         </main>
       </div>
 
-      {/* Floating AI Assistant (ChemNova Chemistry AI) & Global Modals */}
+      {/* Floating AI Assistant (ChemSpace AI) & Global Modals */}
       <CopilotWindow isOpen={aiModalOpen} onClose={() => setAiModalOpen(false)} onOpen={() => setAiModalOpen(true)} />
       {googleModalOpen && <GoogleAuthModal onClose={() => setGoogleModalOpen(false)} />}
       {gesturePanelOpen && <GestureControlPanel isOpen={gesturePanelOpen} onClose={() => setGesturePanelOpen(false)} />}

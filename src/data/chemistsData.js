@@ -1,5 +1,5 @@
 /**
- * ChemNova Comprehensive Scientific History & Scientist Directory Archive
+ * ChemSpace Comprehensive Scientific History & Scientist Directory Archive
  * World-class curated database of foundational and modern scientific pioneers
  * across all chemical subdisciplines, physics, and molecular biology.
  */
@@ -2854,17 +2854,17 @@ export const FAMOUS_CHEMISTS = [
     subfields: ['Green Catalysis', 'Asymmetric Synthesis', 'Medicinal Scaffolds'],
     era: 'Modern & Contemporary',
     institutions: [
-      'ChemNova Advanced Institute of Chemical Sciences',
+      'ChemSpace Advanced Institute of Chemical Sciences',
       'Cambridge University Chemical Laboratory',
       'National Institute of Chemical Sciences'
     ],
-    positions: ['Research Director of the ChemNova Institute of Molecular Intelligence', 'Fellow of the Royal Society of Chemistry'],
+    positions: ['Research Director of the ChemSpace Institute of Molecular Intelligence', 'Fellow of the Royal Society of Chemistry'],
     photo: 'https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=600&q=80',
     fallbackPhotos: [
       'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
     ],
     isAiPortrait: true,
-    portraitProvenance: 'Illustrative Executive Research Scholar Portrait (ChemNova Archival Registry)',
+    portraitProvenance: 'Illustrative Executive Research Scholar Portrait (ChemSpace Archival Registry)',
     nobel: 'Distinguished Research Pioneer in Asymmetric Catalysis, Green Solvent-Free Synthesis & Molecular Functionalization.',
     isNobelLaureate: false,
     summary: 'Pioneered high-turnover transition-metal catalyzed asymmetric cross-coupling, environmentally benign solvent-free synthesis protocols, and targeted bioactive macromolecular scaffolds.',
@@ -2928,23 +2928,23 @@ export const FAMOUS_CHEMISTS = [
       { year: '2010', event: 'Established the Advanced Molecular Synthesis & Green Chemistry Laboratory.', category: 'Early Research' },
       { year: '2014', event: 'Discovered high-turnover pincer catalytic complexes.', category: 'Discovery' },
       { year: '2018', event: 'Honored with the International Pioneer in Green Catalytic Sciences Award.', category: 'Award' },
-      { year: '2024', event: 'Appointed Research Director of the ChemNova Institute of Molecular Intelligence.', category: 'Legacy' }
+      { year: '2024', event: 'Appointed Research Director of the ChemSpace Institute of Molecular Intelligence.', category: 'Legacy' }
     ],
     awards: ['International Pioneer in Green Catalysis (2018)', 'Fellow of the Royal Society of Chemistry (FRSC)', 'Gold Medal for Chemical Innovation', 'Distinguished National Science Award'],
     publications: ['Asymmetric Catalysis in Green Synthesis (Journal of Catalysis, 2014)', 'High-Turnover Pincer Ligands in Industrial Cross-Coupling (Organic Letters, 2019)', 'Sustainable Molecular Engineering Principles (2022)'],
     mentors: ['Cambridge University Chemical Sciences Faculty'],
-    students: ['ChemNova Research Fellows & Computational Chemists'],
-    collaborators: ['Robert Burns Woodward Archive Team', 'Roald Hoffmann', 'Ryoji Noyori Group', 'ChemNova Collaborative Research Network'],
+    students: ['ChemSpace Research Fellows & Computational Chemists'],
+    collaborators: ['Robert Burns Woodward Archive Team', 'Roald Hoffmann', 'Ryoji Noyori Group', 'ChemSpace Collaborative Research Network'],
     lineage: {
       mentors: ['Cambridge University Chemical Sciences Faculty'],
-      students: ['ChemNova Research Fellows'],
+      students: ['ChemSpace Research Fellows'],
       collaborators: ['Roald Hoffmann Group', 'Ryoji Noyori Group'],
       influenced: ['Next-Generation Green Process Chemists']
     },
     facts: [
-      'Spearheaded the integration of AI-assisted reaction planning and automated flow chemistry at the ChemNova Institute.',
+      'Spearheaded the integration of AI-assisted reaction planning and automated flow chemistry at the ChemSpace Institute.',
       'Active advocate for green chemistry education in developing nations, providing open-access laboratory protocols that eliminate chlorinated solvents.'
     ],
-    references: ['ChemNova International Scientist Registry', 'Royal Society of Chemistry Fellow Directory', 'Journal of Organic Chemistry Citations']
+    references: ['ChemSpace International Scientist Registry', 'Royal Society of Chemistry Fellow Directory', 'Journal of Organic Chemistry Citations']
   }
 ];

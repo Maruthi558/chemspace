@@ -145,16 +145,14 @@ export default function Settings() {
   const isDark = theme === 'dark';
 
   return (
-    <div className={`min-h-screen pt-20 pb-16 px-4 sm:px-6 lg:px-8 transition-colors ${
-      isDark ? 'bg-[#08080a] text-neutral-200' : 'bg-[#f8f9fa] text-neutral-800'
-    }`}>
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="workspace-container font-sans select-none space-y-6 max-w-6xl mx-auto">
+      <div className="space-y-6">
 
         {/* Top Control Center Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-neutral-200 dark:border-neutral-800">
+        <div className="workspace-header">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-emerald-500">
+              <span className="text-[10px] font-mono uppercase tracking-widest font-bold text-orange-500">
                 CONTROL CENTER
               </span>
               {saveStatus && (
@@ -163,8 +161,8 @@ export default function Settings() {
                 </span>
               )}
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
-              Settings &amp; Personalization
+            <h1 className="text-sm font-bold tracking-wider text-[var(--text-primary)]">
+              CHEMSPACE SETTINGS &amp; PREFERENCES
             </h1>
           </div>
 
@@ -181,7 +179,7 @@ export default function Settings() {
         </div>
 
         {/* 10 Clean Tab Navigation */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 no-scrollbar border-b border-neutral-200 dark:border-neutral-800">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 no-scrollbar">
           {CATEGORIES.map((cat) => {
             const Icon = cat.icon;
             const active = activeTab === cat.id;
@@ -189,14 +187,10 @@ export default function Settings() {
               <button
                 key={cat.id}
                 onClick={() => handleTabChange(cat.id)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold tracking-wide shrink-0 transition cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold tracking-wide shrink-0 transition-all cursor-pointer ${
                   active
-                    ? isDark
-                      ? 'bg-neutral-800 text-white shadow-sm border border-neutral-700'
-                      : 'bg-white text-black shadow-sm border border-neutral-300'
-                    : isDark
-                      ? 'text-neutral-400 hover:text-white hover:bg-neutral-900'
-                      : 'text-neutral-600 hover:text-black hover:bg-neutral-100'
+                    ? 'bg-orange-500 text-white shadow-md font-bold'
+                    : 'inner-box hover:border-orange-500/50 text-[var(--text-secondary)]'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5 stroke-[1.75]" />
@@ -207,9 +201,7 @@ export default function Settings() {
         </div>
 
         {/* Active Tab Panel */}
-        <div className={`p-6 rounded-3xl border shadow-sm transition-all ${
-          isDark ? 'bg-[#0f0f11] border-neutral-800' : 'bg-white border-neutral-200'
-        }`}>
+        <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-subtle)] space-y-6 shadow-xl">
 
           {/* 1. PROFILE */}
           {activeTab === 'profile' && (

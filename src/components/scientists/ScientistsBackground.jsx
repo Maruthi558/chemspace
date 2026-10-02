@@ -36,7 +36,7 @@ export default function ScientistsBackground() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       const strokeAlpha = isDark ? 0.08 : 0.06;
-      const nodeFill = isDark ? 'rgba(56, 189, 248, 0.25)' : 'rgba(2, 132, 199, 0.2)';
+      const nodeFill = isDark ? 'rgba(249, 115, 22, 0.3)' : 'rgba(234, 88, 12, 0.25)';
 
       // Connect near nodes with fine lines
       for (let i = 0; i < nodes.length; i++) {
@@ -49,8 +49,8 @@ export default function ScientistsBackground() {
 
           if (dist < 130) {
             ctx.strokeStyle = isDark
-              ? `rgba(56, 189, 248, ${(1 - dist / 130) * strokeAlpha})`
-              : `rgba(2, 132, 199, ${(1 - dist / 130) * strokeAlpha})`;
+              ? `rgba(249, 115, 22, ${(1 - dist / 130) * strokeAlpha})`
+              : `rgba(234, 88, 12, ${(1 - dist / 130) * strokeAlpha})`;
             ctx.lineWidth = 0.8;
             ctx.beginPath();
             ctx.moveTo(a.x, a.y);

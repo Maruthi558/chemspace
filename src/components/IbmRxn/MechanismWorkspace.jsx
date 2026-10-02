@@ -754,7 +754,7 @@ ${currentStep.description}
     const cy = (y1 + y2) / 2 + ny * offset;
 
     const pathData = `M ${x1} ${y1} Q ${cx} ${cy} ${x2} ${y2}`;
-    const strokeColor = arr.type === 'single' ? '#f59e0b' : '#06b6d4'; // Gold for single fishhook, Cyan for 2-electron pair
+    const strokeColor = arr.type === 'single' ? '#f59e0b' : '#f97316'; // Amber for single fishhook, Radiant Orange for 2-electron pair
 
     return (
       <g key={arr.id || 'draft_arrow'} className="cursor-pointer">
@@ -1092,13 +1092,13 @@ ${currentStep.description}
           {/* SVG INTERACTIVE MECHANISM CANVAS */}
           <div
             ref={containerRef}
-            className="relative w-full h-[680px] rounded-3xl overflow-hidden border border-cyan-500/30 bg-[#050811] shadow-2xl"
+            className="relative w-full h-[680px] rounded-3xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-canvas)] shadow-2xl"
           >
             {/* Background Grid Pattern */}
             <div
-              className="absolute inset-0 opacity-15 pointer-events-none"
+              className="absolute inset-0 opacity-10 pointer-events-none"
               style={{
-                backgroundImage: `radial-gradient(circle, #06b6d4 1px, transparent 1px)`,
+                backgroundImage: `radial-gradient(circle, var(--text-muted) 1px, transparent 1px)`,
                 backgroundSize: '24px 24px'
               }}
             />
@@ -1122,7 +1122,7 @@ ${currentStep.description}
                   markerHeight="6"
                   orient="auto-start-reverse"
                 >
-                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#06b6d4" />
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#f97316" />
                 </marker>
 
                 {/* 1-Electron Single-Fishhook Arrowhead Marker */}
@@ -1390,13 +1390,13 @@ ${currentStep.description}
           <div className="glass-panel p-4 rounded-3xl border border-cyan-500/30 space-y-3 bg-gradient-to-b from-[#080d1a] to-[#04060c] flex flex-col h-[780px]">
             <div className="flex items-center justify-between border-b border-inherit pb-2 shrink-0">
               <div className="flex items-center gap-2">
-                <Bot className="w-4 h-4 text-cyan-400" />
+                <Bot className="w-4 h-4 text-orange-400" />
                 <span className="text-xs font-black text-[var(--text-primary)] tracking-wider uppercase">
-                  ChemAI Mechanism Copilot
+                  ChemSpace Mechanism Copilot
                 </span>
               </div>
-              <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 text-[9px] font-bold border border-cyan-500/20">
-                CHEMNOVA AI
+              <span className="px-2 py-0.5 rounded-full bg-orange-500/10 text-orange-400 text-[9px] font-bold border border-orange-500/25">
+                CHEMSPACE AI
               </span>
             </div>
 
@@ -1430,7 +1430,7 @@ ${currentStep.description}
                   }`}
                 >
                   <div className="text-[9px] font-black text-slate-400 mb-1 uppercase font-mono">
-                    {msg.role === 'user' ? 'Scientist Query' : 'ChemAI Mechanistic Engine'}
+                    {msg.role === 'user' ? 'Scientist Query' : 'ChemSpace Mechanistic Engine'}
                   </div>
                   <div className="whitespace-pre-wrap">{msg.text}</div>
                 </div>

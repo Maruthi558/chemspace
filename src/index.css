@@ -14,39 +14,39 @@
 :root,
 html[data-theme="dark"],
 .dark {
-  /* Surfaces & Structural Layers */
-  --bg-page: #090a0f;
-  --bg-card: #111319;
-  --bg-card-glass: rgba(17, 19, 25, 0.88);
-  --bg-sidebar: #0d0f15;
+  /* Surfaces & Structural Layers — Obsidian & Graphite Optical Bench */
+  --bg-page: #0a0c10;
+  --bg-card: #121520;
+  --bg-card-glass: rgba(18, 21, 32, 0.88);
+  --bg-sidebar: #0e1017;
   --border-sidebar: rgba(255, 255, 255, 0.08);
-  --bg-header: rgba(13, 15, 21, 0.92);
-  --bg-inner: #171a23;
+  --bg-header: rgba(14, 16, 23, 0.90);
+  --bg-inner: #181c2b;
   --bg-hover: rgba(255, 255, 255, 0.05);
   --bg-active: rgba(255, 255, 255, 0.09);
-  --bg-input: #0f1118;
-  --viewport-bg: #090a0f;
+  --bg-input: #10131d;
+  --viewport-bg: #0a0c10;
 
   /* Architectural Borders */
   --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-medium: rgba(255, 255, 255, 0.16);
   --border-strong: rgba(255, 255, 255, 0.28);
-  --border-focus: #10b981;
+  --border-focus: #f97316;
 
   /* Clean Scientific Typography Hierarchy */
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --text-muted: #64748b;
   --text-dim: #475569;
-  --text-inverse: #090a0f;
+  --text-inverse: #0a0c10;
   --text-sidebar: #cbd5e1;
 
   /* Distinct High-Impact Scientific Accents */
   --accent-orange: #f97316;
   --accent-orange-hover: #ea580c;
-  --accent-orange-glow: rgba(249, 115, 22, 0.28);
+  --accent-orange-glow: rgba(249, 115, 22, 0.32);
   --accent-orange-subtle: rgba(249, 115, 22, 0.12);
-  --accent-orange-border: rgba(249, 115, 22, 0.35);
+  --accent-orange-border: rgba(249, 115, 22, 0.38);
 
   --accent-emerald: #10b981;
   --accent-emerald-hover: #059669;
@@ -54,23 +54,23 @@ html[data-theme="dark"],
   --accent-emerald-subtle: rgba(16, 185, 129, 0.10);
   --accent-emerald-border: rgba(16, 185, 129, 0.30);
 
-  /* Primary Solid Button (Monochrome Precision) */
+  /* Primary Solid Button (Graphite Monolith with Inset Edge Light) */
   --btn-primary-bg: #f8fafc;
   --btn-primary-text: #090a0f;
   --btn-primary-hover: #e2e8f0;
-  --btn-primary-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  --btn-primary-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 
   /* Orange Action Button */
   --btn-orange-bg: #f97316;
   --btn-orange-text: #ffffff;
   --btn-orange-hover: #ea580c;
-  --btn-orange-shadow: 0 2px 14px rgba(249, 115, 22, 0.35);
+  --btn-orange-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
 
   /* Secondary Button */
-  --btn-secondary-bg: #171a23;
+  --btn-secondary-bg: #181c2b;
   --btn-secondary-text: #e2e8f0;
   --btn-secondary-border: rgba(255, 255, 255, 0.12);
-  --btn-secondary-hover: #202431;
+  --btn-secondary-hover: #222738;
   --btn-secondary-hover-border: rgba(255, 255, 255, 0.22);
 
   /* Accent Button (Restrained Emerald Precision) */
@@ -82,19 +82,19 @@ html[data-theme="dark"],
   /* Sidebar Navigation */
   --sidebar-active-bg: #f8fafc;
   --sidebar-active-text: #090a0f;
-  --sidebar-active-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --sidebar-active-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
   --sidebar-hover-bg: rgba(255, 255, 255, 0.05);
   --sidebar-hover-text: #ffffff;
 
   /* Telemetry & Badges */
-  --pill-bg: #171a23;
+  --pill-bg: #181c2b;
   --pill-border: rgba(255, 255, 255, 0.10);
   --pill-text: #94a3b8;
 
-  /* Domain-Specific Scientific Accents (Refined, Cohesive Neutral Foundation) */
-  --mod-chemdraw-accent: #94a3b8; /* Slate / Titanium 2D/3D CAD */
+  /* Domain-Specific Scientific Accents */
+  --mod-chemdraw-accent: #94a3b8;
   --mod-chemdraw-bg: rgba(148, 163, 184, 0.08);
-  --mod-rdkit-accent: #10b981; /* Restrained Emerald Precision */
+  --mod-rdkit-accent: #10b981;
   --mod-rdkit-bg: rgba(16, 185, 129, 0.08);
   --mod-spectroscopy-accent: #94a3b8;
   --mod-spectroscopy-bg: rgba(148, 163, 184, 0.08);
@@ -107,13 +107,13 @@ html[data-theme="dark"],
   --mod-scientists-accent: #94a3b8;
   --mod-scientists-bg: rgba(148, 163, 184, 0.08);
 
-  /* Clean Shadows without Neon Halos */
-  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.3);
-  --card-shadow-hover: 0 8px 30px -4px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(0, 0, 0, 0.4);
-  --ambient-bg: #090a0f;
+  /* Clean Shadows with Depth */
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.35);
+  --card-shadow-hover: 0 10px 32px -4px rgba(0, 0, 0, 0.7), 0 3px 8px rgba(0, 0, 0, 0.45);
+  --ambient-bg: #0a0c10;
   --grid-pattern: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 
-  /* Home Page Dedicated Scientific Palette (Dark Mode: Deep Graphite & Obsidian) */
+  /* Dedicated Scientific Palette */
   --home-bg-base: #0a0c10;
   --home-surface-subtle: #10131c;
   --home-surface-card: #131622;
@@ -131,24 +131,24 @@ html[data-theme="dark"],
 
 html[data-theme="light"],
 .light {
-  /* Surfaces & Structural Layers */
-  --bg-page: #f6f8fa;
+  /* Surfaces & Structural Layers — Milk White & Warm Ivory */
+  --bg-page: #faf8f5;
   --bg-card: #ffffff;
-  --bg-card-glass: rgba(255, 255, 255, 0.92);
-  --bg-sidebar: #ffffff;
-  --border-sidebar: rgba(15, 23, 42, 0.08);
-  --bg-header: rgba(255, 255, 255, 0.92);
-  --bg-inner: #edf1f5;
-  --bg-hover: #f1f5f9;
-  --bg-active: #e2e8f0;
+  --bg-card-glass: rgba(255, 255, 255, 0.88);
+  --bg-sidebar: #f5f2eb;
+  --border-sidebar: rgba(30, 41, 59, 0.08);
+  --bg-header: rgba(250, 248, 245, 0.90);
+  --bg-inner: #f0ece3;
+  --bg-hover: rgba(30, 41, 59, 0.045);
+  --bg-active: rgba(30, 41, 59, 0.085);
   --bg-input: #ffffff;
-  --viewport-bg: #f6f8fa;
+  --viewport-bg: #faf8f5;
 
   /* Architectural Borders */
-  --border-subtle: rgba(15, 23, 42, 0.08);
-  --border-medium: rgba(15, 23, 42, 0.16);
-  --border-strong: rgba(15, 23, 42, 0.28);
-  --border-focus: #059669;
+  --border-subtle: rgba(30, 41, 59, 0.08);
+  --border-medium: rgba(30, 41, 59, 0.16);
+  --border-strong: rgba(30, 41, 59, 0.28);
+  --border-focus: #f97316;
 
   /* Clean Scientific Typography Hierarchy */
   --text-primary: #0f172a;
@@ -161,9 +161,9 @@ html[data-theme="light"],
   /* Distinct High-Impact Scientific Accents */
   --accent-orange: #ea580c;
   --accent-orange-hover: #c2410c;
-  --accent-orange-glow: rgba(234, 88, 12, 0.20);
+  --accent-orange-glow: rgba(234, 88, 12, 0.25);
   --accent-orange-subtle: rgba(234, 88, 12, 0.08);
-  --accent-orange-border: rgba(234, 88, 12, 0.30);
+  --accent-orange-border: rgba(234, 88, 12, 0.32);
 
   --accent-emerald: #059669;
   --accent-emerald-hover: #047857;
@@ -181,14 +181,14 @@ html[data-theme="light"],
   --btn-orange-bg: #ea580c;
   --btn-orange-text: #ffffff;
   --btn-orange-hover: #c2410c;
-  --btn-orange-shadow: 0 2px 14px rgba(234, 88, 12, 0.25);
+  --btn-orange-shadow: 0 4px 16px rgba(234, 88, 12, 0.25);
 
   /* Secondary Button */
   --btn-secondary-bg: #ffffff;
   --btn-secondary-text: #0f172a;
-  --btn-secondary-border: rgba(15, 23, 42, 0.12);
-  --btn-secondary-hover: #f8fafc;
-  --btn-secondary-hover-border: rgba(15, 23, 42, 0.25);
+  --btn-secondary-border: rgba(30, 41, 59, 0.12);
+  --btn-secondary-hover: #fcfbf9;
+  --btn-secondary-hover-border: rgba(30, 41, 59, 0.22);
 
   /* Accent Button */
   --btn-accent-bg: rgba(5, 150, 105, 0.08);
@@ -200,15 +200,15 @@ html[data-theme="light"],
   --sidebar-active-bg: #0f172a;
   --sidebar-active-text: #ffffff;
   --sidebar-active-shadow: 0 2px 8px rgba(15, 23, 42, 0.14);
-  --sidebar-hover-bg: #f1f5f9;
+  --sidebar-hover-bg: rgba(30, 41, 59, 0.045);
   --sidebar-hover-text: #0f172a;
 
   /* Telemetry & Badges */
-  --pill-bg: #f1f5f9;
-  --pill-border: rgba(15, 23, 42, 0.08);
+  --pill-bg: #f4f1ea;
+  --pill-border: rgba(30, 41, 59, 0.08);
   --pill-text: #475569;
 
-  /* Module Specific Accents (Refined, Cohesive Neutral Foundation) */
+  /* Module Specific Accents */
   --mod-chemdraw-accent: #475569;
   --mod-chemdraw-bg: rgba(71, 85, 105, 0.06);
   --mod-rdkit-accent: #059669;
@@ -225,22 +225,22 @@ html[data-theme="light"],
   --mod-scientists-bg: rgba(71, 85, 105, 0.06);
 
   /* Clean Shadows */
-  --card-shadow: 0 4px 18px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.04);
-  --card-shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
-  --ambient-bg: #f6f8fa;
-  --grid-pattern: radial-gradient(rgba(15, 23, 42, 0.05) 1px, transparent 1px);
+  --card-shadow: 0 2px 12px rgba(30, 41, 59, 0.05), 0 1px 3px rgba(30, 41, 59, 0.03);
+  --card-shadow-hover: 0 8px 24px rgba(30, 41, 59, 0.08), 0 2px 6px rgba(30, 41, 59, 0.04);
+  --ambient-bg: #faf8f5;
+  --grid-pattern: radial-gradient(rgba(30, 41, 59, 0.05) 1px, transparent 1px);
 
-  /* Home Page Dedicated Luxury Neutral Palette (Light Mode: Warm Cream, Milk-White & Ivory) */
-  --home-bg-base: #faf8f5; /* Warm off-white / milk cream paper (not yellow) */
-  --home-surface-subtle: #f4f1ea; /* Slightly darker cream surface */
-  --home-surface-card: #ffffff; /* Clean milk-white card */
+  /* Home Page Dedicated Luxury Neutral Palette */
+  --home-bg-base: #faf8f5;
+  --home-surface-subtle: #f4f1ea;
+  --home-surface-card: #ffffff;
   --home-surface-card-hover: #fcfbf9;
-  --home-surface-ivory: rgba(247, 244, 237, 0.90); /* Soft ivory translucent layer */
-  --home-border: rgba(30, 41, 59, 0.08); /* Fine graphite/slate border */
+  --home-surface-ivory: rgba(247, 244, 237, 0.90);
+  --home-border: rgba(30, 41, 59, 0.08);
   --home-border-subtle: rgba(30, 41, 59, 0.05);
   --home-border-strong: rgba(30, 41, 59, 0.20);
-  --home-text-primary: #14171f; /* Deep graphite */
-  --home-text-secondary: #4a5468; /* Balanced slate */
+  --home-text-primary: #14171f;
+  --home-text-secondary: #4a5468;
   --home-text-muted: #727e94;
   --home-card-shadow: 0 2px 10px rgba(30, 41, 59, 0.04), 0 1px 3px rgba(30, 41, 59, 0.02);
   --home-card-shadow-hover: 0 10px 28px rgba(30, 41, 59, 0.09), 0 2px 6px rgba(30, 41, 59, 0.03);
@@ -386,9 +386,81 @@ nav,
 }
 
 /* ==========================================================================
-   STANDARDIZED UNIFIED BUTTON SYSTEM
+   STANDARDIZED UNIFIED BUTTON SYSTEM — CHEMSPACE SPECIFICATION
    ========================================================================== */
 
+/* 1. ChemSpace Signature Orange Action Button (Glossy Depth & Soft Glow) */
+.btn-orange,
+.btn-chemspace-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  border-radius: 0.75rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  background: linear-gradient(180deg, #fb923c 0%, #f97316 40%, #ea580c 100%);
+  color: #ffffff;
+  border: 1px solid rgba(251, 146, 60, 0.5);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 4px 16px rgba(249, 115, 22, 0.35);
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.16s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.16s ease,
+              border-color 0.16s ease;
+}
+
+/* Subtle glossy highlight layer */
+.btn-orange::before,
+.btn-chemspace-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 100%);
+  pointer-events: none;
+  border-top-left-radius: inherit;
+  border-top-right-radius: inherit;
+}
+
+.btn-orange:hover,
+.btn-chemspace-primary:hover {
+  background: linear-gradient(180deg, #fdba74 0%, #f97316 35%, #c2410c 100%);
+  border-color: rgba(253, 186, 116, 0.7);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 2px 4px rgba(0, 0, 0, 0.15),
+    0 6px 24px rgba(249, 115, 22, 0.52);
+  transform: translateY(-1px);
+}
+
+.btn-orange:active,
+.btn-chemspace-primary:active {
+  transform: translateY(0.5px) scale(0.985);
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.22),
+    0 2px 8px rgba(249, 115, 22, 0.3);
+}
+
+.btn-orange:disabled,
+.btn-chemspace-primary:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+/* 2. Primary High-Contrast Monolith Button */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -396,25 +468,39 @@ nav,
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
   border-radius: 0.75rem;
+  font-family: inherit;
   font-size: 0.8125rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   background: var(--btn-primary-bg);
   color: var(--btn-primary-text);
-  box-shadow: var(--btn-primary-shadow);
-  border: 1px solid transparent;
+  border: 1px solid var(--border-medium);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    var(--btn-primary-shadow);
   cursor: pointer;
   user-select: none;
-  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease;
+  position: relative;
+  transition: opacity 0.15s ease, transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .btn-primary:hover {
   background: var(--btn-primary-hover);
+  border-color: var(--border-strong);
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
 }
 
 .btn-primary:active {
-  transform: scale(0.99);
+  transform: translateY(0.5px) scale(0.985);
 }
 
+.btn-primary:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* 3. Secondary Tactile Button */
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -422,25 +508,37 @@ nav,
   gap: 0.5rem;
   padding: 0.625rem 1.25rem;
   border-radius: 0.75rem;
+  font-family: inherit;
   font-size: 0.8125rem;
   font-weight: 600;
   background: var(--btn-secondary-bg);
   color: var(--btn-secondary-text);
   border: 1px solid var(--btn-secondary-border);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.04);
   cursor: pointer;
   user-select: none;
-  transition: all 0.15s ease;
+  transition: all 0.16s ease;
 }
 
 .btn-secondary:hover {
   background: var(--btn-secondary-hover);
   border-color: var(--btn-secondary-hover-border);
+  transform: translateY(-0.5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .btn-secondary:active {
-  transform: scale(0.99);
+  transform: translateY(0.5px) scale(0.985);
 }
 
+.btn-secondary:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+/* 4. Outline Precision Button */
 .btn-outline {
   display: inline-flex;
   align-items: center;
@@ -461,8 +559,14 @@ nav,
 .btn-outline:hover {
   background: var(--bg-hover);
   border-color: var(--border-strong);
+  transform: translateY(-0.5px);
 }
 
+.btn-outline:active {
+  transform: translateY(0.5px) scale(0.985);
+}
+
+/* 5. Ghost Action Button */
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -485,36 +589,7 @@ nav,
   color: var(--text-primary);
 }
 
-/* High-Impact Scientific Energetic Orange Button */
-.btn-orange {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.625rem 1.25rem;
-  border-radius: 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  background: var(--btn-orange-bg);
-  color: var(--btn-orange-text);
-  box-shadow: var(--btn-orange-shadow);
-  border: 1px solid rgba(249, 115, 22, 0.35);
-  cursor: pointer;
-  user-select: none;
-  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-orange:hover {
-  background: var(--btn-orange-hover);
-  box-shadow: 0 4px 20px rgba(249, 115, 22, 0.45);
-  transform: translateY(-1px);
-}
-
-.btn-orange:active {
-  transform: scale(0.98);
-}
-
-/* Laboratory Emerald Button */
+/* 6. Laboratory Emerald Button */
 .btn-emerald {
   display: inline-flex;
   align-items: center;
@@ -524,18 +599,24 @@ nav,
   border-radius: 0.75rem;
   font-size: 0.8125rem;
   font-weight: 600;
-  background: var(--accent-emerald);
+  background: linear-gradient(180deg, #34d399 0%, #10b981 40%, #059669 100%);
   color: #ffffff;
-  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
-  border: 1px solid rgba(16, 185, 129, 0.35);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    0 2px 12px rgba(16, 185, 129, 0.35);
+  border: 1px solid rgba(52, 211, 153, 0.5);
   cursor: pointer;
   user-select: none;
+  position: relative;
+  overflow: hidden;
   transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-emerald:hover {
-  background: var(--accent-emerald-hover);
-  box-shadow: 0 4px 18px rgba(16, 185, 129, 0.45);
+  background: linear-gradient(180deg, #6ee7b7 0%, #10b981 35%, #047857 100%);
+  box-shadow: 
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 4px 18px rgba(16, 185, 129, 0.48);
   transform: translateY(-1px);
 }
 
@@ -543,7 +624,7 @@ nav,
   transform: scale(0.98);
 }
 
-/* Scientific Tool Button */
+/* 7. Scientific Compact Tool Button */
 .btn-tool {
   display: inline-flex;
   align-items: center;
@@ -553,10 +634,11 @@ nav,
   border-radius: 0.625rem;
   font-size: 0.75rem;
   font-weight: 500;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-family: inherit;
   background: var(--bg-inner);
   color: var(--text-secondary);
   border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   cursor: pointer;
   user-select: none;
   transition: all 0.15s ease;
@@ -566,17 +648,28 @@ nav,
   background: var(--bg-hover);
   border-color: var(--border-medium);
   color: var(--text-primary);
+  transform: translateY(-0.5px);
 }
 
-/* Circular Action Button */
+.btn-tool.active,
+.btn-tool:active {
+  color: var(--text-primary);
+  border-color: var(--accent-orange);
+  background: var(--accent-orange-subtle);
+}
+
+/* 8. Circular Action Button */
 .btn-circular {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
   border-radius: 9999px;
   background: var(--bg-inner);
   color: var(--text-primary);
   border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   cursor: pointer;
   user-select: none;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -592,7 +685,7 @@ nav,
   transform: scale(0.95);
 }
 
-/* Arrow Micro-Interaction: Smooth translation on hover */
+/* 9. Arrow Micro-Interaction */
 .arrow-micro {
   display: inline-block;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -603,6 +696,7 @@ button:hover .arrow-micro {
   transform: translateX(4px);
 }
 
+/* 10. Danger Button */
 .btn-danger {
   display: inline-flex;
   align-items: center;
@@ -622,6 +716,7 @@ button:hover .arrow-micro {
 
 .btn-danger:hover {
   background: rgba(244, 63, 94, 0.25);
+  transform: translateY(-0.5px);
 }
 
 /* Inline theme variables for shadcn compatibility */
