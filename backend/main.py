@@ -9,6 +9,9 @@ import tempfile
 import time
 import re
 import asyncio
+import ast
+import traceback
+import base64
 from typing import Annotated, Optional, List, Dict, Any
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import JSONResponse, PlainTextResponse, StreamingResponse
@@ -378,6 +381,8 @@ class SpectroscopyPredictInput(BaseModel):
 
 class PythonScriptInput(BaseModel):
     code: str
+    session_id: Optional[str] = None
+    cell_id: Optional[str] = None
 
 class AIChatInput(BaseModel):
     query: str
@@ -1461,22 +1466,43 @@ def predict_spectroscopy(data: SpectroscopyPredictInput):
         }
     }
 
-@app.post("/api/rdkit/execute")
-def execute_python_rdkit(data: PythonScriptInput):
-    import io
-    import sys
+# ============================================================================
+# SCIENTIFIC NOTEBOOK EXECUTION SYSTEM & PERSISTENT KERNEL SESSIONS
+# ============================================================================
+
+_NOTEBOOK_SESSIONS: Dict[str, Dict[str, Any]] = {}
+
+FORBIDDEN_IMPORT_MODULES = {
+    "os", "sys", "subprocess", "shutil", "socket", "http", "urllib", "requests",
+    "ctypes", "pty", "winreg", "signal", "posix", "nt", "importlib", "builtins"
+}
+
+def _get_notebook_session_globals(session_id: Optional[str] = None) -> Dict[str, Any]:
+    """Retrieves or initializes persistent Python globals for notebook session"""
+    now = time.time()
     
-    output_capture = io.StringIO()
-    error_output = ""
-    
-    # Execution context with standard libraries and chemical mocks
-    exec_globals = {
+    # Garbage collect sessions inactive for > 2 hours
+    expired = [sid for sid, data in _NOTEBOOK_SESSIONS.items() if now - data.get("last_accessed", 0) > 7200]
+    for sid in expired:
+        _NOTEBOOK_SESSIONS.pop(sid, None)
+        
+    sid = session_id or "default_session"
+    if sid in _NOTEBOOK_SESSIONS:
+        _NOTEBOOK_SESSIONS[sid]["last_accessed"] = now
+        return _NOTEBOOK_SESSIONS[sid]["globals"]
+        
+    # Build safe scientific sandbox namespace
+    safe_globals: Dict[str, Any] = {
+        "__name__": "__main__",
+        "__doc__": None,
         "math": math,
-        "print": lambda *args, **kwargs: print(*args, file=output_capture, **kwargs)
+        "time": time,
+        "json": json,
+        "re": re,
     }
     
     if RDKIT_AVAILABLE:
-        exec_globals.update({
+        safe_globals.update({
             "Chem": Chem,
             "AllChem": AllChem,
             "Descriptors": Descriptors,
@@ -1486,25 +1512,269 @@ def execute_python_rdkit(data: PythonScriptInput):
             "rdMolTransforms": rdMolTransforms,
             "rdDistGeom": rdDistGeom,
             "rdMolDescriptors": rdMolDescriptors,
-            "rdDepictor": rdDepictor
+            "rdDepictor": rdDepictor,
+            "Draw": getattr(Chem, "Draw", None)
         })
+        
+    try:
+        import numpy as np
+        safe_globals["np"] = np
+        safe_globals["numpy"] = np
+    except Exception:
+        pass
+        
+    try:
+        import pandas as pd
+        safe_globals["pd"] = pd
+        safe_globals["pandas"] = pd
+    except Exception:
+        pass
+        
+    try:
+        import matplotlib
+        matplotlib.use("Agg")  # Non-interactive headless backend
+        import matplotlib.pyplot as plt
+        safe_globals["plt"] = plt
+        safe_globals["matplotlib"] = matplotlib
+    except Exception:
+        pass
+        
+    _NOTEBOOK_SESSIONS[sid] = {
+        "globals": safe_globals,
+        "created_at": now,
+        "last_accessed": now
+    }
+    return safe_globals
+
+
+@app.post("/api/rdkit/reset-session")
+def reset_notebook_session(data: Dict[str, Any]):
+    """Resets the persistent Python notebook execution kernel for a given session"""
+    session_id = data.get("session_id") or "default_session"
+    if session_id in _NOTEBOOK_SESSIONS:
+        _NOTEBOOK_SESSIONS.pop(session_id, None)
+    return {
+        "status": "success",
+        "message": f"Notebook execution kernel reset successfully for session '{session_id}'."
+    }
+
+
+@app.post("/api/rdkit/execute")
+def execute_python_rdkit(data: PythonScriptInput):
+    """
+    Executes Python/RDKit code within a persistent notebook kernel session.
+    Inspects AST for security, captures stdout, evaluates the final expression,
+    and returns rich scientific outputs (2D SVG, 3D conformers, tables, images, scalars).
+    """
+    import io
+    import sys
+    
+    start_time = time.perf_counter()
+    output_capture = io.StringIO()
+    error_output = ""
+    error_traceback = ""
+    result_type = "none"
+    result_value = None
+    molecule_data = None
+    table_data = None
+    image_data = None
+    
+    code = (data.code or "").strip()
+    session_id = data.session_id or "default_session"
+    
+    # 1. AST Security Analysis
+    try:
+        parsed_tree = ast.parse(code)
+    except SyntaxError as se:
+        return {
+            "status": "error",
+            "stdout": "",
+            "error": f"SyntaxError: {se.msg} (line {se.lineno})",
+            "traceback": f"  File \"<cell>\", line {se.lineno}\n    {se.text or ''}\nSyntaxError: {se.msg}",
+            "result_type": "error",
+            "execution_duration": 0.0,
+            "session_id": session_id
+        }
+        
+    # Check for forbidden imports in AST
+    for node in ast.walk(parsed_tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                root_pkg = alias.name.split(".")[0]
+                if root_pkg in FORBIDDEN_IMPORT_MODULES:
+                    return {
+                        "status": "error",
+                        "stdout": "",
+                        "error": f"SecurityRestriction: Importing module '{root_pkg}' is prohibited in the ChemSpace sandbox.",
+                        "result_type": "error",
+                        "execution_duration": 0.0,
+                        "session_id": session_id
+                    }
+        elif isinstance(node, ast.ImportFrom):
+            if node.module:
+                root_pkg = node.module.split(".")[0]
+                if root_pkg in FORBIDDEN_IMPORT_MODULES:
+                    return {
+                        "status": "error",
+                        "stdout": "",
+                        "error": f"SecurityRestriction: Importing from '{root_pkg}' is prohibited in the ChemSpace sandbox.",
+                        "result_type": "error",
+                        "execution_duration": 0.0,
+                        "session_id": session_id
+                    }
+                    
+    # 2. Setup Execution Scope with Persistent Session
+    exec_globals = _get_notebook_session_globals(session_id)
+    exec_globals["print"] = lambda *args, **kwargs: print(*args, file=output_capture, **kwargs)
     
     old_stdout = sys.stdout
     sys.stdout = output_capture
+    eval_result = None
     
     try:
-        exec(data.code, exec_globals)
+        # Separate statements from trailing expression for notebook-style value inspection
+        if parsed_tree.body and isinstance(parsed_tree.body[-1], ast.Expr):
+            # All statements prior to last expression
+            if len(parsed_tree.body) > 1:
+                stmts_mod = ast.Module(body=parsed_tree.body[:-1], type_ignores=[])
+                exec(compile(stmts_mod, "<cell>", "exec"), exec_globals)
+            # Evaluate trailing expression
+            last_expr = ast.Expression(body=parsed_tree.body[-1].value)
+            eval_result = eval(compile(last_expr, "<cell>", "eval"), exec_globals)
+        else:
+            # Entire block is statements
+            exec(compile(parsed_tree, "<cell>", "exec"), exec_globals)
     except Exception as e:
         error_output = f"{type(e).__name__}: {str(e)}"
+        exc_type, exc_val, exc_tb = sys.exc_info()
+        tb_lines = traceback.format_exception(exc_type, exc_val, exc_tb)
+        # Filter out internal engine frames
+        filtered_tb = [l for l in tb_lines if "backend" not in l and "importlib" not in l]
+        error_traceback = "".join(filtered_tb) if filtered_tb else "".join(tb_lines)
     finally:
         sys.stdout = old_stdout
         
+    duration = round(time.perf_counter() - start_time, 4)
     stdout_text = output_capture.getvalue()
     
+    # 3. Detect and Format Rich Scientific Outputs
+    if not error_output:
+        # A. Check for active matplotlib plots
+        try:
+            import matplotlib.pyplot as plt
+            if plt.get_fignums():
+                buf = io.BytesIO()
+                plt.savefig(buf, format="png", bbox_inches="tight", dpi=160, transparent=True)
+                buf.seek(0)
+                b64_img = base64.b64encode(buf.read()).decode("utf-8")
+                image_data = f"data:image/png;base64,{b64_img}"
+                result_type = "image"
+                plt.close("all")
+        except Exception:
+            pass
+            
+        # B. Check for RDKit Mol object (2D and 3D conformers)
+        candidate_mol = None
+        if RDKIT_AVAILABLE:
+            if isinstance(eval_result, Chem.Mol):
+                candidate_mol = eval_result
+            elif "mol" in exec_globals and isinstance(exec_globals["mol"], Chem.Mol):
+                # If user assigned `mol = Chem.MolFromSmiles(...)`
+                candidate_mol = exec_globals["mol"]
+            elif "m" in exec_globals and isinstance(exec_globals["m"], Chem.Mol):
+                candidate_mol = exec_globals["m"]
+                
+        if candidate_mol is not None and RDKIT_AVAILABLE:
+            try:
+                # 2D SVG generation
+                drawer = rdMolDraw2D.MolDraw2DSVG(450, 300)
+                drawer.drawOptions().clearBackground = False
+                drawer.DrawMolecule(candidate_mol)
+                drawer.FinishDrawing()
+                svg_str = drawer.GetDrawingText()
+                
+                can_smiles = Chem.MolToSmiles(candidate_mol)
+                formula = rdMolDescriptors.CalcMolFormula(candidate_mol)
+                mw = round(Descriptors.MolWt(candidate_mol), 3)
+                
+                atoms_3d = []
+                bonds_3d = []
+                has_3d = candidate_mol.GetNumConformers() > 0
+                
+                if has_3d:
+                    conf = candidate_mol.GetConformer()
+                    for i in range(candidate_mol.GetNumAtoms()):
+                        p = conf.GetAtomPosition(i)
+                        atoms_3d.append({
+                            "id": i,
+                            "element": candidate_mol.GetAtomWithIdx(i).GetSymbol(),
+                            "x": round(p.x, 3),
+                            "y": round(p.y, 3),
+                            "z": round(p.z, 3)
+                        })
+                    for b in candidate_mol.GetBonds():
+                        bonds_3d.append({
+                            "source": b.GetBeginAtomIdx(),
+                            "target": b.GetEndAtomIdx(),
+                            "order": float(b.GetBondTypeAsDouble())
+                        })
+                    pass
+
+                molecule_data = {
+                    "smiles": can_smiles,
+                    "formula": formula,
+                    "mw": mw,
+                    "svg": svg_str,
+                    "has_3d": has_3d,
+                    "atoms_3d": atoms_3d,
+                    "bonds_3d": bonds_3d
+                }
+            except Exception as mol_err:
+                output_capture.write(f"\n[Mol Visualizer Notice] {str(mol_err)}")
+
+        # Determine Primary Result Type based on evaluated expression
+        if eval_result is not None:
+            if RDKIT_AVAILABLE and isinstance(eval_result, Chem.Mol):
+                result_type = "molecule_3d" if eval_result.GetNumConformers() > 0 else "molecule_2d"
+            else:
+                try:
+                    import pandas as pd
+                    if isinstance(eval_result, pd.DataFrame):
+                        table_data = {
+                            "columns": list(eval_result.columns),
+                            "rows": eval_result.fillna("").to_dict(orient="records")
+                        }
+                        result_type = "table"
+                except Exception:
+                    pass
+                if result_type == "none" and isinstance(eval_result, list) and eval_result and isinstance(eval_result[0], dict):
+                    table_data = {
+                        "columns": list(eval_result[0].keys()),
+                        "rows": eval_result
+                    }
+                    result_type = "table"
+                if result_type == "none":
+                    result_type = "data"
+                    result_value = str(eval_result) if isinstance(eval_result, (int, float, bool)) else repr(eval_result)
+        elif result_type == "none":
+            # No explicit return expression
+            if molecule_data:
+                result_type = "molecule_3d" if molecule_data.get("has_3d") and "EmbedMolecule" in code else "molecule_2d"
+            elif stdout_text:
+                result_type = "text"
+            
     return {
         "status": "error" if error_output else "success",
         "stdout": stdout_text,
-        "error": error_output
+        "error": error_output,
+        "traceback": error_traceback,
+        "result_type": result_type,
+        "result_value": result_value,
+        "molecule_data": molecule_data,
+        "table_data": table_data,
+        "image_data": image_data,
+        "execution_duration": duration,
+        "session_id": session_id
     }
 
 

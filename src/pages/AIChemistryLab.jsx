@@ -1,936 +1,566 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   Play,
-  Square,
   RotateCcw,
-  Trash2,
-  Upload,
-  Download,
-  Check,
-  Copy,
-  Code,
+  Plus,
   Terminal,
   FileCode,
-  Settings,
   Box,
-  Mic,
-  MicOff,
   Layers,
   Activity,
   CheckCircle2,
   AlertCircle,
-  Search,
   BookOpen,
   ArrowRight,
-  RefreshCw,
-  Eye,
-  Sliders,
   ShieldCheck,
-  PenTool,
-  Atom
+  Atom,
+  Trash2
 } from 'lucide-react';
-import ThreeMoleculeViewer from '../components/ThreeMoleculeViewer';
-import Molecule2DViewer from '../components/RDKit/Molecule2DViewer';
-import ButtonSpinner from '../components/common/ButtonSpinner';
-import {
-  executePythonScript,
-  parseMoleculeSMILES,
-  calculateMolecularProperties,
-  generate3DConformer,
-  standardizeMolecularStructure
-} from '../services/api';
-import {
-  parseSmilesTo2D,
-  computeHillFormula,
-  computeMolecularWeight,
-  computeExactMass,
-  computePhysicochemicalDescriptors
-} from '../services/chemicalGraph';
+import NotebookHeader from '../components/notebook/NotebookHeader';
+import NotebookCell from '../components/notebook/NotebookCell';
+import { executePythonScript, resetNotebookSession } from '../services/api';
 import { logActivity } from '../services/activityStore';
-import { recordDownload } from '../services/downloadsManager';
 import { useTheme } from '../context/ThemeContext';
 
-const RDKIT_TEMPLATES = [
+/**
+ * INITIAL SCIENTIFIC NOTEBOOK WORKFLOW
+ * Demonstrates imports, SMILES parsing, 2D Kekulé rendering,
+ * cross-cell state sharing (Descriptors), and MMFF94 3D conformer generation.
+ */
+const DEFAULT_INITIAL_CELLS = [
   {
-    id: 'drawing2d',
-    title: '1. 2D Molecule Graph & SVG Rendering',
-    description: 'Parse molecular SMILES and render clean 2D Kekulé chemical valence structures.',
+    id: 'cell-init-1',
     code: `from rdkit import Chem
-from rdkit.Chem import Draw
-
-# Enter your target molecular structure
-smiles = "CC(=O)OC1=CC=CC=C1C(=O)O"  # Aspirin
+from rdkit.Chem import Descriptors, AllChem
+print("RDKit 2026.03.5 scientific kernel connected successfully.")`,
+    status: 'idle',
+    executionCount: null,
+    executionTime: null,
+    output: null
+  },
+  {
+    id: 'cell-init-2',
+    code: `# Enter target molecular structure (SMILES)
+smiles = "CC(=O)Oc1ccccc1C(=O)O"  # Aspirin
 mol = Chem.MolFromSmiles(smiles)
-
-print(f"[RDKit Kernel] Molecule parsed successfully: {smiles}")
-print(f"[RDKit Kernel] Chemical Formula: {Chem.CalcMolFormula(mol)}")
-print(f"[RDKit Kernel] Total Atom Count: {mol.GetNumAtoms()} atoms ({mol.GetNumHeavyAtoms()} heavy)")
-print(f"[RDKit Kernel] Generated 2D coordinate embedding for visualization.")`
+mol`,
+    status: 'idle',
+    executionCount: null,
+    executionTime: null,
+    output: null
   },
   {
-    id: 'descriptors',
-    title: '2. Lipinski Rule of 5 & Physicochemical Descriptors',
-    description: 'Compute molecular weight, LogP, TPSA, HBD, HBA, and oral bioavailability compliance.',
-    code: `from rdkit import Chem
-from rdkit.Chem import Descriptors, Lipinski
+    id: 'cell-init-3',
+    code: `# Compute physicochemical descriptors from the active 'mol'
+mw = round(Descriptors.MolWt(mol), 2)
+logp = round(Descriptors.MolLogP(mol), 2)
+tpsa = round(Descriptors.TPSA(mol), 2)
+hbd = Descriptors.NumHDonors(mol)
+hba = Descriptors.NumHAcceptors(mol)
+rot = Descriptors.NumRotatableBonds(mol)
 
-smiles = "CN1C=NC2=C1C(=O)N(C(=O)N2C)C"  # Caffeine
-mol = Chem.MolFromSmiles(smiles)
+print(f"Molecular Weight: {mw} g/mol | LogP: {logp} | TPSA: {tpsa} Å²")
 
-mw = Descriptors.MolWt(mol)
-logp = Descriptors.MolLogP(mol)
-tpsa = Descriptors.TPSA(mol)
-hbd = Lipinski.NumHDonors(mol)
-hba = Lipinski.NumHAcceptors(mol)
-rotBonds = Lipinski.NumRotatableBonds(mol)
-heavyAtoms = mol.GetNumHeavyAtoms()
-numRings = Lipinski.RingCount(mol)
-
-lipinski_passed = (mw <= 500) and (logp <= 5.0) and (hbd <= 5) and (hba <= 10)
-
-print("=" * 60)
-print(" RDKit COMPUTED PHYSICOCHEMICAL & LIPINSKI DESCRIPTORS")
-print("=" * 60)
-print(f" SMILES Canonical   : {smiles}")
-print(f" Molecular Weight   : {mw:.2f} g/mol (Rule: <= 500)")
-print(f" Octanol/Water LogP : {logp:.2f} (Rule: <= 5.0)")
-print(f" Polar Surface Area : {tpsa:.2f} Å²")
-print(f" H-Bond Donors      : {hbd} (Rule: <= 5)")
-print(f" H-Bond Acceptors   : {hba} (Rule: <= 10)")
-print(f" Rotatable Bonds    : {rotBonds}")
-print(f" Heavy Atom Count   : {heavyAtoms}")
-print(f" Ring Count         : {numRings}")
-print(f" Lipinski Rule of 5 : {'PASSED (Drug-like candidate)' if lipinski_passed else 'VIOLATED'}")
-print("=" * 60)`
+# Return structured Lipinski Ro5 compliance table
+[{"Descriptor": "Molecular Weight", "Value": f"{mw} g/mol", "Rule_of_5": "<= 500 Da"},
+ {"Descriptor": "LogP (Lipophilicity)", "Value": str(logp), "Rule_of_5": "<= 5.0"},
+ {"Descriptor": "Polar Surface Area", "Value": f"{tpsa} Å²", "Rule_of_5": "<= 140 Å²"},
+ {"Descriptor": "H-Bond Donors", "Value": str(hbd), "Rule_of_5": "<= 5"},
+ {"Descriptor": "H-Bond Acceptors", "Value": str(hba), "Rule_of_5": "<= 10"},
+ {"Descriptor": "Rotatable Bonds", "Value": str(rot), "Rule_of_5": "<= 10"}]`,
+    status: 'idle',
+    executionCount: null,
+    executionTime: null,
+    output: null
   },
   {
-    id: 'conformer3d',
-    title: '3. 3D Conformer Generation (ETKDG & MMFF94 Minimization)',
-    description: 'Generate 3D Cartesian conformer using distance geometry and force field minimization.',
-    code: `from rdkit import Chem
-from rdkit.Chem import AllChem
-
-smiles = "CC(=O)OC1=CC=CC=C1C(=O)O"  # Aspirin
-mol = Chem.MolFromSmiles(smiles)
-mol_h = Chem.AddHs(mol)
-
-# ETKDG 3D embedding & MMFF94 force-field energy minimization
-embed_status = AllChem.EmbedMolecule(mol_h, AllChem.ETKDGv3())
-energy_status = AllChem.MMFFOptimizeMolecule(mol_h)
-
-print(f"[RDKit 3D Engine] 3D ETKDGv3 Conformer generated (Status: {embed_status}).")
-print(f"[RDKit 3D Engine] MMFF94 Energy Minimization (Status: {energy_status} - Converged).")
-print(f"[RDKit 3D Engine] Total 3D Atom Count: {mol_h.GetNumAtoms()} atoms.")
-print(f"[RDKit 3D Engine] Cartesian coordinates streamed to 3D WebGL viewport.")`
-  },
-  {
-    id: 'standardization',
-    title: '4. Chemical Standardization & Salt Stripping',
-    description: 'Strip inorganic counterion salts and neutralize formal ionic charges into canonical forms.',
-    code: `from rdkit import Chem
-
-raw_smiles = "CC(=O)O.[Na+].[Cl-]"  # Sodium Acetate + Salt impurity
-mol = Chem.MolFromSmiles(raw_smiles)
-
-print("=" * 60)
-print(" RDKit CHEMICAL STRUCTURE STANDARDIZATION PROTOCOL")
-print("=" * 60)
-print(f" Raw Input SMILES       : {raw_smiles}")
-print(f" Stripped Counterions   : Na+, Cl- isolated from parent ligand")
-print(f" Standardized Canonical : CC(=O)O (Acetic Acid)")
-print(f" Valence Sanitization   : Neutral canonical state validated")
-print("=" * 60)`
-  },
-  {
-    id: 'similarity',
-    title: '5. Morgan Fingerprints & Tanimoto Similarity',
-    description: 'Calculate circular Morgan fingerprints (ECFP4) and structural similarity scores.',
-    code: `from rdkit import Chem, DataStructs
-from rdkit.Chem import AllChem
-
-smiles_a = "CC(=O)OC1=CC=CC=C1C(=O)O"        # Aspirin
-smiles_b = "CC(C)CC1=CC=C(C=C1)C(C)C(=O)O"  # Ibuprofen
-
-mol_a = Chem.MolFromSmiles(smiles_a)
-mol_b = Chem.MolFromSmiles(smiles_b)
-
-fp_a = AllChem.GetMorganFingerprintAsBitVect(mol_a, radius=2, nBits=2048)
-fp_b = AllChem.GetMorganFingerprintAsBitVect(mol_b, radius=2, nBits=2048)
-
-similarity = DataStructs.TanimotoSimilarity(fp_a, fp_b)
-
-print("=" * 60)
-print(" RDKit MORGAN FINGERPRINT (ECFP4) TANIMOTO SIMILARITY")
-print("=" * 60)
-print(f" Compound A : Aspirin ({smiles_a})")
-print(f" Compound B : Ibuprofen ({smiles_b})")
-print(f" Tanimoto Similarity Score: {similarity:.4f} ({similarity * 100:.1f}% match)")
-print("=" * 60)`
+    id: 'cell-init-4',
+    code: `# Generate 3D energy-minimized conformer with MMFF94 force field
+mol_3d = Chem.AddHs(mol)
+AllChem.EmbedMolecule(mol_3d, randomSeed=42)
+AllChem.MMFFOptimizeMolecule(mol_3d)
+mol_3d`,
+    status: 'idle',
+    executionCount: null,
+    executionTime: null,
+    output: null
   }
 ];
+
+const TEMPLATES = {
+  aspirin: [
+    {
+      code: `from rdkit import Chem
+from rdkit.Chem import Descriptors, AllChem
+
+smiles = "CC(=O)Oc1ccccc1C(=O)O"  # 2-Acetyloxybenzoic acid (Aspirin)
+mol = Chem.MolFromSmiles(smiles)
+mol`
+    },
+    {
+      code: `print(f"Chemical Formula: {Chem.rdMolDescriptors.CalcMolFormula(mol)}")
+print(f"Molecular Weight: {Descriptors.MolWt(mol):.2f} g/mol")
+print(f"Exact Monoisotopic Mass: {Descriptors.ExactMolWt(mol):.4f}")`
+    },
+    {
+      code: `mol_3d = Chem.AddHs(mol)
+AllChem.EmbedMolecule(mol_3d, randomSeed=42)
+AllChem.MMFFOptimizeMolecule(mol_3d)
+mol_3d`
+    }
+  ],
+  lipinski: [
+    {
+      code: `from rdkit import Chem
+from rdkit.Chem import Descriptors
+
+# Compare drug-likeness across benchmark compounds
+specimens = {
+    "Aspirin": "CC(=O)Oc1ccccc1C(=O)O",
+    "Caffeine": "CN1C=NC2=C1C(=O)N(C(=O)N2C)C",
+    "Paracetamol": "CC(=O)Nc1ccc(O)cc1",
+    "Ibuprofen": "CC(C)Cc1ccc(cc1)C(C)C(=O)O"
+}
+
+rows = []
+for name, smi in specimens.items():
+    m = Chem.MolFromSmiles(smi)
+    mw = Descriptors.MolWt(m)
+    logp = Descriptors.MolLogP(m)
+    tpsa = Descriptors.TPSA(m)
+    hbd = Descriptors.NumHDonors(m)
+    hba = Descriptors.NumHAcceptors(m)
+    passed = mw <= 500 and logp <= 5.0 and hbd <= 5 and hba <= 10
+    rows.append({
+        "Molecule": name,
+        "SMILES": smi,
+        "MW (g/mol)": round(mw, 2),
+        "LogP": round(logp, 2),
+        "TPSA (Å²)": round(tpsa, 2),
+        "Ro5 Status": "PASS" if passed else "FAIL"
+    })
+
+rows`
+    }
+  ],
+  conformer: [
+    {
+      code: `from rdkit import Chem
+from rdkit.Chem import AllChem
+
+# Conformation search: Benzene ring with conjugated sidechain
+mol = Chem.MolFromSmiles("c1ccccc1C(=O)NCC")
+mol_3d = Chem.AddHs(mol)
+AllChem.EmbedMolecule(mol_3d, randomSeed=101)
+AllChem.MMFFOptimizeMolecule(mol_3d, maxIters=500)
+mol_3d`
+    }
+  ],
+  descriptors: [
+    {
+      code: `from rdkit import Chem
+from rdkit.Chem import Descriptors
+import matplotlib.pyplot as plt
+
+smiles_list = ["c1ccccc1", "CCO", "CC(=O)O", "CCN", "c1ccc(O)cc1", "c1ccc(Cl)cc1"]
+mols = [Chem.MolFromSmiles(s) for s in smiles_list]
+weights = [Descriptors.MolWt(m) for m in mols]
+logps = [Descriptors.MolLogP(m) for m in mols]
+
+fig, ax = plt.subplots(figsize=(6, 3.5))
+ax.scatter(weights, logps, color="#10b981", s=80, edgecolors="#0f172a")
+for i, txt in enumerate(smiles_list):
+    ax.annotate(txt, (weights[i] + 1, logps[i] + 0.05), fontsize=8)
+ax.set_xlabel("Molecular Weight (g/mol)")
+ax.set_ylabel("LogP (Octanol/Water)")
+ax.set_title("RDKit Descriptors Distribution", fontsize=11, fontweight="bold")
+ax.grid(True, linestyle="--", alpha=0.5)
+plt.tight_layout()
+plt.show()`
+    }
+  ]
+};
 
 export default function AIChemistryLab() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  const [selectedTemplateId, setSelectedTemplateId] = useState('drawing2d');
-  const [code, setCode] = useState(RDKIT_TEMPLATES[0].code);
-  const [isRunning, setIsRunning] = useState(false);
-  const [kernelStatus, setKernelStatus] = useState('ready');
-  const [consoleOutput, setConsoleOutput] = useState([]);
-  const [copiedCode, setCopiedCode] = useState(false);
-  const [isListening, setIsListening] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-
-  // Controlled Visualizer View: '2d' or '3d'
-  const [viewMode, setViewMode] = useState('2d');
-  const [viewStyle3D, setViewStyle3D] = useState('ball-stick');
-
-  // Input & Processed Molecular Graph State
-  const [targetSmiles, setTargetSmiles] = useState('CC(=O)OC1=CC=CC=C1C(=O)O');
-  const [activeGraph, setActiveGraph] = useState({ atoms: [], bonds: [] });
-  const [active3dMolecule, setActive3dMolecule] = useState(null);
-  const [descriptors, setDescriptors] = useState(null);
-  const [processingStages, setProcessingStages] = useState([]);
-  const [validationError, setValidationError] = useState(null);
-
-  const [executionCount, setExecutionCount] = useState(1);
-  const [executionDuration, setExecutionDuration] = useState('0.18s');
-  const [activeOutputTab, setActiveOutputTab] = useState('all');
-
-  const fileInputRef = useRef(null);
-  const lines = code.split('\n');
-
-  // Initialize with initial structure upon mount
-  useEffect(() => {
-    processMoleculeFromSmiles('CC(=O)OC1=CC=CC=C1C(=O)O');
-  }, []);
-
-  /**
-   * Helper: Extracts SMILES string from python code (looks for smiles = "...")
-   */
-  const extractSmilesFromCode = (pythonCode) => {
-    const match = pythonCode.match(/smiles\s*=\s*["']([^"']+)["']/i) || pythonCode.match(/["']([A-Za-z0-9@+\-\[\]\(\)\\=#\$%]{3,})["']/);
-    return match ? match[1] : null;
-  };
-
-  /**
-   * Processes a real molecular structure through the scientific pipeline
-   */
-  const processMoleculeFromSmiles = async (smilesStr) => {
-    const s = smilesStr ? smilesStr.trim() : '';
-    if (!s) {
-      setValidationError('Invalid molecular structure. Please provide a valid SMILES string or molecular structure.');
-      return;
-    }
-
-    setValidationError(null);
-    setProcessingStages(['Input Received', 'Validating Structure', 'RDKit Processing']);
-
+  // Persistent unique session ID for this notebook session
+  const [sessionId] = useState(() => {
     try {
-      // 1. Generate 2D vector graph
-      const parsed2D = parseSmilesTo2D(s);
-      if (!parsed2D || parsed2D.atoms.length === 0) {
-        setValidationError('Unable to process the provided molecular structure. Please verify the SMILES syntax.');
-        return;
-      }
-
-      setProcessingStages((prev) => [...prev, 'Generating 2D Structure']);
-      setActiveGraph(parsed2D);
-
-      // 2. Compute full physicochemical descriptors
-      setProcessingStages((prev) => [...prev, 'Computing Descriptors']);
-      const desc = computePhysicochemicalDescriptors(parsed2D.atoms, parsed2D.bonds);
-      const exactMass = computeExactMass(parsed2D.atoms, parsed2D.bonds);
-      setDescriptors({
-        ...desc,
-        exactMass,
-        bondCount: parsed2D.bonds.length,
-        formalCharge: 0
-      });
-
-      // 3. Generate real 3D conformer coordinates
-      setProcessingStages((prev) => [...prev, 'Generating 3D Conformer']);
-      let coords3D = [];
-
-      try {
-        const res3d = await generate3DConformer(s);
-        if (res3d && res3d.status === 'success' && res3d.atoms) {
-          coords3D = res3d.atoms;
-        }
-      } catch (e) {}
-
-      if (coords3D.length === 0) {
-        // Fallback high-fidelity 3D force-field coordinate embedding
-        coords3D = parsed2D.atoms.map((a, idx) => ({
-          id: a.id,
-          element: a.element || 'C',
-          x: Number(((a.x - 350) / 45).toFixed(3)),
-          y: Number((-(a.y - 250) / 45).toFixed(3)),
-          z: Number(((idx % 2 === 0 ? 0.35 : -0.35)).toFixed(3))
-        }));
-      }
-
-      setActive3dMolecule({
-        id: `rdkit_${Date.now()}`,
-        name: desc.formula || 'Target Molecule',
-        formula: desc.formula,
-        atoms: coords3D,
-        bonds: parsed2D.bonds
-      });
-
-      setProcessingStages((prev) => [...prev, 'Results Ready']);
-      setTargetSmiles(s);
-    } catch (err) {
-      setValidationError('Error processing molecular structure. Please verify input syntax.');
+      const stored = sessionStorage.getItem('chemspace_notebook_session');
+      if (stored) return stored;
+      const newId = 'session_' + Math.random().toString(36).substring(2, 10);
+      sessionStorage.setItem('chemspace_notebook_session', newId);
+      return newId;
+    } catch {
+      return 'session_' + Math.random().toString(36).substring(2, 10);
     }
-  };
+  });
+
+  const [cells, setCells] = useState(DEFAULT_INITIAL_CELLS);
+  const [globalExecutionCount, setGlobalExecutionCount] = useState(1);
+  const [kernelStatus, setKernelStatus] = useState('ready'); // 'ready' | 'busy'
+  const [isExecutingAll, setIsExecutingAll] = useState(false);
 
   /**
-   * Executes Python RDKit Script
+   * Run a specific cell by its unique ID
    */
-  const runPythonScript = async () => {
+  const handleRunCell = useCallback(async (cellId) => {
+    const targetCell = cells.find((c) => c.id === cellId);
+    if (!targetCell || !targetCell.code.trim()) return;
+
+    setKernelStatus('busy');
+
+    // Update target cell state to running
+    setCells((prev) =>
+      prev.map((c) =>
+        c.id === cellId
+          ? { ...c, status: 'running' }
+          : c
+      )
+    );
+
     const startTime = performance.now();
-    setIsRunning(true);
-    setKernelStatus('running');
-    setConsoleOutput([
-      { type: 'info', text: `[${new Date().toLocaleTimeString()}] Python 3.14 RDKit Kernel initialized...` },
-      { type: 'info', text: `[${new Date().toLocaleTimeString()}] Executing cell [${executionCount}] in sandbox...` }
-    ]);
-
-    // Extract SMILES if present in code to update 2D/3D viewers
-    const extractedSmiles = extractSmilesFromCode(code);
-    if (extractedSmiles) {
-      await processMoleculeFromSmiles(extractedSmiles);
-    }
 
     try {
-      const response = await executePythonScript(code);
-      const elapsed = ((performance.now() - startTime) / 1000).toFixed(2);
-      setExecutionDuration(`${elapsed}s`);
-      setExecutionCount((prev) => prev + 1);
+      const result = await executePythonScript(targetCell.code, sessionId, cellId);
+      const elapsed = ((performance.now() - startTime) / 1000).toFixed(2) + 's';
 
-      if (response && response.status === 'success' && response.stdout) {
-        const splitLines = response.stdout.split('\n').filter(Boolean);
-        setConsoleOutput((prev) => [
-          ...prev,
-          ...splitLines.map((l) => ({ type: 'stdout', text: l })),
-          { type: 'success', text: `✔ Cell [${executionCount}] completed in ${elapsed}s (Exit Code 0).` }
-        ]);
-      } else {
-        // Execution fallback based on active script context
-        setConsoleOutput((prev) => [
-          ...prev,
-          { type: 'stdout', text: `[RDKit Kernel] Executed ${selectedTemplateId} workflow.` },
-          { type: 'stdout', text: `[RDKit Kernel] Processed target structure: ${extractedSmiles || targetSmiles}` },
-          { type: 'stdout', text: `[RDKit Kernel] Computed molecular graph and 2D/3D embeddings.` },
-          { type: 'success', text: `✔ Cell [${executionCount}] finished in ${elapsed}s (Exit Code 0).` }
-        ]);
-      }
+      const execCount = globalExecutionCount;
+      setGlobalExecutionCount((n) => n + 1);
 
-      logActivity('RDKit Lab', 'Executed RDKit Script', `Template: ${selectedTemplateId}`, 'rdkit');
-    } catch (e) {
-      setConsoleOutput((prev) => [
-        ...prev,
-        { type: 'error', text: 'Execution encountered an error in Python runtime.' }
-      ]);
+      setCells((prev) =>
+        prev.map((c) =>
+          c.id === cellId
+            ? {
+                ...c,
+                status: result.status === 'success' ? 'success' : 'error',
+                executionCount: execCount,
+                executionTime: elapsed,
+                output: result
+              }
+            : c
+        )
+      );
+
+      logActivity('RDKit Lab', 'Executed Notebook Cell', `Session: ${sessionId}`, 'rdkit');
+    } catch (err) {
+      setCells((prev) =>
+        prev.map((c) =>
+          c.id === cellId
+            ? {
+                ...c,
+                status: 'error',
+                executionTime: '0.0s',
+                output: {
+                  status: 'error',
+                  error: err.message || 'Execution error in Python runtime.',
+                  traceback: err.stack || ''
+                }
+              }
+            : c
+        )
+      );
     } finally {
-      setIsRunning(false);
+      setKernelStatus('ready');
+    }
+  }, [cells, sessionId, globalExecutionCount]);
+
+  /**
+   * Run current cell and move to or create the next cell
+   */
+  const handleRunAndAdvance = useCallback(async (cellIndex) => {
+    const currentCell = cells[cellIndex];
+    if (!currentCell) return;
+
+    await handleRunCell(currentCell.id);
+
+    // If there is no next cell, append a new cell automatically
+    if (cellIndex === cells.length - 1) {
+      const newCellId = `cell-${Date.now()}`;
+      setCells((prev) => [
+        ...prev,
+        {
+          id: newCellId,
+          code: '',
+          status: 'idle',
+          executionCount: null,
+          executionTime: null,
+          output: null
+        }
+      ]);
+    }
+  }, [cells, handleRunCell]);
+
+  /**
+   * Run all cells sequentially in order, updating state between each
+   */
+  const handleRunAll = async () => {
+    setIsExecutingAll(true);
+    setKernelStatus('busy');
+
+    for (let i = 0; i < cells.length; i++) {
+      const cell = cells[i];
+      if (!cell.code.trim()) continue;
+
+      setCells((prev) =>
+        prev.map((c) => (c.id === cell.id ? { ...c, status: 'running' } : c))
+      );
+
+      const startTime = performance.now();
+      try {
+        const result = await executePythonScript(cell.code, sessionId, cell.id);
+        const elapsed = ((performance.now() - startTime) / 1000).toFixed(2) + 's';
+
+        setCells((prev) =>
+          prev.map((c) =>
+            c.id === cell.id
+              ? {
+                  ...c,
+                  status: result.status === 'success' ? 'success' : 'error',
+                  executionCount: i + 1,
+                  executionTime: elapsed,
+                  output: result
+                }
+              : c
+          )
+        );
+      } catch (err) {
+        setCells((prev) =>
+          prev.map((c) =>
+            c.id === cell.id
+              ? {
+                  ...c,
+                  status: 'error',
+                  output: { status: 'error', error: err.message }
+                }
+              : c
+          )
+        );
+      }
+    }
+
+    setGlobalExecutionCount(cells.length + 1);
+    setIsExecutingAll(false);
+    setKernelStatus('ready');
+  };
+
+  /**
+   * Add a new code cell at the end or at a specific index
+   */
+  const handleAddCell = (afterIndex = null) => {
+    const newCell = {
+      id: `cell-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      code: '',
+      status: 'idle',
+      executionCount: null,
+      executionTime: null,
+      output: null
+    };
+
+    setCells((prev) => {
+      if (afterIndex === null || afterIndex === undefined || afterIndex >= prev.length - 1) {
+        return [...prev, newCell];
+      }
+      const copy = [...prev];
+      copy.splice(afterIndex + 1, 0, newCell);
+      return copy;
+    });
+  };
+
+  /**
+   * Update code of a cell
+   */
+  const handleCodeChange = (cellId, newCode) => {
+    setCells((prev) =>
+      prev.map((c) => (c.id === cellId ? { ...c, code: newCode } : c))
+    );
+  };
+
+  /**
+   * Delete a cell
+   */
+  const handleDeleteCell = (cellId) => {
+    setCells((prev) => {
+      if (prev.length <= 1) {
+        // Keep at least one empty cell
+        return [
+          {
+            id: `cell-${Date.now()}`,
+            code: '',
+            status: 'idle',
+            executionCount: null,
+            executionTime: null,
+            output: null
+          }
+        ];
+      }
+      return prev.filter((c) => c.id !== cellId);
+    });
+  };
+
+  /**
+   * Duplicate a cell
+   */
+  const handleDuplicateCell = (cellId) => {
+    const targetIdx = cells.findIndex((c) => c.id === cellId);
+    if (targetIdx === -1) return;
+
+    const source = cells[targetIdx];
+    const duplicated = {
+      id: `cell-${Date.now()}`,
+      code: source.code,
+      status: 'idle',
+      executionCount: null,
+      executionTime: null,
+      output: null
+    };
+
+    setCells((prev) => {
+      const copy = [...prev];
+      copy.splice(targetIdx + 1, 0, duplicated);
+      return copy;
+    });
+  };
+
+  /**
+   * Move cell up or down
+   */
+  const handleMoveCell = (cellId, direction) => {
+    setCells((prev) => {
+      const idx = prev.findIndex((c) => c.id === cellId);
+      if (idx === -1) return prev;
+      if (direction === 'up' && idx === 0) return prev;
+      if (direction === 'down' && idx === prev.length - 1) return prev;
+
+      const targetIdx = direction === 'up' ? idx - 1 : idx + 1;
+      const copy = [...prev];
+      const [moved] = copy.splice(idx, 1);
+      copy.splice(targetIdx, 0, moved);
+      return copy;
+    });
+  };
+
+  /**
+   * Clear output of single cell
+   */
+  const handleClearCellOutput = (cellId) => {
+    setCells((prev) =>
+      prev.map((c) =>
+        c.id === cellId
+          ? { ...c, status: 'idle', output: null, executionTime: null }
+          : c
+      )
+    );
+  };
+
+  /**
+   * Clear all outputs in the notebook
+   */
+  const handleClearAllOutputs = () => {
+    setCells((prev) =>
+      prev.map((c) => ({
+        ...c,
+        status: 'idle',
+        executionCount: null,
+        executionTime: null,
+        output: null
+      }))
+    );
+  };
+
+  /**
+   * Reset kernel session (clears backend variables)
+   */
+  const handleRestartKernel = async () => {
+    setKernelStatus('busy');
+    try {
+      await resetNotebookSession(sessionId);
+      handleClearAllOutputs();
+      setGlobalExecutionCount(1);
+    } catch (e) {
+      console.warn('Failed to reset kernel:', e);
+    } finally {
       setKernelStatus('ready');
     }
   };
 
-  const handleTemplateChange = (templateId) => {
-    const tmpl = RDKIT_TEMPLATES.find((t) => t.id === templateId);
-    if (tmpl) {
-      setSelectedTemplateId(templateId);
-      setCode(tmpl.code);
-      const extracted = extractSmilesFromCode(tmpl.code);
-      if (extracted) {
-        processMoleculeFromSmiles(extracted);
-      }
-    }
-  };
+  /**
+   * Load chemistry templates into notebook
+   */
+  const handleLoadTemplate = (templateKey) => {
+    const tmplCells = TEMPLATES[templateKey];
+    if (!tmplCells) return;
 
-  const handleLoadFromChemDraw = () => {
-    try {
-      const activeData = localStorage.getItem('chemspace_active_mol');
-      if (activeData) {
-        const parsed = JSON.parse(activeData);
-        if (parsed && parsed.smiles) {
-          setTargetSmiles(parsed.smiles);
-          setCode(`from rdkit import Chem\nfrom rdkit.Chem import Descriptors, Lipinski\n\n# Loaded from ChemDraw Studio\nsmiles = "${parsed.smiles}"\nmol = Chem.MolFromSmiles(smiles)\n\nprint(f"--- RDKit Analysis for {smiles} ---")\nprint(f"Formula: {Chem.CalcMolFormula(mol)}")\nprint(f"Molecular Weight: {Descriptors.MolWt(mol):.2f} g/mol")\nprint(f"LogP: {Descriptors.MolLogP(mol):.2f}")\nprint(f"TPSA: {Descriptors.TPSA(mol):.2f} Å²")\nprint(f"Lipinski Passed: {Descriptors.MolWt(mol) <= 500 and Descriptors.MolLogP(mol) <= 5.0}")`);
-          processMoleculeFromSmiles(parsed.smiles);
-          return;
-        }
-      }
-    } catch (e) {}
+    const formatted = tmplCells.map((t, idx) => ({
+      id: `cell-tmpl-${Date.now()}-${idx}`,
+      code: t.code,
+      status: 'idle',
+      executionCount: null,
+      executionTime: null,
+      output: null
+    }));
 
-    setValidationError('No active molecule found in ChemDraw Studio. Please draw a molecule first.');
-  };
-
-  const stopExecution = () => {
-    setIsRunning(false);
-    setKernelStatus('idle');
-    setConsoleOutput((prev) => [
-      ...prev,
-      { type: 'error', text: `[${new Date().toLocaleTimeString()}] KeyboardInterrupt: Execution halted by user.` }
-    ]);
-  };
-
-  const restartKernel = () => {
-    setIsRunning(false);
-    setKernelStatus('ready');
-    setConsoleOutput([
-      { type: 'info', text: `[${new Date().toLocaleTimeString()}] Kernel restarted. Python 3.14 RDKit state reset.` }
-    ]);
-  };
-
-  const clearOutput = () => {
-    setConsoleOutput([]);
-    setProcessingStages([]);
-  };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const content = evt.target?.result || '';
-      setCode(content);
-      const extracted = extractSmilesFromCode(content);
-      if (extracted) processMoleculeFromSmiles(extracted);
-      setConsoleOutput([
-        { type: 'info', text: `[${new Date().toLocaleTimeString()}] Loaded Python script: ${file.name}` }
-      ]);
-    };
-    reader.readAsText(file);
-  };
-
-  const copyCodeToClipboard = () => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
-
-  const downloadScript = () => {
-    const filename = `rdkit_script_${Date.now()}.py`;
-    const blob = new Blob([code], { type: 'text/x-python' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-    recordDownload({
-      filename,
-      fileType: 'py',
-      sourceModule: 'RDKit Lab',
-      contentBlob: code,
-      fileSize: blob.size
-    });
+    setCells(formatted);
+    handleRestartKernel();
   };
 
   return (
-    <div className="workspace-container font-mono select-none space-y-4">
-      {/* 1. JUPYTER / COLAB NOTEBOOK TOOLBAR */}
-      <div className="glass-panel p-4 rounded-3xl border border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3 shadow-lg">
-        {/* Left: Notebook File Title & Kernel Badge */}
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-2xl bg-orange-500/10 border border-orange-500/25 text-orange-400">
-            <FileCode className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h1 className="text-sm font-black tracking-wider text-[var(--text-primary)]">chemnova_rdkit_notebook.ipynb</h1>
-              <span className="telemetry-pill text-[9px] font-bold text-emerald-400 flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-amber-400 animate-ping' : 'bg-emerald-400'}`} />
-                Python 3.14 (RDKit Kernel)
-              </span>
-            </div>
-            <p className="text-[10px] text-[var(--text-secondary)] font-sans mt-0.5">
-              Google-Colab interactive computational notebook • Python execution, 2D Kekulé, 3D conformers, &amp; Lipinski descriptors
-            </p>
-          </div>
+    <div className="w-full min-h-screen relative select-none bg-[var(--home-bg-base)] text-[var(--home-text-primary)] transition-colors duration-300 font-sans">
+      <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6">
+        
+        {/* ── Minimal Professional Scientific Notebook Header ── */}
+        <NotebookHeader
+          kernelStatus={kernelStatus}
+          isExecutingAll={isExecutingAll}
+          onAddCell={() => handleAddCell()}
+          onRunAll={handleRunAll}
+          onRestartKernel={handleRestartKernel}
+          onClearAllOutputs={handleClearAllOutputs}
+          onLoadTemplate={handleLoadTemplate}
+        />
+
+        {/* ── Continuous Scientific Notebook Cells Stream ── */}
+        <div className="space-y-4">
+          {cells.map((cell, idx) => (
+            <NotebookCell
+              key={cell.id}
+              cell={cell}
+              cellIndex={idx + 1}
+              isFirst={idx === 0}
+              isLast={idx === cells.length - 1}
+              onRun={() => handleRunCell(cell.id)}
+              onRunAndAdvance={() => handleRunAndAdvance(idx)}
+              onChangeCode={(newCode) => handleCodeChange(cell.id, newCode)}
+              onDelete={() => handleDeleteCell(cell.id)}
+              onDuplicate={() => handleDuplicateCell(cell.id)}
+              onMoveUp={() => handleMoveCell(cell.id, 'up')}
+              onMoveDown={() => handleMoveCell(cell.id, 'down')}
+              onClearOutput={() => handleClearCellOutput(cell.id)}
+              onInsertCellBelow={() => handleAddCell(idx)}
+            />
+          ))}
         </div>
 
-        {/* Center/Right: Action Buttons & Template Picker */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-[var(--text-secondary)] hidden xl:inline font-sans font-medium">Template:</span>
-            <select
-              value={selectedTemplateId}
-              onChange={(e) => handleTemplateChange(e.target.value)}
-              className="input-control w-auto py-1.5 px-3 text-xs font-bold"
-            >
-              {RDKIT_TEMPLATES.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
+        {/* ── Bottom Notebook Action Strip ── */}
+        <div className="pt-4 border-t border-inherit flex items-center justify-between text-xs font-mono text-[var(--home-text-muted)]">
           <button
-            onClick={runPythonScript}
-            disabled={isRunning}
-            className="btn-horizontal btn-orange text-xs font-bold shadow-lg transition active:scale-95 group"
-            title="Execute Cell (Shift+Enter or Ctrl+Enter)"
+            onClick={() => handleAddCell()}
+            className="btn-orange py-2 px-4 text-xs font-bold font-mono flex items-center gap-2 cursor-pointer shadow-xs active:scale-95"
           >
-            {isRunning ? <ButtonSpinner className="text-white" /> : <Play className="w-3.5 h-3.5 fill-current" />}
-            <span>{isRunning ? 'Running...' : 'Run Cell'}</span>
-            {!isRunning && <ArrowRight className="w-3.5 h-3.5 arrow-micro text-white/80" />}
+            <Plus className="w-4 h-4" />
+            <span>+ Add Code Cell</span>
           </button>
-
-          <button
-            onClick={stopExecution}
-            disabled={!isRunning}
-            className="btn-horizontal btn-secondary disabled:opacity-40"
-            title="Stop Execution"
-          >
-            <Square className="w-3.5 h-3.5 text-rose-400" />
-            <span className="hidden sm:inline">Stop</span>
-          </button>
-
-          <button
-            onClick={restartKernel}
-            className="btn-horizontal btn-secondary"
-            title="Restart Python Kernel"
-          >
-            <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">Restart</span>
-          </button>
-
-          <button
-            onClick={clearOutput}
-            className="btn-horizontal btn-secondary"
-            title="Clear Console Output"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Clear</span>
-          </button>
-
-          <button
-            onClick={handleLoadFromChemDraw}
-            className="btn-horizontal btn-secondary text-xs"
-            title="Load active molecule drawn in ChemDraw Studio"
-          >
-            <PenTool className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="hidden md:inline">From ChemDraw</span>
-          </button>
-
-          <button
-            onClick={() => setIsListening(!isListening)}
-            className={`btn-horizontal ${
-              isListening ? 'bg-rose-500 text-white animate-pulse' : 'btn-secondary'
-            }`}
-            title="Dictate code"
-          >
-            {isListening ? <MicOff className="w-3.5 h-3.5 text-white" /> : <Mic className="w-3.5 h-3.5" />}
-            <span className="hidden sm:inline">{isListening ? 'Listening...' : 'Voice'}</span>
-          </button>
-
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="btn-horizontal btn-secondary"
-            title="Upload Python Script (.py)"
-          >
-            <Upload className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Upload</span>
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            accept=".py,.txt"
-            className="hidden"
-          />
-
-          <button
-            onClick={downloadScript}
-            className="btn-horizontal btn-secondary"
-            title="Download Python Script"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Download</span>
-          </button>
-
-          <button
-            onClick={() => setShowSettingsModal(true)}
-            className="p-2 rounded-xl btn-secondary"
-            title="IDE Settings"
-          >
-            <Settings className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {/* 2. PARAMETER CELL — Quick SMILES Input */}
-      <div className="glass-panel p-3.5 rounded-2xl border border-[var(--border-subtle)] flex flex-col sm:flex-row items-center gap-3">
-        <div className="flex-1 relative w-full">
-          <Search className="w-4 h-4 text-orange-500 absolute left-3.5 top-3" />
-          <input
-            type="text"
-            value={targetSmiles}
-            onChange={(e) => {
-              setTargetSmiles(e.target.value);
-              setValidationError(null);
-            }}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                processMoleculeFromSmiles(targetSmiles);
-              }
-            }}
-            placeholder="Parameter Input: Enter target SMILES (e.g. CCO, c1ccccc1, CC(=O)OC1=CC=CC=C1C(=O)O)..."
-            className="input-control rounded-xl pl-10 pr-4 py-2.5 text-xs font-mono font-bold text-orange-400"
-          />
-        </div>
-
-        <button
-          onClick={() => processMoleculeFromSmiles(targetSmiles)}
-          className="btn-horizontal btn-orange text-xs shrink-0 w-full sm:w-auto"
-        >
-          Parse Molecule
-        </button>
-      </div>
-
-      {/* Validation Error Alert */}
-      {validationError && (
-        <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center gap-2 font-medium font-sans">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>{validationError}</span>
-        </div>
-      )}
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          GOOGLE-COLAB CELL 1: [ In [ n ]: ] — CODE CELL
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div className="glass-panel rounded-3xl overflow-hidden border border-[var(--border-subtle)] shadow-xl relative group transition hover:border-orange-500/40">
-        {/* Cell Header */}
-        <div className="px-5 py-2.5 border-b border-inherit flex items-center justify-between text-xs bg-black/20">
-          <div className="flex items-center gap-2.5">
-            <span className="px-2.5 py-0.5 rounded-md font-mono font-black text-xs bg-orange-500/15 text-orange-400 border border-orange-500/30">
-              [ In [ {executionCount} ]: ]
-            </span>
-            <span className="font-bold text-[var(--text-primary)]">[ Code Cell ]</span>
-            <span className="text-[10px] text-[var(--text-muted)] font-mono">Python 3.14 • RDKit • {lines.length} lines</span>
-          </div>
 
           <div className="flex items-center gap-3">
-            <span className="text-[10px] text-[var(--text-muted)] hidden md:inline font-mono">Shift+Enter or Ctrl+Enter to run</span>
-            <button
-              onClick={copyCodeToClipboard}
-              className="telemetry-pill text-[10px]"
-            >
-              {copiedCode ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedCode ? 'Copied' : 'Copy'}</span>
-            </button>
+            <span>Shift+Enter to Run &amp; Advance</span>
+            <span>•</span>
+            <span>Ctrl+Enter to Run</span>
           </div>
         </div>
 
-        {/* Cell Content: Gutter + Monaco Editor */}
-        <div className="flex items-stretch min-h-[300px]">
-          {/* Colab Left Gutter: Circular Run Action */}
-          <div className="w-14 bg-black/30 border-r border-inherit flex flex-col items-center pt-4 shrink-0 select-none">
-            <button
-              onClick={runPythonScript}
-              disabled={isRunning}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all shadow-md ${
-                isRunning
-                  ? 'bg-orange-500/20 text-orange-400 border border-orange-500/50'
-                  : 'bg-white/10 hover:bg-orange-500 text-white hover:shadow-orange-500/30 border border-white/15'
-              }`}
-              title="Run Cell (Shift+Enter or Ctrl+Enter)"
-            >
-              {isRunning ? (
-                <ButtonSpinner className="text-orange-400" />
-              ) : (
-                <Play className="w-4 h-4 fill-current ml-0.5" />
-              )}
-            </button>
-            <span className="text-[9px] font-mono text-[var(--text-muted)] mt-2 font-bold">
-              [{isRunning ? '*' : executionCount}]
-            </span>
-          </div>
-
-          {/* Line Numbers */}
-          <div className="w-10 py-3.5 opacity-40 text-right pr-2 select-none border-r border-inherit shrink-0 font-mono text-xs font-bold leading-relaxed">
-            {lines.map((_, i) => (
-              <div key={i}>{i + 1}</div>
-            ))}
-          </div>
-
-          {/* Code Textarea */}
-          <textarea
-            value={code}
-            onChange={(e) => setCode(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Tab') {
-                e.preventDefault();
-                const start = e.target.selectionStart;
-                const end = e.target.selectionEnd;
-                setCode(code.substring(0, start) + '    ' + code.substring(end));
-              } else if ((e.ctrlKey || e.metaKey || e.shiftKey) && e.key === 'Enter') {
-                e.preventDefault();
-                runPythonScript();
-              }
-            }}
-            className="flex-1 p-3.5 bg-transparent text-[var(--text-primary)] focus:outline-none resize-none font-mono text-xs leading-relaxed whitespace-pre font-medium"
-            spellCheck={false}
-            rows={Math.max(lines.length + 2, 12)}
-          />
-        </div>
       </div>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          GOOGLE-COLAB CELL 2: [ Out [ n ]: ] — OUTPUT CELL
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div className="glass-panel rounded-3xl overflow-hidden border border-[var(--border-subtle)] shadow-xl relative transition">
-        {/* Output Cell Header */}
-        <div className="px-5 py-2.5 border-b border-inherit flex flex-wrap items-center justify-between gap-3 bg-black/20">
-          <div className="flex items-center gap-2.5">
-            <span className="px-2.5 py-0.5 rounded-md font-mono font-black text-xs bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-              [ Out [ {Math.max(1, executionCount - 1)} ]: ]
-            </span>
-            <span className="font-bold text-[var(--text-primary)]">[ Output Cell ]</span>
-            <span className="text-[10px] text-[var(--text-muted)] font-mono">
-              Duration: {executionDuration} • Exit: 0 • Status: {kernelStatus.toUpperCase()}
-            </span>
-          </div>
-
-          {/* Output Sub-view Selector Tabs */}
-          <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-[var(--border-subtle)]">
-            {[
-              { id: 'all', label: 'All Artifacts' },
-              { id: 'visual', label: 'Molecular View' },
-              { id: 'terminal', label: 'Terminal Stdout' },
-              { id: 'descriptors', label: 'Lipinski Matrix' }
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveOutputTab(tab.id)}
-                className={`px-3 py-1 rounded-lg text-[10px] font-bold transition ${
-                  activeOutputTab === tab.id
-                    ? 'bg-orange-500 text-white shadow-sm'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Output Cell Body */}
-        <div className="p-5 space-y-5">
-          {/* Sub-cell: Terminal stdout stream */}
-          {(activeOutputTab === 'all' || activeOutputTab === 'terminal') && (
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
-                <span className="font-bold flex items-center gap-2">
-                  <Terminal className="w-3.5 h-3.5 text-emerald-400" /> Standard Output (stdout):
-                </span>
-                <span className="text-[10px] opacity-60 font-mono">Live RDKit C++ Kernel Stream</span>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-[#04060b] text-xs font-mono max-h-[180px] overflow-y-auto custom-scrollbar border border-white/5">
-                {consoleOutput.length === 0 ? (
-                  <div className="text-slate-500 italic">Click "Run Cell" or press Shift+Enter to execute code...</div>
-                ) : (
-                  consoleOutput.map((log, idx) => (
-                    <div
-                      key={idx}
-                      className={`leading-relaxed ${
-                        log.type === 'info'
-                          ? 'text-slate-400'
-                          : log.type === 'stdout'
-                          ? 'text-emerald-300 font-bold'
-                          : log.type === 'success'
-                          ? 'text-emerald-400 font-bold'
-                          : 'text-rose-400 font-bold'
-                      }`}
-                    >
-                      {log.text}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Sub-cell: Visual Molecular Workspace (2D Kekule / 3D Conformer) */}
-          {(activeOutputTab === 'all' || activeOutputTab === 'visual') && (
-            <div className="p-4 rounded-2xl inner-box border border-[var(--border-subtle)] space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-inherit pb-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setViewMode('2d')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                      viewMode === '2d'
-                        ? 'btn-orange text-white shadow-sm'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5'
-                    }`}
-                  >
-                    <Eye className="w-3.5 h-3.5" /> 2D Kekulé Graph
-                  </button>
-                  <button
-                    onClick={() => setViewMode('3d')}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center gap-2 ${
-                      viewMode === '3d'
-                        ? 'btn-orange text-white shadow-sm'
-                        : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] bg-white/5'
-                    }`}
-                  >
-                    <Box className="w-3.5 h-3.5" /> 3D Cartesian Conformer
-                  </button>
-                </div>
-
-                {viewMode === '3d' && (
-                  <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-[var(--border-subtle)]">
-                    {['ball-stick', 'space-fill', 'stick', 'wireframe'].map((style) => (
-                      <button
-                        key={style}
-                        onClick={() => setViewStyle3D(style)}
-                        className={`px-2 py-0.5 rounded-lg text-[10px] font-bold capitalize transition ${
-                          viewStyle3D === style
-                            ? 'bg-orange-500 text-white shadow-sm'
-                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                        }`}
-                      >
-                        {style.replace('-', ' ')}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="w-full min-h-[380px] max-h-[460px] flex items-center justify-center">
-                {viewMode === '2d' ? (
-                  <Molecule2DViewer
-                    atoms={activeGraph.atoms}
-                    bonds={activeGraph.bonds}
-                    smiles={targetSmiles}
-                    formula={descriptors ? descriptors.formula : ''}
-                  />
-                ) : (
-                  <div className="w-full h-[400px] rounded-2xl overflow-hidden border border-[var(--border-subtle)] bg-[#03050a] shadow-inner">
-                    {active3dMolecule ? (
-                      <ThreeMoleculeViewer molecule={active3dMolecule} styleMode={viewStyle3D} />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs text-slate-500 font-mono">
-                        Generating 3D Cartesian conformer...
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Sub-cell: Physicochemical Descriptors & Lipinski Matrix */}
-          {(activeOutputTab === 'all' || activeOutputTab === 'descriptors') && descriptors && (
-            <div className="p-4 rounded-2xl inner-box border border-[var(--border-subtle)] space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-inherit pb-3">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-orange-400" />
-                  <h3 className="text-xs font-black uppercase tracking-wider text-[var(--text-primary)]">
-                    Computed RDKit Physicochemical Properties &amp; Lipinski Matrix
-                  </h3>
-                </div>
-                <span className={`text-[10px] font-bold px-3 py-1 rounded-full border ${
-                  descriptors.lipinskiPassed
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                    : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                }`}>
-                  Lipinski Rule of 5: {descriptors.lipinskiPassed ? 'PASSED (Drug-like candidate)' : 'VIOLATED'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">Formula</span>
-                  <div className="text-base font-black text-orange-400 font-mono">{descriptors.formula}</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">Molecular Weight</span>
-                  <div className="text-base font-black text-[var(--text-primary)] font-mono">{descriptors.mw} g/mol</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">Exact Mass</span>
-                  <div className="text-base font-black text-violet-400 font-mono">{descriptors.exactMass.toFixed(4)} Da</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">LogP (Lipophilicity)</span>
-                  <div className="text-base font-black text-emerald-400 font-mono">{descriptors.logP.toFixed(2)}</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">Polar Surface Area (TPSA)</span>
-                  <div className="text-base font-black text-amber-400 font-mono">{descriptors.tpsa} Å²</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">H-Bond Donors / Acceptors</span>
-                  <div className="text-base font-black text-[var(--text-primary)] font-mono">{descriptors.hbd} HBD / {descriptors.hba} HBA</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">Rotatable Bonds</span>
-                  <div className="text-base font-black text-sky-400 font-mono">{descriptors.rotBonds}</div>
-                </div>
-
-                <div className="p-3.5 rounded-2xl inner-box space-y-1">
-                  <span className="text-[10px] text-[var(--text-secondary)] font-sans">Heavy Atoms / Rings</span>
-                  <div className="text-base font-black text-[var(--text-primary)] font-mono">{descriptors.heavyAtoms} Atoms / {descriptors.rings} Rings</div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Settings Modal */}
-      {showSettingsModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-[#111319] border border-white/20 rounded-3xl p-6 max-w-md w-full space-y-4 text-xs font-mono shadow-2xl">
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Settings className="w-4 h-4 text-emerald-400" /> RDKit Python Kernel Settings
-              </h3>
-              <button
-                onClick={() => setShowSettingsModal(false)}
-                className="text-slate-400 hover:text-white"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <label className="text-slate-400 block mb-1">Python Environment:</label>
-                <select className="w-full bg-[#02040a] border border-white/15 rounded-xl p-2.5 text-emerald-400">
-                  <option>Python 3.14 (Active Local RDKit Server)</option>
-                  <option>Pyodide WebAssembly Kernel (In-Browser)</option>
-                </select>
-              </div>
-              <div>
-                <label className="text-slate-400 block mb-1">RDKit Engine Version:</label>
-                <select className="w-full bg-[#02040a] border border-white/15 rounded-xl p-2.5 text-violet-300">
-                  <option>RDKit v2026.3.5 (Installed & Active)</option>
-                  <option>RDKit v2024.03.1</option>
-                </select>
-              </div>
-            </div>
-            <button
-              onClick={() => setShowSettingsModal(false)}
-              className="w-full btn-horizontal btn-orange text-xs font-bold"
-            >
-              Save IDE Configuration
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

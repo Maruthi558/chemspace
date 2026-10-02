@@ -441,10 +441,17 @@ export async function calculateQuantumEnergies(method, basis_set, smiles = null)
   };
 }
 
-export function executePythonScript(code) {
+export function executePythonScript(code, sessionId = null, cellId = null) {
   return request('/rdkit/execute', {
     method: 'POST',
-    body: JSON.stringify({ code })
+    body: JSON.stringify({ code, session_id: sessionId, cell_id: cellId })
+  });
+}
+
+export function resetNotebookSession(sessionId = null) {
+  return request('/rdkit/reset-session', {
+    method: 'POST',
+    body: JSON.stringify({ session_id: sessionId })
   });
 }
 
